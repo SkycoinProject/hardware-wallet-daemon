@@ -170,6 +170,8 @@ func createDirIfNotExist(dir string) error {
 
 func (d *Daemon) createServer(host string, gateway *api.Gateway) (*api.Server, error) {
 	apiConfig := api.Config{
+		DisableHeaderCheck: d.config.DisableHeaderCheck,
+		HostWhitelist: d.config.hostWhitelist,
 		ReadTimeout:  d.config.HTTPReadTimeout,
 		WriteTimeout: d.config.HTTPWriteTimeout,
 		IdleTimeout:  d.config.HTTPIdleTimeout,

@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"errors"
 	"flag"
 	"log"
 	"strings"
@@ -18,6 +19,12 @@ type Config struct {
 	WebInterfacePort int
 	// Remote web interface address
 	WebInterfaceAddr string
+
+	// Disable Host, Origin and Referer header check in the wallet API
+	DisableHeaderCheck bool
+	// Comma separate list of hostnames to accept in the Host header, used to bypass the Host header check which only applies to localhost addresses
+	HostWhitelist string
+	hostWhitelist []string
 
 	// Timeouts for the HTTP listener
 	HTTPReadTimeout  time.Duration
@@ -46,8 +53,8 @@ type Config struct {
 
 func NewConfig(port int, datadir string) Config {
 	return Config{
-		WebInterfacePort: port,
 		WebInterfaceAddr: "127.0.0.1",
+		WebInterfacePort:    port,
 
 		// Timeout settings for http.Server
 		// https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
@@ -82,6 +89,13 @@ func (c *Config) postProcess() error {
 	c.DataDirectory, err = file.InitDataDir(replaceHome(c.DataDirectory, home))
 	panicIfError(err, "Invalid DataDirectory")
 
+	if c.HostWhitelist != "" {
+		if c.DisableHeaderCheck {
+			return errors.New("host whitelist should be empty when header check is disabled")
+		}
+		c.hostWhitelist = strings.Split(c.HostWhitelist, ",")
+	}
+
 	return nil
 }
 
@@ -89,6 +103,8 @@ func (c *Config) RegisterFlags() {
 	flag.BoolVar(&help, "help", false, "Show help")
 	flag.IntVar(&c.WebInterfacePort, "web-interface-port", c.WebInterfacePort, "port to serve web interface on")
 	flag.StringVar(&c.WebInterfaceAddr, "web-interface-addr", c.WebInterfaceAddr, "addr to serve web interface on")
+	flag.BoolVar(&c.DisableHeaderCheck, "disable-header-check", c.DisableHeaderCheck, "disables the host, origin and referer header checks.")
+	flag.StringVar(&c.HostWhitelist, "host-whitelist", c.HostWhitelist, "Hostnames to whitelist in the Host header check. Only applies when the web interface is bound to localhost.")
 
 	flag.BoolVar(&c.ColorLog, "color-log", c.ColorLog, "Add terminal colors to log output")
 	flag.StringVar(&c.LogLevel, "log-level", c.LogLevel, "Choices are: debug, info, warn, error, fatal, panic")

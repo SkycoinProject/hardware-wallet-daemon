@@ -8,9 +8,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/gogo/protobuf/proto"
+	"github.com/rs/cors"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
@@ -25,11 +27,19 @@ const (
 	ContentTypeJSON = "application/json"
 	// ContentTypeForm form data content type header
 	ContentTypeForm = "application/x-www-form-urlencoded"
+
+	apiVersion1 = "v1"
 )
 
 var (
 	logger = logging.MustGetLogger("daemon-api")
 )
+
+type muxConfig struct {
+	host               string
+	disableHeaderCheck bool
+	hostWhitelist      []string
+}
 
 // Server exposes an HTTP API
 type Server struct {
@@ -40,6 +50,8 @@ type Server struct {
 
 // Config configures Server
 type Config struct {
+	DisableHeaderCheck bool
+	HostWhitelist      []string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 	IdleTimeout  time.Duration
@@ -139,7 +151,13 @@ func create(host string, c Config, gateway *Gateway) (*Server, error) {
 		c.IdleTimeout = defaultIdleTimeout
 	}
 
-	srvMux := newServerMux(gateway.USBDevice, gateway.EmulatorDevice)
+	mc := muxConfig{
+		host: host,
+		disableHeaderCheck: c.DisableHeaderCheck,
+		hostWhitelist: c.HostWhitelist,
+	}
+
+	srvMux := newServerMux(mc, gateway.USBDevice, gateway.EmulatorDevice)
 
 	srv := &http.Server{
 		Handler:      srvMux,
@@ -177,50 +195,89 @@ func Create(host string, c Config, gateway *Gateway) (*Server, error) {
 	return s, nil
 }
 
-func newServerMux(usbGateway, emulatorGateway Gatewayer) *http.ServeMux {
+func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	webHandler := func(endpoint string, handler http.Handler) {
+	allowedOrigins := []string{fmt.Sprintf("http://%s", c.host)}
+	for _, s := range c.hostWhitelist {
+		allowedOrigins = append(allowedOrigins, fmt.Sprintf("http://%s", s))
+	}
+
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:     allowedOrigins,
+		Debug:              false,
+		AllowedMethods:     []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut},
+		AllowedHeaders:     []string{"Origin", "Accept", "Content-Type", "X-Requested-With"},
+		AllowCredentials:   false, // credentials are not used, but it would be safe to enable if necessary
+		OptionsPassthrough: false,
+	})
+
+	headerCheck := func(apiVersion, host string, hostWhitelist []string, handler http.Handler) http.Handler {
+		handler = originRefererCheck(apiVersion, host, hostWhitelist, handler)
+		handler = hostCheck(apiVersion, host, hostWhitelist, handler)
+		return handler
+	}
+
+	webHandlerWithOptionals := func(apiVersion, endpoint string, handlerFunc http.Handler, checkHeaders bool) {
+		handler := wh.ElapsedHandler(logger, handlerFunc)
+
+		handler = corsHandler.Handler(handler)
+
+		if checkHeaders {
+			handler = headerCheck(apiVersion, c.host, c.hostWhitelist, handler)
+		}
+
+		handler = gziphandler.GzipHandler(handler)
+		mux.Handle(endpoint, handler)
+	}
+
+	webHandler := func(apiVersion, endpoint string, handler http.Handler) {
 		handler = wh.ElapsedHandler(logger, handler)
 
-		mux.Handle("/api"+endpoint, handler)
+		// mux.Handle("/api"+endpoint, handler)
+
+		webHandlerWithOptionals(apiVersion1, endpoint, handler, !c.disableCSP)
+	}
+
+	webHandlerV1 := func(endpoint string, handler http.Handler) {
+		webHandler(apiVersion1, "/api/v1"+endpoint, handler)
 	}
 
 	// hw wallet endpoints
-	webHandler("/generateAddresses", generateAddresses(usbGateway))
-	webHandler("/applySettings", applySettings(usbGateway))
-	webHandler("/backup", backup(usbGateway))
-	webHandler("/cancel", cancel(usbGateway))
-	webHandler("/checkMessageSignature", checkMessageSignature(usbGateway))
-	webHandler("/features", features(usbGateway))
-	webHandler("/generateMnemonic", generateMnemonic(usbGateway))
-	webHandler("/recovery", recovery(usbGateway))
-	webHandler("/setMnemonic", setMnemonic(usbGateway))
-	webHandler("/setPinCode", setPinCode(usbGateway))
-	webHandler("/signMessage", signMessage(usbGateway))
-	webHandler("/transactionSign", transactionSign(usbGateway))
-	webHandler("/wipe", wipe(usbGateway))
-	webHandler("/intermediate/pinmatrix", PinMatrixRequestHandler(usbGateway))
-	webHandler("/intermediate/passphrase", PassphraseRequestHandler(usbGateway))
-	webHandler("/intermediate/word", WordRequestHandler(usbGateway))
+	webHandlerV1("/generateAddresses", generateAddresses(usbGateway))
+	webHandlerV1("/applySettings", applySettings(usbGateway))
+	webHandlerV1("/backup", backup(usbGateway))
+	webHandlerV1("/cancel", cancel(usbGateway))
+	webHandlerV1("/checkMessageSignature", checkMessageSignature(usbGateway))
+	webHandlerV1("/features", features(usbGateway))
+	webHandlerV1("/generateMnemonic", generateMnemonic(usbGateway))
+	webHandlerV1("/recovery", recovery(usbGateway))
+	webHandlerV1("/setMnemonic", setMnemonic(usbGateway))
+	webHandlerV1("/setPinCode", setPinCode(usbGateway))
+	webHandlerV1("/signMessage", signMessage(usbGateway))
+	webHandlerV1("/transactionSign", transactionSign(usbGateway))
+	webHandlerV1("/wipe", wipe(usbGateway))
+	webHandlerV1("/intermediate/pinmatrix", PinMatrixRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/passphrase", PassphraseRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/word", WordRequestHandler(usbGateway))
 
 	// emulator endpoints
-	webHandler("/emulator/generateAddresses", generateAddresses(emulatorGateway))
-	webHandler("/emulator/applySettings", applySettings(emulatorGateway))
-	webHandler("/emulator/backup", backup(emulatorGateway))
-	webHandler("/emulator/cancel", cancel(emulatorGateway))
-	webHandler("/emulator/checkMessageSignature", checkMessageSignature(emulatorGateway))
-	webHandler("/emulator/features", features(emulatorGateway))
-	webHandler("/emulator/generateMnemonic", generateMnemonic(emulatorGateway))
-	webHandler("/emulator/recovery", recovery(emulatorGateway))
-	webHandler("/emulator/setMnemonic", setMnemonic(emulatorGateway))
-	webHandler("/emulator/setPinCode", setPinCode(emulatorGateway))
-	webHandler("/emulator/signMessage", signMessage(emulatorGateway))
-	webHandler("/emulator/transactionSign", transactionSign(emulatorGateway))
-	webHandler("/emulator/wipe", wipe(emulatorGateway))
-	webHandler("/emulator/intermediate/pinmatrix", PinMatrixRequestHandler(emulatorGateway))
-	webHandler("/emulator/intermediate/passphrase", PassphraseRequestHandler(emulatorGateway))
-	webHandler("/emulator/intermediate/word", WordRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/generateAddresses", generateAddresses(emulatorGateway))
+	webHandlerV1("/emulator/applySettings", applySettings(emulatorGateway))
+	webHandlerV1("/emulator/backup", backup(emulatorGateway))
+	webHandlerV1("/emulator/cancel", cancel(emulatorGateway))
+	webHandlerV1("/emulator/checkMessageSignature", checkMessageSignature(emulatorGateway))
+	webHandlerV1("/emulator/features", features(emulatorGateway))
+	webHandlerV1("/emulator/generateMnemonic", generateMnemonic(emulatorGateway))
+	webHandlerV1("/emulator/recovery", recovery(emulatorGateway))
+	webHandlerV1("/emulator/setMnemonic", setMnemonic(emulatorGateway))
+	webHandlerV1("/emulator/setPinCode", setPinCode(emulatorGateway))
+	webHandlerV1("/emulator/signMessage", signMessage(emulatorGateway))
+	webHandlerV1("/emulator/transactionSign", transactionSign(emulatorGateway))
+	webHandlerV1("/emulator/wipe", wipe(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/pinmatrix", PinMatrixRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/passphrase", PassphraseRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/word", WordRequestHandler(emulatorGateway))
 
 	return mux
 }

@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:af6e785bedb62fc2abb81977c58a7a44e5cf9f7e41b8d3c8dd4d872edea0ce08"
+  name = "github.com/NYTimes/gziphandler"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "dd0439581c7657cb652dfe5c71d7d48baf39541d"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:a2682518d905d662d984ef9959984ef87cecb777d379bfa9d9fe40e78069b3e4"
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
@@ -205,6 +213,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
+  name = "github.com/rs/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
+
+[[projects]]
   digest = "1:81e02c4edb639c80559c0650f9401d3e2dcc3256d1fa215382bb7c83c1db9126"
   name = "github.com/shopspring/decimal"
   packages = ["."]
@@ -235,7 +251,7 @@
   revision = "800cfec01c6bc1c57653b76eb6e3ed34835fd018"
 
 [[projects]]
-  digest = "1:f77e4a319362b216332ce97896b63b3eaa761a53ad728b977b9427e9fabdbcb8"
+  digest = "1:60a450854b4edf4cf42decf7646756e04e255eff8b0de67711292edc2ba7eca7"
   name = "github.com/skycoin/skycoin"
   packages = [
     "src/cipher",
@@ -247,6 +263,7 @@
     "src/util/droplet",
     "src/util/file",
     "src/util/http",
+    "src/util/iputil",
     "src/util/logging",
   ]
   pruneopts = "UT"
@@ -336,6 +353,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/NYTimes/gziphandler",
     "github.com/go-openapi/errors",
     "github.com/go-openapi/runtime",
     "github.com/go-openapi/runtime/client",
@@ -343,6 +361,7 @@
     "github.com/go-openapi/swag",
     "github.com/go-openapi/validate",
     "github.com/gogo/protobuf/proto",
+    "github.com/rs/cors",
     "github.com/skycoin/hardware-wallet-go/src/device-wallet",
     "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go",
     "github.com/skycoin/hardware-wallet-go/src/device-wallet/wire",
@@ -351,6 +370,7 @@
     "github.com/skycoin/skycoin/src/util/droplet",
     "github.com/skycoin/skycoin/src/util/file",
     "github.com/skycoin/skycoin/src/util/http",
+    "github.com/skycoin/skycoin/src/util/iputil",
     "github.com/skycoin/skycoin/src/util/logging",
     "github.com/stretchr/testify/mock",
     "github.com/stretchr/testify/require",
