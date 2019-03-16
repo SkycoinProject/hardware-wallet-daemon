@@ -92,7 +92,10 @@ func (d *Daemon) Run() error {
 	// Catch SIGUSR1 (prints runtime stack to stdout)
 	go apputil.CatchDebug()
 
-	apiServer, err = d.createServer(host, api.NewGateway(deviceWallet.NewUSBDevice(), deviceWallet.NewEmulatorDevice()))
+	apiServer, err = d.createServer(host, api.NewGateway(
+		deviceWallet.NewDevice(deviceWallet.DeviceType(deviceWallet.DeviceTypeUSB).String()),
+		deviceWallet.NewDevice(deviceWallet.DeviceType(deviceWallet.DeviceTypeEmulator).String())),
+	)
 	if err != nil {
 		d.logger.Error(err)
 		retErr = err
@@ -171,10 +174,10 @@ func createDirIfNotExist(dir string) error {
 func (d *Daemon) createServer(host string, gateway *api.Gateway) (*api.Server, error) {
 	apiConfig := api.Config{
 		DisableHeaderCheck: d.config.DisableHeaderCheck,
-		HostWhitelist: d.config.hostWhitelist,
-		ReadTimeout:  d.config.HTTPReadTimeout,
-		WriteTimeout: d.config.HTTPWriteTimeout,
-		IdleTimeout:  d.config.HTTPIdleTimeout,
+		HostWhitelist:      d.config.hostWhitelist,
+		ReadTimeout:        d.config.HTTPReadTimeout,
+		WriteTimeout:       d.config.HTTPWriteTimeout,
+		IdleTimeout:        d.config.HTTPIdleTimeout,
 	}
 
 	var s *api.Server

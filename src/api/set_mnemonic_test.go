@@ -113,11 +113,11 @@ func TestSetMnemonic(t *testing.T) {
 					gateway.On("SetMnemonic", tc.httpBody.mnemonic).Return(tc.gatewaySetMnemonicResult, nil)
 				}
 
-				req, err := http.NewRequest(tc.method, "/api"+endpoint, nil)
+				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
 				require.NoError(t, err)
 
 				rr := httptest.NewRecorder()
-				handler := newServerMux(gateway, gateway)
+				handler := newServerMux(defaultMuxConfig(), gateway, gateway)
 				handler.ServeHTTP(rr, req)
 
 				status := rr.Code

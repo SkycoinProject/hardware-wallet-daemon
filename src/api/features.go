@@ -3,10 +3,10 @@ package api
 import (
 	"net/http"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 )
 
-// FeaturesResponse is data returned by GET /api/features
+// FeaturesResponse is data returned by GET /api/v1/features
 type FeaturesResponse struct {
 	Features *messages.Features `json:"features"`
 }

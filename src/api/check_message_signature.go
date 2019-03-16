@@ -7,7 +7,7 @@ import (
 	"github.com/skycoin/skycoin/src/cipher"
 )
 
-// CheckMessageSignatureRequest is request data for /api/checkMessageSignature
+// CheckMessageSignatureRequest is request data for /api/v1/checkMessageSignature
 type CheckMessageSignatureRequest struct {
 	Message   string `json:"message"`
 	Signature string `json:"signature"`

@@ -233,10 +233,7 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 
 	webHandler := func(apiVersion, endpoint string, handler http.Handler) {
 		handler = wh.ElapsedHandler(logger, handler)
-
-		// mux.Handle("/api"+endpoint, handler)
-
-		webHandlerWithOptionals(apiVersion1, endpoint, handler, !c.disableCSP)
+		webHandlerWithOptionals(apiVersion1, endpoint, handler, !c.disableHeaderCheck)
 	}
 
 	webHandlerV1 := func(endpoint string, handler http.Handler) {
@@ -250,6 +247,7 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/cancel", cancel(usbGateway))
 	webHandlerV1("/checkMessageSignature", checkMessageSignature(usbGateway))
 	webHandlerV1("/features", features(usbGateway))
+	webHandlerV1("/firmwareUpdate", firmwareUpdate(usbGateway))
 	webHandlerV1("/generateMnemonic", generateMnemonic(usbGateway))
 	webHandlerV1("/recovery", recovery(usbGateway))
 	webHandlerV1("/setMnemonic", setMnemonic(usbGateway))

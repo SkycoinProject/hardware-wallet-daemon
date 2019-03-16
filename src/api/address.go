@@ -5,14 +5,14 @@ import (
 	"net/http"
 )
 
-// GenerateAddressesRequest is request data for /api/generateAddresses
+// GenerateAddressesRequest is request data for /api/v1/generateAddresses
 type GenerateAddressesRequest struct {
 	AddressN       int  `json:"address_n"`
 	StartIndex     int  `json:"start_index"`
 	ConfirmAddress bool `json:"confirm_address"`
 }
 
-// GenerateAddressesResponse is returned by POST /api/generateAddresses
+// GenerateAddressesResponse is returned by POST /api/v1/generateAddresses
 type GenerateAddressesResponse struct {
 	Addresses []string `json:"addresses"`
 }

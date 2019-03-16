@@ -1,5 +1,5 @@
 # Hardware Wallet Daemon API
-API default service port is `6430`.
+API default service port is `9510`.
 
 The API currently supports skywallet and its emulator.
 
@@ -15,6 +15,7 @@ The skywallet endpoints start with `/api` and emulator endpoints with `/api/emul
         - [Cancel](#cancel)
         - [Check Message Signature](#check-message-signature)
         - [Get Features](#get-features)
+        - [Firmware Update](#firmware-update)
         - [Recover Wallet](#recover-old-wallet)
         - [Generate Mnemonic](#generate-mnemonic)
         - [Set Mnemonic](#set-mnemonic)
@@ -32,7 +33,7 @@ The skywallet endpoints start with `/api` and emulator endpoints with `/api/emul
 Generate addresses for the hardware wallet seed.
 
 ```
-URI: /api/generateAddresses
+URI: /api/v1/generateAddresses
 Method: POST
 Content-Type: application/json
 Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_address": "<confirm_address>"}
@@ -40,7 +41,7 @@ Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_addr
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/address_gen \
+$ curl http://127.0.0.1:6430/api/v1/generateAddresses \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 2, "start_index": 0}'
 ```
@@ -61,7 +62,7 @@ Response:
 Apply hardware wallet settings.
 
 ```
-URI: /api/applySettings
+URI: /api/v1/applySettings
 Method: POST
 Args:
     label: label for hardware wallet
@@ -70,7 +71,7 @@ Args:
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/applySettings \
+$ curl -X POST http://127.0.0.1:6430/api/v1/applySettings \
    -H 'Content-Type: application/x-www-form-urlencoded' \
    -d 'label=skywallet'
 ```
@@ -86,13 +87,13 @@ Response:
 Start seed backup procedure
 
 ```
-URI: /api/backup
+URI: /api/v1/backup
 Method: POST
 ```
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/backup
+$ curl -X POST http://127.0.0.1:6430/api/v1/backup
 ```
 
 Response Flow:
@@ -122,13 +123,13 @@ Cancels the current operation.
 > This function can be called safely even if no operation is active. The response will be the same.
 
 ```
-URI: /api/cancel
+URI: /api/v1/cancel
 Method: PUT
 ```
 
 Example:
 ```sh
-$ curl -X PUT http://127.0.0.1:6430/api/cancel
+$ curl -X PUT http://127.0.0.1:6430/api/v1/cancel
 ```
 
 Response:
@@ -142,7 +143,7 @@ Response:
 Check a message signature matches the given address.
 
 ```
-URI: /api/checkMessageSignature
+URI: /api/v1/checkMessageSignature
 Method: POST
 Content-Type: application/json
 Args: {"message": "<message>", "signature": "<signature>", "address": "<address>"}
@@ -150,7 +151,7 @@ Args: {"message": "<message>", "signature": "<signature>", "address": "<address>
 
 Example:
 ```sh
-curl -X POST http://127.0.0.1:6430/api/checkMessageSignature \
+curl -X POST http://127.0.0.1:6430/api/v1/checkMessageSignature \
 -H 'Content-Type: application/json' \
 -d '{"message": "Hello World!", "signature": "GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQTvMjokd3A4upPz4wyeAyKJEtRdRDGUvUgoGASpsTTUeMn", "address": "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"}'
 ```
@@ -159,13 +160,13 @@ curl -X POST http://127.0.0.1:6430/api/checkMessageSignature \
 Returns device information.
 
 ```
-URI: /api/features
+URI: /api/v1/features
 Method: GET
 ```
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/features
+$ curl http://127.0.0.1:6430/api/v1/features
 ```
 
 Response:
@@ -192,13 +193,25 @@ Response:
 }
 ```
 
+
+### Firmware Update
+Update device firmware
+
+```
+URI: /api/v1/firmwareUpdate
+Method: PUT
+Args:
+    file: firmware file
+```
+
+
 ### Recover Wallet
 Recover existing wallet using seed.
 
 The device needs to be wiped if already initialized.
 
 ```
-URI: /api/recovery
+URI: /api/v1/recovery
 Method: POST
 Args:
     word-count: mnemonic seed length
@@ -208,7 +221,7 @@ Args:
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/recovery \
+$ curl -X POST http://127.0.0.1:6430/api/v1/recovery \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'word-count=$word-count' \
   -d 'use-passphrase=$use-passphrase' \
@@ -231,7 +244,7 @@ Response Flow:
 Generate mnemonic can be used to initialize the device with a random seed.
 
 ```
-URI: /api/generateMnemonic
+URI: /api/v1/generateMnemonic
 Method: POST
 Args:
     word-count: mnemonic seed length
@@ -240,7 +253,7 @@ Args:
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/generateMnemonic \
+$ curl http://127.0.0.1:6430/api/v1/generateMnemonic \
   -H 'Content-Type: x-www-form-urlencoded' 
   -d 'word-count=12' \
   -d 'use-passphrase=$use-passphrase'
@@ -259,7 +272,7 @@ Set mnemonic can be used to initialize the device with your own seed.
 > The seed needs to be a valid bip39 seed.
 
 ```
-URI: /api/setMnemonic
+URI: /api/v1/setMnemonic
 Method: POST
 Args:
     mnemonic: bip39 mnemonic seed [required]
@@ -267,7 +280,7 @@ Args:
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/setMnemonic\
+$ curl -X POST http://127.0.0.1:6430/api/v1/setMnemonic\
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'mnemonic=$mnemonic'
 ```
@@ -295,13 +308,13 @@ Response:
 Configure a pin code on the device.
 
 ```
-URI: /api/setPinCode
+URI: /api/v1/setPinCode
 Method: POST
 ```
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/setPinCode
+$ curl -X POST http://127.0.0.1:6430/api/v1/setPinCode
 ```
 
 Response Flow:
@@ -328,7 +341,7 @@ Response Flow:
 Sign a message using the secret key at given index.
 
 ```
-URI: /api/signMessage
+URI: /api/v1/signMessage
 Method: POST
 Args: {
     "address_n": <address_n>, 
@@ -339,7 +352,7 @@ Args: {
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/signMessage \
+$ curl -X POST http://127.0.0.1:6430/api/v1/signMessage \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 0, "message": "hello world"}'
 ```
@@ -357,7 +370,7 @@ Response:
 Sign a transaction with the hardware wallet.
 
 ```
-URI: /api/transactionSign
+URI: /api/v1/transactionSign
 Method: POST
 Args: {
     "inputs": "<inputs>", 
@@ -371,7 +384,7 @@ Args: {
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/transactionSign \
+$ curl http://127.0.0.1:6430/api/v1/transactionSign \
   -H 'Content-Type: application/json' \
   -d '{"inputs": ["e3411a073376d2abf2e3231023fca48f2396c575871764276d6206350207cde4"],
     "input_indexes": [0],
@@ -386,13 +399,13 @@ $ curl http://127.0.0.1:6430/api/transactionSign \
 Wipe deletes all data from the hardware wallet.
 
 ```
-URI: /api/wipe
+URI: /api/v1/wipe
 Method: DELETE
 ```
 
 Example:
 ```sh
-$ curl -X DELETE http://127.0.0.1:6430/api/wipe
+$ curl -X DELETE http://127.0.0.1:6430/api/v1/wipe
 ```
 
 Response:

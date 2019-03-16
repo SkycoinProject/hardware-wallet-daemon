@@ -13,7 +13,7 @@ var (
 	logger = logging.MustGetLogger("hw-daemon")
 
 	config = daemon.NewConfig(
-		6430,
+		9510,
 		"$HOME/.skycoin")
 )
 

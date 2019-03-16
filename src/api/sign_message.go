@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-// SignMessageRequest is request data for /api/signMessage
+// SignMessageRequest is request data for /api/v1/signMessage
 type SignMessageRequest struct {
 	AddressN int    `json:"address_n"`
 	Message  string `json:"message"`
 }
 
-// SignMessageResponse is data returned by POST /api/sign_message
+// SignMessageResponse is data returned by POST /api/v1/signMessage
 type SignMessageResponse struct {
 	Signature string `json:"signature"`
 }

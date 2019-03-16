@@ -242,7 +242,7 @@ func TestSignTransaction(t *testing.T) {
 					}
 				}
 
-				req, err := http.NewRequest(tc.method, "/api"+endpoint, strings.NewReader(tc.httpBody))
+				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
 				require.NoError(t, err)
 
 				contentType := tc.contentType
@@ -253,7 +253,7 @@ func TestSignTransaction(t *testing.T) {
 				req.Header.Set("Content-Type", contentType)
 
 				rr := httptest.NewRecorder()
-				handler := newServerMux(gateway, gateway)
+				handler := newServerMux(defaultMuxConfig(), gateway, gateway)
 				handler.ServeHTTP(rr, req)
 
 				status := rr.Code

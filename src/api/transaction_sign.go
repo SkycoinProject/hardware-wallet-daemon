@@ -13,7 +13,7 @@ import (
 
 // TODO(therealssj): add more validation
 
-// TransactionSignRequest is request data for /api/transactionSign
+// TransactionSignRequest is request data for /api/v1/transactionSign
 type TransactionSignRequest struct {
 	Inputs          []string `json:"inputs"`
 	InputIndexes    []uint32 `json:"input_indexes"`
@@ -23,7 +23,7 @@ type TransactionSignRequest struct {
 	AddressIndexes  []int    `json:"address_indexes"`
 }
 
-// TransactionSignResponse is data returned by POST /api/transaction_sign
+// TransactionSignResponse is data returned by POST /api/v1/transactionSign
 type TransactionSignResponse struct {
 	Signatures []string `json:"signatures"`
 }
