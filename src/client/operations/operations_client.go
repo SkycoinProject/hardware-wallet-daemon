@@ -360,6 +360,34 @@ func (a *Client) PutCancel(params *PutCancelParams) (*PutCancelOK, error) {
 
 }
 
+/*
+PutFirmwareUpdate Update firmware
+*/
+func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams) (*PutFirmwareUpdateOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPutFirmwareUpdateParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PutFirmwareUpdate",
+		Method:             "PUT",
+		PathPattern:        "/firmwareUpdate",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PutFirmwareUpdateReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PutFirmwareUpdateOK), nil
+
+}
+
 // SetTransport changes the transport on the client
 func (a *Client) SetTransport(transport runtime.ClientTransport) {
 	a.transport = transport
