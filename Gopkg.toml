@@ -29,6 +29,10 @@
   go-tests = true
   unused-packages = true
 
+  [[prune.project]]
+    name = "github.com/skycoin/hardware-wallet-go"
+    unused-packages = false
+
 [[constraint]]
   name = "github.com/gogo/protobuf"
   version = "1.2.1"
@@ -36,3 +40,13 @@
 [[constraint]]
   name = "github.com/NYTimes/gziphandler"
   version = "1.0.1"
+
+[[override]]
+  name = "github.com/skycoin/skycoin"
+  version = "0.25.0"
+
+[[constraint]]
+  name = "github.com/skycoin/hardware-wallet-go"
+  branch = "master"
+
+

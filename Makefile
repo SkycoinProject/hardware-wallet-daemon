@@ -1,7 +1,10 @@
 .DEFAULT_GOAL := help
+.PHONY: run lint format generate-client
 
 run: ## Run hardware wallet daemon
 	go run cmd/daemon/daemon.go
+
+test: ## Run tests for hardware wallet daemon
 
 lint: ## Run linters. Use make install-linters first.
 	vendorcheck ./...

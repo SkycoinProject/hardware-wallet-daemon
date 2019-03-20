@@ -1,0 +1,27 @@
+language: go
+go:
+  - "1.10.x"
+matrix:
+  include:
+    - os: linux
+    - os: osx
+before_install:
+  - source ./ci-scripts/install-$TRAVIS_OS_NAME.sh
+  - sh "./src/device-wallet/messages/ci-scripts/install-$TRAVIS_OS_NAME.sh"
+install:
+  - make vendor_proto
+  - if [[ ! -d $GOPATH/src/github.com/skycoin/hardware-wallet-go ]]; then mkdir -p $GOPATH/src/github.com/skycoin; ln -s $TRAVIS_BUILD_DIR $GOPATH/src/github.com/skycoin/hardware-wallet-go; fi
+  - go get github.com/vektra/mockery/.../
+  - cd $GOPATH/src/github.com/skycoin/hardware-wallet-go
+  - make mocks
+  - make install-linters
+  - go get -t ./...
+before_script:
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+script:
+  - make check
+  - make dep
+notifications:
+  # https://github.com/kvld/travisci-telegram TravisCI Telegram Bot integration
+  webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
+

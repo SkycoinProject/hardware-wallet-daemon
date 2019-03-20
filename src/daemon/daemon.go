@@ -93,9 +93,8 @@ func (d *Daemon) Run() error {
 	go apputil.CatchDebug()
 
 	apiServer, err = d.createServer(host, api.NewGateway(
-		deviceWallet.NewDevice(deviceWallet.DeviceType(deviceWallet.DeviceTypeUSB).String()),
-		deviceWallet.NewDevice(deviceWallet.DeviceType(deviceWallet.DeviceTypeEmulator).String())),
-	)
+		deviceWallet.NewDevice(deviceWallet.DeviceTypeUSB),
+		deviceWallet.NewDevice(deviceWallet.DeviceTypeEmulator)))
 	if err != nil {
 		d.logger.Error(err)
 		retErr = err
