@@ -4,6 +4,12 @@ import (
 	"net/http"
 )
 
+// applySettings apply device settings
+// URI: /api/v1/applySettings
+// Method: POST
+// Args:
+//  label: label for hardware wallet
+//  use-passphrase: (boolean) ask for passphrase before starting operation
 func applySettings(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

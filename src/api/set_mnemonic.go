@@ -4,6 +4,10 @@ import (
 	"net/http"
 )
 
+// URI: /api/v1/setMnemonic
+// Method: POST
+// Args:
+//  mnemonic: bip39 mnemonic seed [required]
 func setMnemonic(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

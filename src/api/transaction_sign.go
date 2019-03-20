@@ -28,6 +28,9 @@ type TransactionSignResponse struct {
 	Signatures []string `json:"signatures"`
 }
 
+// URI: /api/v1/transactionSign
+// Method: POST
+// Args: JSON Body
 func transactionSign(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

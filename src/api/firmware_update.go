@@ -11,6 +11,10 @@ const (
 	maxUploadSize = 1024 * 1024 // 1 MB
 )
 
+// URI: /api/v1/firmwareUpdate
+// Method: PUT
+// Args:
+//  file: firmware file
 func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {

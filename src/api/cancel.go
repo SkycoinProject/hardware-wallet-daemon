@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// URI: /api/v1/cancel
+// Method: PUT
 func cancel(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {

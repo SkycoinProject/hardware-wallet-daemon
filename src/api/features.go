@@ -11,6 +11,8 @@ type FeaturesResponse struct {
 	Features *messages.Features `json:"features"`
 }
 
+// URI: /api/v1/features
+// Method: GET
 func features(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

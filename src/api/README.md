@@ -347,7 +347,6 @@ Args: {
     "address_n": <address_n>, 
     "message": "<message>"
 }
-
 ```
 
 Example:

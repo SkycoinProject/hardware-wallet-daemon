@@ -14,6 +14,7 @@ var (
 	help = false
 )
 
+// Config records the daemon's configuration
 type Config struct {
 	// Remote web interface port
 	WebInterfacePort int
@@ -51,6 +52,7 @@ type Config struct {
 	DataDirectory string
 }
 
+// NewConfig returns a new config instance
 func NewConfig(port int, datadir string) Config {
 	return Config{
 		WebInterfaceAddr: "127.0.0.1",
@@ -99,6 +101,7 @@ func (c *Config) postProcess() error {
 	return nil
 }
 
+// RegisterFlags binds CLI flags to config values
 func (c *Config) RegisterFlags() {
 	flag.BoolVar(&help, "help", false, "Show help")
 	flag.IntVar(&c.WebInterfacePort, "web-interface-port", c.WebInterfacePort, "port to serve web interface on")

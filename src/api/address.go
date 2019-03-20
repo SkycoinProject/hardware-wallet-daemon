@@ -17,7 +17,7 @@ type GenerateAddressesResponse struct {
 	Addresses []string `json:"addresses"`
 }
 
-// generateAddresses gene
+// generateAddresses generates addresses for hardware wallet.
 // URI: /api/v1/generateAddresses
 // Method: POST
 // Args: JSON Body
@@ -60,7 +60,7 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 			writeHTTPResponse(w, resp)
 			return
 		}
-		
+
 		msg, err := gateway.AddressGen(req.AddressN, req.StartIndex, req.ConfirmAddress)
 		if err != nil {
 			logger.Error("generateAddress failed: %s", err.Error())

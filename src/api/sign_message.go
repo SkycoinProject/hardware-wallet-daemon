@@ -16,6 +16,9 @@ type SignMessageResponse struct {
 	Signature string `json:"signature"`
 }
 
+// URI: /api/v1/signMessage
+// Method: POST
+// Args: JSON Body
 func signMessage(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

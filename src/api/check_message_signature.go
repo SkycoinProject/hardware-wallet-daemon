@@ -14,6 +14,10 @@ type CheckMessageSignatureRequest struct {
 	Address   string `json:"address"`
 }
 
+// URI: /api/v1/checkMessageSignature
+// Method: POST
+// Content-Type: application/json
+// Args: JSON Body
 func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

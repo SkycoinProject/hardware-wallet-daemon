@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+// URI: /api/v1/wipe
+// Method: DELETE
 func wipe(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {

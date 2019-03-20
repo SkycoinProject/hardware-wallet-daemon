@@ -16,11 +16,13 @@ import (
 	"github.com/skycoin/hardware-wallet-daemon/src/api"
 )
 
+// Daemon represents a hardware wallet daemon instance
 type Daemon struct {
 	config Config
 	logger *logging.Logger
 }
 
+// NewDaemon returns a new hardware wallet daemon instance
 func NewDaemon(config Config, logger *logging.Logger) *Daemon {
 	return &Daemon{
 		config: config,
@@ -28,6 +30,7 @@ func NewDaemon(config Config, logger *logging.Logger) *Daemon {
 	}
 }
 
+// Run starts the daemon
 func (d *Daemon) Run() error {
 	var apiServer *api.Server
 	var retErr error
@@ -191,6 +194,7 @@ func (d *Daemon) createServer(host string, gateway *api.Gateway) (*api.Server, e
 	return s, nil
 }
 
+// ParseConfig prepare the config
 func (d *Daemon) ParseConfig() error {
 	return d.config.postProcess()
 }

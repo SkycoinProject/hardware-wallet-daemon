@@ -6,6 +6,12 @@ import (
 	"strconv"
 )
 
+// URI: /api/v1/recovery
+// Method: POST
+// Args:
+//  word-count: mnemonic seed length
+//  use-passphrase: (boolean) ask for passphrase before starting operation
+//  dry-run: (bool) perform dry-run recovery workflow (for safe mnemonic validation).
 func recovery(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

@@ -6,6 +6,11 @@ import (
 	"strconv"
 )
 
+// URI: /api/v1/generateMnemonic
+// Method: POST
+// Args:
+//  word-count: mnemonic seed length
+//  use-passphrase: (bool) ask for passphrase before starting operation
 func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
