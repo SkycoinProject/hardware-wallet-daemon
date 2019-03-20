@@ -61,6 +61,11 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
+		// simple warning for logs
+		if req.AddressN > 8 {
+			logger.Warn("wallet has too many addresses")
+		}
+
 		msg, err := gateway.AddressGen(req.AddressN, req.StartIndex, req.ConfirmAddress)
 		if err != nil {
 			logger.Error("generateAddress failed: %s", err.Error())
