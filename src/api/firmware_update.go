@@ -44,6 +44,7 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 
 		err = gateway.FirmwareUpload(fileBytes, sha256.Sum256(fileBytes[0x100:]))
 		if err != nil {
+			logger.Errorf("firmwareUpdate failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

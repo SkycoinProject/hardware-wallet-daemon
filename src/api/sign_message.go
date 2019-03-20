@@ -52,6 +52,7 @@ func signMessage(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.SignMessage(req.AddressN, req.Message)
 		if err != nil {
+			logger.Errorf("signMessage failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

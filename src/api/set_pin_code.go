@@ -14,6 +14,7 @@ func setPinCode(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.ChangePin()
 		if err != nil {
+			logger.Errorf("setPinCode failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

@@ -28,6 +28,7 @@ func applySettings(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.ApplySettings(passphrase, label)
 		if err != nil {
+			logger.Error("applySettings failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

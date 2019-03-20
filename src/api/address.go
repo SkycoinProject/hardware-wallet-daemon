@@ -17,6 +17,10 @@ type GenerateAddressesResponse struct {
 	Addresses []string `json:"addresses"`
 }
 
+// generateAddresses gene
+// URI: /api/v1/generateAddresses
+// Method: POST
+// Args: JSON Body
 func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -56,9 +60,10 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 			writeHTTPResponse(w, resp)
 			return
 		}
-
+		
 		msg, err := gateway.AddressGen(req.AddressN, req.StartIndex, req.ConfirmAddress)
 		if err != nil {
+			logger.Error("generateAddress failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

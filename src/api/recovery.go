@@ -45,6 +45,7 @@ func recovery(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.Recovery(uint32(wc), usePassphrase, dryRun)
 		if err != nil {
+			logger.Errorf("recovery failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

@@ -63,6 +63,7 @@ func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.CheckMessageSignature(req.Message, req.Signature, req.Address)
 		if err != nil {
+			logger.Errorf("checkMessageSignature failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

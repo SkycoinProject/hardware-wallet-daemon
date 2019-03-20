@@ -39,6 +39,7 @@ func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.GenerateMnemonic(uint32(wc), usePassphrase)
 		if err != nil {
+			logger.Errorf("generateMnemonic failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

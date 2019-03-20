@@ -23,6 +23,7 @@ func setMnemonic(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.SetMnemonic(mnemonic)
 		if err != nil {
+			logger.Errorf("setMnemonic failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

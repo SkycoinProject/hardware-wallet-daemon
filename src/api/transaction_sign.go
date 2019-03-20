@@ -65,6 +65,7 @@ func transactionSign(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.TransactionSign(txnInputs, txnOutputs)
 		if err != nil {
+			logger.Errorf("transactionSign failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return

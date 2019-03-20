@@ -21,6 +21,7 @@ func features(gateway Gatewayer) http.HandlerFunc {
 
 		msg, err := gateway.GetFeatures()
 		if err != nil {
+			logger.Errorf("features failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return
