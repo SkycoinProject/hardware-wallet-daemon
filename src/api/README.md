@@ -3,7 +3,7 @@ API default service port is `9510`.
 
 The API currently supports skywallet and its emulator.
 
-The skywallet endpoints start with `/api` and emulator endpoints with `/api/emulator`.
+The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v1/emulator`.
 
 <!-- MarkdownTOC autolink="true" bracket="round" levels="1,2,3" -->
 
@@ -38,6 +38,11 @@ Method: POST
 Content-Type: application/json
 Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_address": "<confirm_address>"}
 ```
+
+**Parameters**
+- `address_n`: Number of addresses to generate. Assume 1 if not set.
+- `start_index`: Index where deterministic key generation will start from. Assume 0 if not set.
+- `confirm_address`: If requesting one address it will be sent only if user confirms operation by pressing device's button.
 
 Example:
 ```sh
@@ -148,6 +153,11 @@ Method: POST
 Content-Type: application/json
 Args: {"message": "<message>", "signature": "<signature>", "address": "<address>"}
 ```
+
+**Parameters**
+- `message`: The message that the signature claims to be signing.
+- `signature`: Signature of the message.
+- `address`: Address that issued the signature.
 
 Example:
 ```sh
@@ -349,6 +359,10 @@ Args: {
 }
 ```
 
+**Parameters**
+- `address_n`: Index of the address that will issue the signature.
+- `message`: The message that the signature claims to be signing.
+
 Example:
 ```sh
 $ curl -X POST http://127.0.0.1:6430/api/v1/signMessage \
@@ -380,6 +394,15 @@ Args: {
     "address_indexes": "<address_indexes>"
     }
 ```
+
+**Parameters**
+- `inputs`: Hashes of the inputs of the transaction we expect the device to sign.
+- `input_indexes`: Indexes of the inputs in the wallet.
+- `output_addresses`: Addresses of the output for the transaction.
+- `coins`: Amount of coins.
+- `hours`: Number of hours.
+- `address_indexes`: If the address is a return address tell its index in the wallet.
+
 
 Example:
 ```sh
