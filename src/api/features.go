@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 )
 
 // FeaturesResponse is data returned by GET /api/v1/features

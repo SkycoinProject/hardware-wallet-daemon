@@ -3,18 +3,20 @@ package integration
 import (
 	"encoding/json"
 	"flag"
-	"github.com/andreyvit/diff"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/skycoin/hardware-wallet-daemon/src/client"
-	"github.com/skycoin/hardware-wallet-daemon/src/client/operations"
-	"github.com/skycoin/hardware-wallet-daemon/src/models"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/andreyvit/diff"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/stretchr/testify/require"
+
+	"github.com/skycoin/hardware-wallet-daemon/src/client"
+	"github.com/skycoin/hardware-wallet-daemon/src/client/operations"
+	"github.com/skycoin/hardware-wallet-daemon/src/models"
 )
 
 const (
@@ -78,7 +80,7 @@ func doEmulator(t *testing.T) bool {
 	return false
 }
 
-func TestEmulatorGenerateAddresses(t *testing.T){
+func TestEmulatorGenerateAddresses(t *testing.T) {
 	if !doEmulator(t) {
 		return
 	}
@@ -275,12 +277,12 @@ func TestEmulatorTransactionSign(t *testing.T) {
 
 	params := operations.NewPostTransactionSignParams()
 	params.TransactionSignRequest = &models.TransactionSignRequest{
-		Coins: []string{"0.001"},
-		Hours: []string{"1"},
-		Inputs: []string{"82f1d93a04f8ae7a305c1a54efe0c21ac1be86777e60a4f0c2b8a6d0d957a645"},
-		InputIndexes: []uint32{0},
+		Coins:           []string{"0.001"},
+		Hours:           []string{"1"},
+		Inputs:          []string{"82f1d93a04f8ae7a305c1a54efe0c21ac1be86777e60a4f0c2b8a6d0d957a645"},
+		InputIndexes:    []uint32{0},
 		OutputAddresses: []string{"2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"},
-		AddressIndexes: []int64{0},
+		AddressIndexes:  []int64{0},
 	}
 
 	resp, err := c.Operations.PostTransactionSign(params)
@@ -498,12 +500,12 @@ func TestWalletTransactionSign(t *testing.T) {
 
 	params := operations.NewPostTransactionSignParams()
 	params.TransactionSignRequest = &models.TransactionSignRequest{
-		Coins: []string{"0.001"},
-		Hours: []string{"1"},
-		Inputs: []string{"82f1d93a04f8ae7a305c1a54efe0c21ac1be86777e60a4f0c2b8a6d0d957a645"},
-		InputIndexes: []uint32{0},
+		Coins:           []string{"0.001"},
+		Hours:           []string{"1"},
+		Inputs:          []string{"82f1d93a04f8ae7a305c1a54efe0c21ac1be86777e60a4f0c2b8a6d0d957a645"},
+		InputIndexes:    []uint32{0},
 		OutputAddresses: []string{"2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"},
-		AddressIndexes: []int64{0},
+		AddressIndexes:  []int64{0},
 	}
 
 	resp, err := c.Operations.PostTransactionSign(params)
@@ -541,7 +543,6 @@ func bootstrap(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, mnemonicResp.Payload.Data, mnemonic)
 }
-
 
 func newStrPtr(s string) *string {
 	return &s

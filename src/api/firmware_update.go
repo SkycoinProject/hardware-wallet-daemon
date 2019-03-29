@@ -38,7 +38,6 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer file.Close()
 
-
 		fileBytes, err := ioutil.ReadAll(file)
 		if err != nil {
 			resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, err.Error())

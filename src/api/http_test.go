@@ -2,17 +2,18 @@ package api
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 const configuredHost = "127.0.0.1:9510"
 
 func defaultMuxConfig() muxConfig {
 	return muxConfig{
-		host: configuredHost,
+		host:        configuredHost,
 		disableCSRF: true,
 	}
 }
@@ -81,6 +82,7 @@ func TestCORS(t *testing.T) {
 			origin: configuredHost,
 			valid:  true,
 		},
+
 		{
 			name:          "options whitelist",
 			origin:        "example.com",

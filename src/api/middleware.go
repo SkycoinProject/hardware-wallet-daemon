@@ -19,10 +19,10 @@ import (
 // All major browsers send the Host header as required by the HTTP spec.
 // hostWhitelist allows additional Host header values to be accepted.
 func HostCheck(host string, hostWhitelist []string, handler http.Handler) http.Handler {
-	return hostCheck(apiVersion1, host, hostWhitelist, handler)
+	return hostCheck(host, hostWhitelist, handler)
 }
 
-func hostCheck(apiVersion, host string, hostWhitelist []string, handler http.Handler) http.Handler {
+func hostCheck(host string, hostWhitelist []string, handler http.Handler) http.Handler {
 	addr := host
 	var port uint16
 	if strings.Contains(host, ":") {
@@ -51,7 +51,7 @@ func hostCheck(apiVersion, host string, hostWhitelist []string, handler http.Han
 		_, isWhitelisted := hostWhitelistMap[r.Host]
 		if isLocalhost && r.Host != "" && !isWhitelisted {
 			logger.Critical().Errorf("Detected DNS rebind attempt - configured-host=%s header-host=%s", host, r.Host)
-			resp := NewHTTPErrorResponse(http.StatusForbidden,  "Invalid Host")
+			resp := NewHTTPErrorResponse(http.StatusForbidden, "Invalid Host")
 			writeHTTPResponse(w, resp)
 			return
 		}
@@ -66,10 +66,10 @@ func hostCheck(apiVersion, host string, hostWhitelist []string, handler http.Han
 // at least one of these values. If neither are set, assume it is a request
 // from curl/wget.
 func OriginRefererCheck(host string, hostWhitelist []string, handler http.Handler) http.Handler {
-	return originRefererCheck(apiVersion1, host, hostWhitelist, handler)
+	return originRefererCheck(host, hostWhitelist, handler)
 }
 
-func originRefererCheck(apiVersion, host string, hostWhitelist []string, handler http.Handler) http.Handler {
+func originRefererCheck(host string, hostWhitelist []string, handler http.Handler) http.Handler {
 	hostWhitelistMap := make(map[string]struct{}, len(hostWhitelist)+2)
 	for _, k := range hostWhitelist {
 		hostWhitelistMap[k] = struct{}{}
@@ -103,7 +103,7 @@ func originRefererCheck(apiVersion, host string, hostWhitelist []string, handler
 
 			if _, isWhitelisted := hostWhitelistMap[u.Host]; !isWhitelisted {
 				logger.Critical().Errorf("%s header value %s does not match host and is not whitelisted", toCheckHeader, toCheck)
-				resp := NewHTTPErrorResponse(http.StatusForbidden,  "Invalid Origin or Referer")
+				resp := NewHTTPErrorResponse(http.StatusForbidden, "Invalid Origin or Referer")
 				writeHTTPResponse(w, resp)
 				return
 			}
@@ -112,5 +112,3 @@ func originRefererCheck(apiVersion, host string, hostWhitelist []string, handler
 		handler.ServeHTTP(w, r)
 	})
 }
-
-

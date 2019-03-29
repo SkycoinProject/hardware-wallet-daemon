@@ -62,7 +62,7 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 		}
 
 		// simple warning for logs
-		if req.AddressN + req.StartIndex > 8 {
+		if req.AddressN+req.StartIndex > 8 {
 			logger.Warnf("wallet generating high index addresses: start_index: %d; address_n: %d", req.StartIndex, req.AddressN)
 		}
 

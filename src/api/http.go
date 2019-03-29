@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -201,13 +202,37 @@ func Create(host string, c Config, gateway *Gateway) (*Server, error) {
 func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	allowedOrigins := []string{fmt.Sprintf("http://%s", c.host)}
+	allowedOrigins := []string{
+		fmt.Sprintf("http://%s", c.host),
+		"https://staging.wallet.skycoin.net",
+		"https://wallet.skycoin.net",
+	}
 	for _, s := range c.hostWhitelist {
 		allowedOrigins = append(allowedOrigins, fmt.Sprintf("http://%s", s))
 	}
 
+	// allow any localhost orogin
+	lregex, err := regexp.Compile(`^https?://localhost:\d+$`)
+	if err != nil {
+		logger.Panic(err)
+	}
+
+	corsValidator := func(origin string) bool {
+		if lregex.MatchString(origin) {
+			return true
+		}
+
+		for _, allowedOrigin := range allowedOrigins {
+			if allowedOrigin == origin {
+				return true
+			}
+		}
+
+		return false
+	}
+
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:     allowedOrigins,
+		AllowOriginFunc:    corsValidator,
 		Debug:              false,
 		AllowedMethods:     []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut},
 		AllowedHeaders:     []string{"Origin", "Accept", "Content-Type", "X-Requested-With", CSRFHeaderName},
@@ -216,8 +241,8 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	})
 
 	headerCheck := func(apiVersion, host string, hostWhitelist []string, handler http.Handler) http.Handler {
-		handler = originRefererCheck(apiVersion, host, hostWhitelist, handler)
-		handler = hostCheck(apiVersion, host, hostWhitelist, handler)
+		handler = originRefererCheck(host, hostWhitelist, handler)
+		handler = hostCheck(host, hostWhitelist, handler)
 		return handler
 	}
 

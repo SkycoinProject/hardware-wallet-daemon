@@ -59,7 +59,7 @@ type Config struct {
 func NewConfig(port int, datadir string) Config {
 	return Config{
 		WebInterfaceAddr: "127.0.0.1",
-		WebInterfacePort:    port,
+		WebInterfacePort: port,
 
 		// Timeout settings for http.Server
 		// https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
