@@ -1,0 +1,584 @@
+swagger: '2.0'
+host: 127.0.0.1:9510
+basePath: /api/v1
+info:
+  description: This is the hardware-wallet-daemon API
+  version: 0.1.0
+  title: Hardware Wallet Daemon API
+  contact:
+    email: steve@skycoin.net
+
+  license:
+    name: GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+
+paths:
+  /generateAddresses:
+    post:
+      description: Generate addresses for the hardware wallet seed.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: GenerateAddressesRequest
+          description: GenerateAddressesRequest is request data for /api/generateAddresses
+          schema:
+            $ref: '#/definitions/GenerateAddressesRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/GenerateAddressesResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /applySettings:
+    post:
+      description: Apply hardware wallet settings.
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - in: formData
+          name: label
+          description: label for hardware wallet
+          required: true
+          type: string
+        - in: formData
+          name: use-passphrase
+          type: boolean
+          description: ask for passphrase before starting operation
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /backup:
+    post:
+      description: Start seed backup procedure.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /cancel:
+    put:
+      description: Cancels the current operation.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /checkMessageSignature:
+    post:
+      description: Check a message signature matches the given address.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: CheckMessageSignatureRequest
+          description: CheckMessageSignatureRequest is request data for /api/checkMessageSignature
+          schema:
+            $ref: '#/definitions/CheckMessageSignatureRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /features:
+    get:
+      description: Returns device information.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/FeaturesResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+
+  /firmwareUpdate:
+    put:
+      description: Update firmware
+      produces:
+        - application/json
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /recovery:
+    post:
+      description: Recover existing wallet using seed.
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - in: formData
+          name: word-count
+          description: mnemonic seed length
+          required: true
+          type: integer
+        - in: formData
+          name: use-passphrase
+          description: ask for passphrase before starting operation
+          type: boolean
+        - in: formData
+          name: dry-run
+          description: perform dry-run recovery workflow (for safe mnemonic validation)
+          type: boolean
+      responses:
+        200:
+          description: intermediate response
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /generateMnemonic:
+    post:
+      description: Generate mnemonic can be used to initialize the device with a random seed.
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - in: formData
+          name: word-count
+          description: mnemonic seed length
+          required: true
+          type: integer
+        - in: formData
+          name: use-passphrase
+          description: ask for passphrase before starting operation
+          type: boolean
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /setMnemonic:
+    post:
+      description: Set mnemonic can be used to initialize the device with your own seed.
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: mnemonic
+          in: formData
+          description: bip39 mnemonic seed
+          required: true
+          type: string
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /setPinCode:
+    post:
+      description: Configure a pin code on the device.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /signMessage:
+    post:
+      description: Sign a message using the secret key at given index.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: SignMessageRequest
+          description: SignMessageRequest is request data for /api/signMessage
+          schema:
+            $ref: '#/definitions/SignMessageRequest'
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/SignMessageResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /transactionSign:
+    post:
+      description: Sign a transaction with the hardware wallet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: TransactionSignRequest
+          description: TransactionSignRequest is request data for /api/v1/transactionSign
+          schema:
+            $ref: '#/definitions/TransactionSignRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/TransactionSignResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+  /wipe:
+    delete:
+      description: clean all the configurations.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /intermediate/pinMatrix:
+    post:
+      description: pin matrix ack request.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: PinMatrixRequest
+          description: PinMatrixRequest is request data for /api/v1/intermediate/pinMatrix
+          schema:
+            $ref: '#/definitions/PinMatrixRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /intermediate/passPhrase:
+    post:
+      description: passphrase ack request.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: PassPhraseRequest
+          description: PassPhraseRequest is request data for /api/v1/intermediate/passPhrase
+          schema:
+            $ref: '#/definitions/PinMatrixRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /intermediate/word:
+    post:
+      description: word ack request.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: WordRequest
+          description: WordRequest is request data for /api/v1/intermediate/word
+          schema:
+            $ref: '#/definitions/WordRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+definitions:
+  GenerateAddressesRequest:
+    type: object
+    required:
+      - address_n
+    properties:
+      address_n:
+        type: integer
+        example: 2
+      start_index:
+        type: integer
+        example: 1
+      confirm_address:
+        type: boolean
+        example: false
+
+  CheckMessageSignatureRequest:
+    type: object
+    required:
+      - message
+      - signature
+      - address
+    properties:
+      message:
+        type: string
+        example: Hello World!
+      signature:
+        type: string
+        example: GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQTvMjokd3A4upPz4wyeAyKJEtRdRDGUvUgoGASpsTTUeMn
+      address:
+        type: string
+        example: 2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw
+
+  SignMessageRequest:
+    type: object
+    required:
+      - address_n
+      - message
+    properties:
+      address_n:
+        type: integer
+        example: 2
+      message:
+        type: string
+        example: Hello World!
+
+  TransactionSignRequest:
+    type: object
+    required:
+      - inputs
+      - input_indexes
+      - output_addresses
+      - coins
+      - hours
+    properties:
+      inputs:
+        type: array
+        items:
+          type: string
+      input_indexes:
+        type: array
+        items:
+          type: integer
+          format: uint32
+      output_addresses:
+        type: array
+        items:
+          type: string
+      coins:
+        type: array
+        items:
+          type: integer
+          format: string
+      hours:
+        type: array
+        items:
+          type: integer
+          format: string
+      address_indexes:
+        type: array
+        items:
+          type: integer
+
+  PinMatrixRequest:
+    type: object
+    required:
+      - pin
+    properties:
+      pin:
+        type: string
+
+  PassPhraseRequest:
+    type: object
+    required:
+      - passphrase
+    properties:
+      passphrase:
+        type: string
+
+  WordRequest:
+    type: object
+    required:
+      - word
+    properties:
+      word:
+        type: string
+
+  GenerateAddressesResponse:
+    type: object
+    properties:
+      data:
+        type: object
+        properties:
+          addresses:
+            type: array
+            items:
+              type: string
+
+  FeaturesResponse:
+    type: object
+    properties:
+      data:
+        type: object
+        properties:
+          features:
+            type: object
+            required:
+              - vendor
+              - passphrase_protection
+              - pin_protection
+              - passphrase_cached
+              - needs_backup
+              - fw_patch
+              - fw_minor
+              - fw_major
+              - pin_cached
+              - initialized
+            properties:
+              vendor:
+                type: string
+              major_version:
+                type: integer
+              minor_version:
+                type: integer
+              patch_version:
+                type: integer
+              device_id:
+                type: string
+              pin_protection:
+                type: boolean
+              passphrase_protection:
+                type: boolean
+              label:
+                type: string
+              initialized:
+                type: boolean
+              bootloader_hash:
+                type: string
+              pin_cached:
+                type: boolean
+              passphrase_cached:
+                type: boolean
+              needs_backup:
+                type: boolean
+              model:
+                type: string
+              fw_major:
+                type: integer
+              fw_minor:
+                type: integer
+              fw_patch:
+                type: integer
+
+  SignMessageResponse:
+    type: object
+    properties:
+      data:
+        type: object
+        properties:
+          signature:
+            type: string
+
+  TransactionSignResponse:
+    type: object
+    properties:
+      data:
+        type: object
+        properties:
+          signature:
+            type: array
+            items:
+              type: string
+
+  HTTPSuccessResponse:
+    type: object
+    properties:
+      data:
+        type: string
+
+  HTTPErrorResponse:
+    type: object
+    properties:
+      error:
+        type: object
+        properties:
+          message:
+            type: string
+          code:
+            type: integer
+

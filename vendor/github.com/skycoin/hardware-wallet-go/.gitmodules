@@ -1,0 +1,4 @@
+[submodule "src/device-wallet/messages"]
+	path = src/device-wallet/messages
+	url = https://github.com/skycoin/hardware-wallet-protob.git
+    branch = master
