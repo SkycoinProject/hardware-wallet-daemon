@@ -13,6 +13,7 @@ const configuredHost = "127.0.0.1:9510"
 func defaultMuxConfig() muxConfig {
 	return muxConfig{
 		host: configuredHost,
+		disableCSRF: true,
 	}
 }
 

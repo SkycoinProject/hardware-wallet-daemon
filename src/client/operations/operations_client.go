@@ -25,6 +25,34 @@ type Client struct {
 }
 
 /*
+DeleteWipe clean all the configurations.
+*/
+func (a *Client) DeleteWipe(params *DeleteWipeParams) (*DeleteWipeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteWipeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "DeleteWipe",
+		Method:             "DELETE",
+		PathPattern:        "/wipe",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DeleteWipeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*DeleteWipeOK), nil
+
+}
+
+/*
 GetFeatures Returns device information.
 */
 func (a *Client) GetFeatures(params *GetFeaturesParams) (*GetFeaturesOK, error) {
@@ -165,30 +193,114 @@ func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams) (*Po
 }
 
 /*
-PostGenerateMemonic Generate mnemonic can be used to initialize the device with a random seed.
+PostGenerateMnemonic Generate mnemonic can be used to initialize the device with a random seed.
 */
-func (a *Client) PostGenerateMemonic(params *PostGenerateMemonicParams) (*PostGenerateMemonicOK, error) {
+func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams) (*PostGenerateMnemonicOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPostGenerateMemonicParams()
+		params = NewPostGenerateMnemonicParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostGenerateMemonic",
+		ID:                 "PostGenerateMnemonic",
 		Method:             "POST",
-		PathPattern:        "/generateMemonic",
+		PathPattern:        "/generateMnemonic",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &PostGenerateMemonicReader{formats: a.formats},
+		Reader:             &PostGenerateMnemonicReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostGenerateMemonicOK), nil
+	return result.(*PostGenerateMnemonicOK), nil
+
+}
+
+/*
+PostIntermediatePassPhrase passphrase ack request.
+*/
+func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhraseParams) (*PostIntermediatePassPhraseOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostIntermediatePassPhraseParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostIntermediatePassPhrase",
+		Method:             "POST",
+		PathPattern:        "/intermediate/passPhrase",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostIntermediatePassPhraseReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostIntermediatePassPhraseOK), nil
+
+}
+
+/*
+PostIntermediatePinMatrix pin matrix ack request.
+*/
+func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixParams) (*PostIntermediatePinMatrixOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostIntermediatePinMatrixParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostIntermediatePinMatrix",
+		Method:             "POST",
+		PathPattern:        "/intermediate/pinMatrix",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostIntermediatePinMatrixReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostIntermediatePinMatrixOK), nil
+
+}
+
+/*
+PostIntermediateWord word ack request.
+*/
+func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams) (*PostIntermediateWordOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostIntermediateWordParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostIntermediateWord",
+		Method:             "POST",
+		PathPattern:        "/intermediate/word",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostIntermediateWordReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostIntermediateWordOK), nil
 
 }
 

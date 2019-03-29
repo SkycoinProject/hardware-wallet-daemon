@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostSetMnemonicReader) ReadResponse(response runtime.ClientResponse, co
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostSetMnemonicConflict()
+	default:
+		result := NewPostSetMnemonicDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostSetMnemonicOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PostSetMnemonicOK) Error() string {
-	return fmt.Sprintf("[POST /setMnemonic][%d] postSetMnemonicOK  %+v", 200, o.Payload)
-}
-
 func (o *PostSetMnemonicOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PostSetMnemonicOK) readResponse(response runtime.ClientResponse, consum
 	return nil
 }
 
-// NewPostSetMnemonicConflict creates a PostSetMnemonicConflict with default headers values
-func NewPostSetMnemonicConflict() *PostSetMnemonicConflict {
-	return &PostSetMnemonicConflict{}
+// NewPostSetMnemonicDefault creates a PostSetMnemonicDefault with default headers values
+func NewPostSetMnemonicDefault(code int) *PostSetMnemonicDefault {
+	return &PostSetMnemonicDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostSetMnemonicConflict handles this case with default header values.
+/*PostSetMnemonicDefault handles this case with default header values.
 
 error
 */
-type PostSetMnemonicConflict struct {
+type PostSetMnemonicDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostSetMnemonicConflict) Error() string {
-	return fmt.Sprintf("[POST /setMnemonic][%d] postSetMnemonicConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post set mnemonic default response
+func (o *PostSetMnemonicDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostSetMnemonicConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostSetMnemonicDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostSetMnemonicDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

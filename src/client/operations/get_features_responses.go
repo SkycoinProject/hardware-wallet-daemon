@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *GetFeaturesReader) ReadResponse(response runtime.ClientResponse, consum
 		}
 		return result, nil
 
-	case 409:
-		result := NewGetFeaturesConflict()
+	default:
+		result := NewGetFeaturesDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type GetFeaturesOK struct {
 	Payload *models.FeaturesResponse
 }
 
-func (o *GetFeaturesOK) Error() string {
-	return fmt.Sprintf("[GET /features][%d] getFeaturesOK  %+v", 200, o.Payload)
-}
-
 func (o *GetFeaturesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.FeaturesResponse)
@@ -73,24 +68,33 @@ func (o *GetFeaturesOK) readResponse(response runtime.ClientResponse, consumer r
 	return nil
 }
 
-// NewGetFeaturesConflict creates a GetFeaturesConflict with default headers values
-func NewGetFeaturesConflict() *GetFeaturesConflict {
-	return &GetFeaturesConflict{}
+// NewGetFeaturesDefault creates a GetFeaturesDefault with default headers values
+func NewGetFeaturesDefault(code int) *GetFeaturesDefault {
+	return &GetFeaturesDefault{
+		_statusCode: code,
+	}
 }
 
-/*GetFeaturesConflict handles this case with default header values.
+/*GetFeaturesDefault handles this case with default header values.
 
 error
 */
-type GetFeaturesConflict struct {
+type GetFeaturesDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *GetFeaturesConflict) Error() string {
-	return fmt.Sprintf("[GET /features][%d] getFeaturesConflict  %+v", 409, o.Payload)
+// Code gets the status code for the get features default response
+func (o *GetFeaturesDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *GetFeaturesConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *GetFeaturesDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *GetFeaturesDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

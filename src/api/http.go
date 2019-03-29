@@ -37,6 +37,7 @@ var (
 
 type muxConfig struct {
 	host               string
+	disableCSRF        bool
 	disableHeaderCheck bool
 	hostWhitelist      []string
 }
@@ -50,11 +51,12 @@ type Server struct {
 
 // Config configures Server
 type Config struct {
+	DisableCSRF        bool
 	DisableHeaderCheck bool
 	HostWhitelist      []string
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-	IdleTimeout  time.Duration
+	ReadTimeout        time.Duration
+	WriteTimeout       time.Duration
+	IdleTimeout        time.Duration
 }
 
 // HTTPResponse represents the http response struct
@@ -152,9 +154,10 @@ func create(host string, c Config, gateway *Gateway) (*Server, error) {
 	}
 
 	mc := muxConfig{
-		host: host,
+		host:               host,
+		disableCSRF:        c.DisableCSRF,
 		disableHeaderCheck: c.DisableHeaderCheck,
-		hostWhitelist: c.HostWhitelist,
+		hostWhitelist:      c.HostWhitelist,
 	}
 
 	srvMux := newServerMux(mc, gateway.USBDevice, gateway.EmulatorDevice)
@@ -207,7 +210,7 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		AllowedOrigins:     allowedOrigins,
 		Debug:              false,
 		AllowedMethods:     []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut},
-		AllowedHeaders:     []string{"Origin", "Accept", "Content-Type", "X-Requested-With"},
+		AllowedHeaders:     []string{"Origin", "Accept", "Content-Type", "X-Requested-With", CSRFHeaderName},
 		AllowCredentials:   false, // credentials are not used, but it would be safe to enable if necessary
 		OptionsPassthrough: false,
 	})
@@ -218,10 +221,14 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		return handler
 	}
 
-	webHandlerWithOptionals := func(apiVersion, endpoint string, handlerFunc http.Handler, checkHeaders bool) {
+	webHandlerWithOptionals := func(apiVersion, endpoint string, handlerFunc http.Handler, checkCSRF, checkHeaders bool) {
 		handler := wh.ElapsedHandler(logger, handlerFunc)
 
 		handler = corsHandler.Handler(handler)
+
+		if checkCSRF {
+			handler = CSRFCheck(c.disableCSRF, handler)
+		}
 
 		if checkHeaders {
 			handler = headerCheck(apiVersion, c.host, c.hostWhitelist, handler)
@@ -233,12 +240,18 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 
 	webHandler := func(apiVersion, endpoint string, handler http.Handler) {
 		handler = wh.ElapsedHandler(logger, handler)
-		webHandlerWithOptionals(apiVersion1, endpoint, handler, !c.disableHeaderCheck)
+		webHandlerWithOptionals(apiVersion1, endpoint, handler, !c.disableCSRF, !c.disableHeaderCheck)
 	}
 
 	webHandlerV1 := func(endpoint string, handler http.Handler) {
 		webHandler(apiVersion1, "/api/v1"+endpoint, handler)
 	}
+
+	// get the current CSRF token
+	csrfHandlerV1 := func(endpoint string, handler http.Handler) {
+		webHandlerWithOptionals(apiVersion1, "/api/v1"+endpoint, handler, false, !c.disableHeaderCheck)
+	}
+	csrfHandlerV1("/csrf", getCSRFToken(c.disableCSRF)) // csrf is always available, regardless of the API set
 
 	// hw wallet endpoints
 	webHandlerV1("/generateAddresses", generateAddresses(usbGateway))
@@ -251,12 +264,14 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/generateMnemonic", generateMnemonic(usbGateway))
 	webHandlerV1("/recovery", recovery(usbGateway))
 	webHandlerV1("/setMnemonic", setMnemonic(usbGateway))
+
 	webHandlerV1("/setPinCode", setPinCode(usbGateway))
 	webHandlerV1("/signMessage", signMessage(usbGateway))
 	webHandlerV1("/transactionSign", transactionSign(usbGateway))
 	webHandlerV1("/wipe", wipe(usbGateway))
-	webHandlerV1("/intermediate/pinmatrix", PinMatrixRequestHandler(usbGateway))
-	webHandlerV1("/intermediate/passphrase", PassphraseRequestHandler(usbGateway))
+
+	webHandlerV1("/intermediate/pinMatrix", PinMatrixRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/passPhrase", PassphraseRequestHandler(usbGateway))
 	webHandlerV1("/intermediate/word", WordRequestHandler(usbGateway))
 
 	// emulator endpoints
@@ -273,8 +288,9 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/emulator/signMessage", signMessage(emulatorGateway))
 	webHandlerV1("/emulator/transactionSign", transactionSign(emulatorGateway))
 	webHandlerV1("/emulator/wipe", wipe(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/pinmatrix", PinMatrixRequestHandler(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/passphrase", PassphraseRequestHandler(emulatorGateway))
+
+	webHandlerV1("/emulator/intermediate/pinMatrix", PinMatrixRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/passPhrase", PassphraseRequestHandler(emulatorGateway))
 	webHandlerV1("/emulator/intermediate/word", WordRequestHandler(emulatorGateway))
 
 	return mux
@@ -288,33 +304,24 @@ func parseBoolFlag(v string) (bool, error) {
 	return strconv.ParseBool(v)
 }
 
-type IntermediateResponse struct {
-	RequestType string `json:"request_type"`
-}
-
 func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gateway Gatewayer, msg wire.Message) {
 	switch msg.Kind {
 	case uint16(messages.MessageType_MessageType_PinMatrixRequest):
 		writeHTTPResponse(w, HTTPResponse{
-			Data: IntermediateResponse{
-				RequestType: "PinMatrixRequest",
-			},
+			Data: "PinMatrixRequest",
 		})
 	case uint16(messages.MessageType_MessageType_PassphraseRequest):
 		writeHTTPResponse(w, HTTPResponse{
-			Data: IntermediateResponse{
-				RequestType: "PassPhraseRequest",
-			},
+			Data: "PassPhraseRequest",
 		})
 	case uint16(messages.MessageType_MessageType_WordRequest):
 		writeHTTPResponse(w, HTTPResponse{
-			Data: IntermediateResponse{
-				RequestType: "WordRequest",
-			},
+			Data: "WordRequest",
 		})
 	case uint16(messages.MessageType_MessageType_ButtonRequest):
 		msg, err := gateway.ButtonAck()
 		if err != nil {
+			logger.Error(err.Error())
 			resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
 			writeHTTPResponse(w, resp)
 			return
@@ -429,6 +436,7 @@ func PinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		if err != nil {
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
+			return
 		}
 
 		HandleFirmwareResponseMessages(w, r, gateway, msg)

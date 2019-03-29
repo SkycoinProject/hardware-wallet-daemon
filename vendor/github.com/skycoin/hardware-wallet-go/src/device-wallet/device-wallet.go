@@ -316,18 +316,18 @@ func (d *Device) GenerateMnemonic(wordCount uint32, usePassphrase bool) (wire.Me
 		return wire.Message{}, err
 	}
 	defer dev.Close()
-	chunks, err := MessageGenerateMnemonic(wordCount, usePassphrase)
+	generateMnemonicChunks, err := MessageGenerateMnemonic(wordCount, usePassphrase)
 	if err != nil {
 		return wire.Message{}, err
 	}
-	msg, err := d.Driver.SendToDevice(dev, chunks)
+	msg, err := d.Driver.SendToDevice(dev, generateMnemonicChunks)
 	if err != nil {
 		return msg, err
 	}
 
 	switch msg.Kind {
 	case uint16(messages.MessageType_MessageType_ButtonRequest):
-		chunks, err = MessageButtonAck()
+		chunks, err := MessageButtonAck()
 		if err != nil {
 			return wire.Message{}, err
 		}
@@ -336,13 +336,17 @@ func (d *Device) GenerateMnemonic(wordCount uint32, usePassphrase bool) (wire.Me
 			return wire.Message{}, err
 		}
 	case uint16(messages.MessageType_MessageType_EntropyRequest):
-		chunks, err = MessageEntropyAck(entropyBufferSize)
+		chunks, err := MessageEntropyAck(entropyBufferSize)
 		if err != nil {
 			return wire.Message{}, err
 		}
 		msg, err = d.Driver.SendToDevice(dev, chunks)
 		if err != nil {
 			return wire.Message{}, err
+		}
+		msg, err = d.Driver.SendToDevice(dev, generateMnemonicChunks)
+		if err != nil {
+			return msg, err
 		}
 	}
 

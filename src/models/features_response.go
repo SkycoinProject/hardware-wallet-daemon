@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // FeaturesResponse features response
@@ -138,8 +139,21 @@ type FeaturesResponseDataFeatures struct {
 	// device id
 	DeviceID string `json:"device_id,omitempty"`
 
+	// fw major
+	// Required: true
+	FwMajor *int64 `json:"fw_major"`
+
+	// fw minor
+	// Required: true
+	FwMinor *int64 `json:"fw_minor"`
+
+	// fw patch
+	// Required: true
+	FwPatch *int64 `json:"fw_patch"`
+
 	// initialized
-	Initialized bool `json:"initialized,omitempty"`
+	// Required: true
+	Initialized *bool `json:"initialized"`
 
 	// label
 	Label string `json:"label,omitempty"`
@@ -154,29 +168,170 @@ type FeaturesResponseDataFeatures struct {
 	Model string `json:"model,omitempty"`
 
 	// needs backup
-	NeedsBackup bool `json:"needs_backup,omitempty"`
+	// Required: true
+	NeedsBackup *bool `json:"needs_backup"`
 
 	// passphrase cached
-	PassphraseCached bool `json:"passphrase_cached,omitempty"`
+	// Required: true
+	PassphraseCached *bool `json:"passphrase_cached"`
 
 	// passphrase protection
-	PassphraseProtection bool `json:"passphrase_protection,omitempty"`
+	// Required: true
+	PassphraseProtection *bool `json:"passphrase_protection"`
 
 	// patch version
 	PatchVersion int64 `json:"patch_version,omitempty"`
 
 	// pin cached
-	PinCached bool `json:"pin_cached,omitempty"`
+	// Required: true
+	PinCached *bool `json:"pin_cached"`
 
 	// pin protection
-	PinProtection bool `json:"pin_protection,omitempty"`
+	// Required: true
+	PinProtection *bool `json:"pin_protection"`
 
 	// vendor
-	Vendor string `json:"vendor,omitempty"`
+	// Required: true
+	Vendor *string `json:"vendor"`
 }
 
 // Validate validates this features response data features
 func (m *FeaturesResponseDataFeatures) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateFwMajor(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateFwMinor(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateFwPatch(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateInitialized(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNeedsBackup(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePassphraseCached(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePassphraseProtection(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePinCached(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePinProtection(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVendor(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validateFwMajor(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"fw_major", "body", m.FwMajor); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validateFwMinor(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"fw_minor", "body", m.FwMinor); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validateFwPatch(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"fw_patch", "body", m.FwPatch); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validateInitialized(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"initialized", "body", m.Initialized); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validateNeedsBackup(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"needs_backup", "body", m.NeedsBackup); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validatePassphraseCached(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"passphrase_cached", "body", m.PassphraseCached); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validatePassphraseProtection(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"passphrase_protection", "body", m.PassphraseProtection); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validatePinCached(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"pin_cached", "body", m.PinCached); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validatePinProtection(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"pin_protection", "body", m.PinProtection); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *FeaturesResponseDataFeatures) validateVendor(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"features"+"."+"vendor", "body", m.Vendor); err != nil {
+		return err
+	}
+
 	return nil
 }
 

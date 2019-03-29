@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -57,10 +56,6 @@ type PostGenerateMemonicOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PostGenerateMemonicOK) Error() string {
-	return fmt.Sprintf("[POST /generateMemonic][%d] postGenerateMemonicOK  %+v", 200, o.Payload)
-}
-
 func (o *PostGenerateMemonicOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -87,7 +82,7 @@ type PostGenerateMemonicConflict struct {
 }
 
 func (o *PostGenerateMemonicConflict) Error() string {
-	return fmt.Sprintf("[POST /generateMemonic][%d] postGenerateMemonicConflict  %+v", 409, o.Payload)
+	return o.Payload.Error.Message
 }
 
 func (o *PostGenerateMemonicConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

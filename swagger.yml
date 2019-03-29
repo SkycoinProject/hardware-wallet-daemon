@@ -1,4 +1,6 @@
 swagger: '2.0'
+host: 127.0.0.1:9510
+basePath: /api/v1
 info:
   description: This is the hardware-wallet-daemon API
   version: 0.1.0
@@ -29,7 +31,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/GenerateAddressesResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -56,7 +58,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -71,7 +73,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -86,7 +88,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -109,7 +111,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -124,7 +126,7 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/FeaturesResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -140,7 +142,7 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -170,13 +172,13 @@ paths:
         200:
           description: intermediate response
           schema:
-            $ref: '#/definitions/IntermediateResponse'
-        409:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
 
-  /generateMemonic:
+  /generateMnemonic:
     post:
       description: Generate mnemonic can be used to initialize the device with a random seed.
       consumes:
@@ -198,7 +200,7 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -221,7 +223,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -236,7 +238,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/HTTPSuccessResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -259,7 +261,7 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/SignMessageResponse'
-        409:
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -274,7 +276,7 @@ paths:
       parameters:
         - in: body
           name: TransactionSignRequest
-          description: TransactionSignRequest is request data for /api/transactionSign
+          description: TransactionSignRequest is request data for /api/v1/transactionSign
           schema:
             $ref: '#/definitions/TransactionSignRequest'
       responses:
@@ -282,7 +284,90 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/TransactionSignResponse'
-        409:
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+  /wipe:
+    delete:
+      description: clean all the configurations.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /intermediate/pinMatrix:
+    post:
+      description: pin matrix ack request.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: PinMatrixRequest
+          description: PinMatrixRequest is request data for /api/v1/intermediate/pinMatrix
+          schema:
+            $ref: '#/definitions/PinMatrixRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /intermediate/passPhrase:
+    post:
+      description: passphrase ack request.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: PassPhraseRequest
+          description: PassPhraseRequest is request data for /api/v1/intermediate/passPhrase
+          schema:
+            $ref: '#/definitions/PinMatrixRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
+  /intermediate/word:
+    post:
+      description: word ack request.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: WordRequest
+          description: WordRequest is request data for /api/v1/intermediate/word
+          schema:
+            $ref: '#/definitions/WordRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
@@ -341,7 +426,6 @@ definitions:
       - output_addresses
       - coins
       - hours
-      - address_indexes
     properties:
       inputs:
         type: array
@@ -371,6 +455,30 @@ definitions:
         items:
           type: integer
 
+  PinMatrixRequest:
+    type: object
+    required:
+      - pin
+    properties:
+      pin:
+        type: string
+
+  PassPhraseRequest:
+    type: object
+    required:
+      - passphrase
+    properties:
+      passphrase:
+        type: string
+
+  WordRequest:
+    type: object
+    required:
+      - word
+    properties:
+      word:
+        type: string
+
   GenerateAddressesResponse:
     type: object
     properties:
@@ -390,6 +498,17 @@ definitions:
         properties:
           features:
             type: object
+            required:
+              - vendor
+              - passphrase_protection
+              - pin_protection
+              - passphrase_cached
+              - needs_backup
+              - fw_patch
+              - fw_minor
+              - fw_major
+              - pin_cached
+              - initialized
             properties:
               vendor:
                 type: string
@@ -419,6 +538,12 @@ definitions:
                 type: boolean
               model:
                 type: string
+              fw_major:
+                type: integer
+              fw_minor:
+                type: integer
+              fw_patch:
+                type: integer
 
   SignMessageResponse:
     type: object
@@ -457,11 +582,3 @@ definitions:
           code:
             type: integer
 
-  IntermediateResponse:
-    type: object
-    properties:
-      data:
-        type: object
-        properties:
-          request_type:
-            type: string

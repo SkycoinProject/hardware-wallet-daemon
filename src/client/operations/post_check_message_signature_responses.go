@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostCheckMessageSignatureReader) ReadResponse(response runtime.ClientRe
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostCheckMessageSignatureConflict()
+	default:
+		result := NewPostCheckMessageSignatureDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostCheckMessageSignatureOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PostCheckMessageSignatureOK) Error() string {
-	return fmt.Sprintf("[POST /checkMessageSignature][%d] postCheckMessageSignatureOK  %+v", 200, o.Payload)
-}
-
 func (o *PostCheckMessageSignatureOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PostCheckMessageSignatureOK) readResponse(response runtime.ClientRespon
 	return nil
 }
 
-// NewPostCheckMessageSignatureConflict creates a PostCheckMessageSignatureConflict with default headers values
-func NewPostCheckMessageSignatureConflict() *PostCheckMessageSignatureConflict {
-	return &PostCheckMessageSignatureConflict{}
+// NewPostCheckMessageSignatureDefault creates a PostCheckMessageSignatureDefault with default headers values
+func NewPostCheckMessageSignatureDefault(code int) *PostCheckMessageSignatureDefault {
+	return &PostCheckMessageSignatureDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostCheckMessageSignatureConflict handles this case with default header values.
+/*PostCheckMessageSignatureDefault handles this case with default header values.
 
 error
 */
-type PostCheckMessageSignatureConflict struct {
+type PostCheckMessageSignatureDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostCheckMessageSignatureConflict) Error() string {
-	return fmt.Sprintf("[POST /checkMessageSignature][%d] postCheckMessageSignatureConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post check message signature default response
+func (o *PostCheckMessageSignatureDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostCheckMessageSignatureConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostCheckMessageSignatureDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostCheckMessageSignatureDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

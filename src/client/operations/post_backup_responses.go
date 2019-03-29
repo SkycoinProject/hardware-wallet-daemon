@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostBackupReader) ReadResponse(response runtime.ClientResponse, consume
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostBackupConflict()
+	default:
+		result := NewPostBackupDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostBackupOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PostBackupOK) Error() string {
-	return fmt.Sprintf("[POST /backup][%d] postBackupOK  %+v", 200, o.Payload)
-}
-
 func (o *PostBackupOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PostBackupOK) readResponse(response runtime.ClientResponse, consumer ru
 	return nil
 }
 
-// NewPostBackupConflict creates a PostBackupConflict with default headers values
-func NewPostBackupConflict() *PostBackupConflict {
-	return &PostBackupConflict{}
+// NewPostBackupDefault creates a PostBackupDefault with default headers values
+func NewPostBackupDefault(code int) *PostBackupDefault {
+	return &PostBackupDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostBackupConflict handles this case with default header values.
+/*PostBackupDefault handles this case with default header values.
 
 error
 */
-type PostBackupConflict struct {
+type PostBackupDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostBackupConflict) Error() string {
-	return fmt.Sprintf("[POST /backup][%d] postBackupConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post backup default response
+func (o *PostBackupDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostBackupConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostBackupDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostBackupDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

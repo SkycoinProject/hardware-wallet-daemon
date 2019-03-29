@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"strings"
 
-	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/iputil"
 )
 
@@ -52,7 +51,8 @@ func hostCheck(apiVersion, host string, hostWhitelist []string, handler http.Han
 		_, isWhitelisted := hostWhitelistMap[r.Host]
 		if isLocalhost && r.Host != "" && !isWhitelisted {
 			logger.Critical().Errorf("Detected DNS rebind attempt - configured-host=%s header-host=%s", host, r.Host)
-			writeError(w, apiVersion, http.StatusForbidden, "Invalid Host")
+			resp := NewHTTPErrorResponse(http.StatusForbidden,  "Invalid Host")
+			writeHTTPResponse(w, resp)
 			return
 		}
 
@@ -96,13 +96,15 @@ func originRefererCheck(apiVersion, host string, hostWhitelist []string, handler
 			u, err := url.Parse(toCheck)
 			if err != nil {
 				logger.Critical().Errorf("Invalid URL in %s header: %s %v", toCheckHeader, toCheck, err)
-				writeError(w, apiVersion, http.StatusForbidden, "Invalid URL in Origin or Referer header")
+				resp := NewHTTPErrorResponse(http.StatusForbidden, "Invalid URL in Origin or Referer header")
+				writeHTTPResponse(w, resp)
 				return
 			}
 
 			if _, isWhitelisted := hostWhitelistMap[u.Host]; !isWhitelisted {
 				logger.Critical().Errorf("%s header value %s does not match host and is not whitelisted", toCheckHeader, toCheck)
-				writeError(w, apiVersion, http.StatusForbidden, "Invalid Origin or Referer")
+				resp := NewHTTPErrorResponse(http.StatusForbidden,  "Invalid Origin or Referer")
+				writeHTTPResponse(w, resp)
 				return
 			}
 		}
@@ -111,11 +113,4 @@ func originRefererCheck(apiVersion, host string, hostWhitelist []string, handler
 	})
 }
 
-func writeError(w http.ResponseWriter, apiVersion string, code int, msg string) {
-	switch apiVersion {
-	case apiVersion1:
-		writeHTTPResponse(w, NewHTTPErrorResponse(code, msg))
-	default:
-		wh.Error500(w, "Invalid internal API version")
-	}
-}
+

@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostGenerateAddressesReader) ReadResponse(response runtime.ClientRespon
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostGenerateAddressesConflict()
+	default:
+		result := NewPostGenerateAddressesDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostGenerateAddressesOK struct {
 	Payload *models.GenerateAddressesResponse
 }
 
-func (o *PostGenerateAddressesOK) Error() string {
-	return fmt.Sprintf("[POST /generateAddresses][%d] postGenerateAddressesOK  %+v", 200, o.Payload)
-}
-
 func (o *PostGenerateAddressesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenerateAddressesResponse)
@@ -73,24 +68,33 @@ func (o *PostGenerateAddressesOK) readResponse(response runtime.ClientResponse, 
 	return nil
 }
 
-// NewPostGenerateAddressesConflict creates a PostGenerateAddressesConflict with default headers values
-func NewPostGenerateAddressesConflict() *PostGenerateAddressesConflict {
-	return &PostGenerateAddressesConflict{}
+// NewPostGenerateAddressesDefault creates a PostGenerateAddressesDefault with default headers values
+func NewPostGenerateAddressesDefault(code int) *PostGenerateAddressesDefault {
+	return &PostGenerateAddressesDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostGenerateAddressesConflict handles this case with default header values.
+/*PostGenerateAddressesDefault handles this case with default header values.
 
 error
 */
-type PostGenerateAddressesConflict struct {
+type PostGenerateAddressesDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostGenerateAddressesConflict) Error() string {
-	return fmt.Sprintf("[POST /generateAddresses][%d] postGenerateAddressesConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post generate addresses default response
+func (o *PostGenerateAddressesDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostGenerateAddressesConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostGenerateAddressesDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostGenerateAddressesDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

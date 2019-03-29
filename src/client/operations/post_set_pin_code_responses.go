@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostSetPinCodeReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostSetPinCodeConflict()
+	default:
+		result := NewPostSetPinCodeDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostSetPinCodeOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PostSetPinCodeOK) Error() string {
-	return fmt.Sprintf("[POST /setPinCode][%d] postSetPinCodeOK  %+v", 200, o.Payload)
-}
-
 func (o *PostSetPinCodeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PostSetPinCodeOK) readResponse(response runtime.ClientResponse, consume
 	return nil
 }
 
-// NewPostSetPinCodeConflict creates a PostSetPinCodeConflict with default headers values
-func NewPostSetPinCodeConflict() *PostSetPinCodeConflict {
-	return &PostSetPinCodeConflict{}
+// NewPostSetPinCodeDefault creates a PostSetPinCodeDefault with default headers values
+func NewPostSetPinCodeDefault(code int) *PostSetPinCodeDefault {
+	return &PostSetPinCodeDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostSetPinCodeConflict handles this case with default header values.
+/*PostSetPinCodeDefault handles this case with default header values.
 
 error
 */
-type PostSetPinCodeConflict struct {
+type PostSetPinCodeDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostSetPinCodeConflict) Error() string {
-	return fmt.Sprintf("[POST /setPinCode][%d] postSetPinCodeConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post set pin code default response
+func (o *PostSetPinCodeDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostSetPinCodeConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostSetPinCodeDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostSetPinCodeDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

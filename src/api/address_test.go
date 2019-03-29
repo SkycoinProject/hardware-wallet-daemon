@@ -157,6 +157,7 @@ func TestGenerateAddresses(t *testing.T) {
 				req.Header.Set("Content-Type", contentType)
 
 				rr := httptest.NewRecorder()
+
 				handler := newServerMux(defaultMuxConfig(), gateway, gateway)
 				handler.ServeHTTP(rr, req)
 

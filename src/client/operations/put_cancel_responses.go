@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PutCancelReader) ReadResponse(response runtime.ClientResponse, consumer
 		}
 		return result, nil
 
-	case 409:
-		result := NewPutCancelConflict()
+	default:
+		result := NewPutCancelDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PutCancelOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PutCancelOK) Error() string {
-	return fmt.Sprintf("[PUT /cancel][%d] putCancelOK  %+v", 200, o.Payload)
-}
-
 func (o *PutCancelOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PutCancelOK) readResponse(response runtime.ClientResponse, consumer run
 	return nil
 }
 
-// NewPutCancelConflict creates a PutCancelConflict with default headers values
-func NewPutCancelConflict() *PutCancelConflict {
-	return &PutCancelConflict{}
+// NewPutCancelDefault creates a PutCancelDefault with default headers values
+func NewPutCancelDefault(code int) *PutCancelDefault {
+	return &PutCancelDefault{
+		_statusCode: code,
+	}
 }
 
-/*PutCancelConflict handles this case with default header values.
+/*PutCancelDefault handles this case with default header values.
 
 error
 */
-type PutCancelConflict struct {
+type PutCancelDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PutCancelConflict) Error() string {
-	return fmt.Sprintf("[PUT /cancel][%d] putCancelConflict  %+v", 409, o.Payload)
+// Code gets the status code for the put cancel default response
+func (o *PutCancelDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PutCancelConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PutCancelDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PutCancelDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

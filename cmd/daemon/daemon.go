@@ -15,6 +15,8 @@ var (
 	config = daemon.NewConfig(
 		9510,
 		"$HOME/.skycoin")
+
+	parseFlags = true
 )
 
 func init() {
@@ -22,7 +24,9 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
+	if parseFlags {
+		flag.Parse()
+	}
 
 	d := daemon.NewDaemon(config, logger)
 

@@ -18,7 +18,6 @@ import (
 type TransactionSignRequest struct {
 
 	// address indexes
-	// Required: true
 	AddressIndexes []int64 `json:"address_indexes"`
 
 	// coins
@@ -46,10 +45,6 @@ type TransactionSignRequest struct {
 func (m *TransactionSignRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAddressIndexes(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateCoins(formats); err != nil {
 		res = append(res, err)
 	}
@@ -73,15 +68,6 @@ func (m *TransactionSignRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *TransactionSignRequest) validateAddressIndexes(formats strfmt.Registry) error {
-
-	if err := validate.Required("address_indexes", "body", m.AddressIndexes); err != nil {
-		return err
-	}
-
 	return nil
 }
 

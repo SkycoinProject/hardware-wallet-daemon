@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostApplySettingsReader) ReadResponse(response runtime.ClientResponse, 
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostApplySettingsConflict()
+	default:
+		result := NewPostApplySettingsDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostApplySettingsOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PostApplySettingsOK) Error() string {
-	return fmt.Sprintf("[POST /applySettings][%d] postApplySettingsOK  %+v", 200, o.Payload)
-}
-
 func (o *PostApplySettingsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PostApplySettingsOK) readResponse(response runtime.ClientResponse, cons
 	return nil
 }
 
-// NewPostApplySettingsConflict creates a PostApplySettingsConflict with default headers values
-func NewPostApplySettingsConflict() *PostApplySettingsConflict {
-	return &PostApplySettingsConflict{}
+// NewPostApplySettingsDefault creates a PostApplySettingsDefault with default headers values
+func NewPostApplySettingsDefault(code int) *PostApplySettingsDefault {
+	return &PostApplySettingsDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostApplySettingsConflict handles this case with default header values.
+/*PostApplySettingsDefault handles this case with default header values.
 
 error
 */
-type PostApplySettingsConflict struct {
+type PostApplySettingsDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostApplySettingsConflict) Error() string {
-	return fmt.Sprintf("[POST /applySettings][%d] postApplySettingsConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post apply settings default response
+func (o *PostApplySettingsDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostApplySettingsConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostApplySettingsDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostApplySettingsDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

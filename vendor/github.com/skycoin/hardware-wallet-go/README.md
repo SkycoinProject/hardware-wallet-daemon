@@ -25,7 +25,7 @@
 
 ### Install golang
 
-    https://github.com/golang/go/wiki/Ubuntu
+https://github.com/golang/go/wiki/Ubuntu
 
 ## Usage
 

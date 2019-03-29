@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostSignMessageReader) ReadResponse(response runtime.ClientResponse, co
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostSignMessageConflict()
+	default:
+		result := NewPostSignMessageDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostSignMessageOK struct {
 	Payload *models.SignMessageResponse
 }
 
-func (o *PostSignMessageOK) Error() string {
-	return fmt.Sprintf("[POST /signMessage][%d] postSignMessageOK  %+v", 200, o.Payload)
-}
-
 func (o *PostSignMessageOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.SignMessageResponse)
@@ -73,24 +68,33 @@ func (o *PostSignMessageOK) readResponse(response runtime.ClientResponse, consum
 	return nil
 }
 
-// NewPostSignMessageConflict creates a PostSignMessageConflict with default headers values
-func NewPostSignMessageConflict() *PostSignMessageConflict {
-	return &PostSignMessageConflict{}
+// NewPostSignMessageDefault creates a PostSignMessageDefault with default headers values
+func NewPostSignMessageDefault(code int) *PostSignMessageDefault {
+	return &PostSignMessageDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostSignMessageConflict handles this case with default header values.
+/*PostSignMessageDefault handles this case with default header values.
 
 error
 */
-type PostSignMessageConflict struct {
+type PostSignMessageDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostSignMessageConflict) Error() string {
-	return fmt.Sprintf("[POST /signMessage][%d] postSignMessageConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post sign message default response
+func (o *PostSignMessageDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostSignMessageConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostSignMessageDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostSignMessageDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

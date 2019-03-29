@@ -50,3 +50,7 @@
   branch = "master"
 
 
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/andreyvit/diff"

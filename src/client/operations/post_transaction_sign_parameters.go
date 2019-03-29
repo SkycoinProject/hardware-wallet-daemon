@@ -64,7 +64,7 @@ for the post transaction sign operation typically these are written to a http.Re
 type PostTransactionSignParams struct {
 
 	/*TransactionSignRequest
-	  TransactionSignRequest is request data for /api/transactionSign
+	  TransactionSignRequest is request data for /api/v1/transactionSign
 
 	*/
 	TransactionSignRequest *models.TransactionSignRequest

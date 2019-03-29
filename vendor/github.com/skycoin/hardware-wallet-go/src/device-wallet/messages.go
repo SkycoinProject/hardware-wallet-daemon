@@ -69,7 +69,7 @@ func MessageCheckMessageSignature(message, signature, address string) ([][64]byt
 	if err != nil {
 		return [][64]byte{}, err
 	}
-	chunks := makeSkyWalletMessage(data, messages.MessageType_MessageType_Cancel)
+	chunks := makeSkyWalletMessage(data, messages.MessageType_MessageType_SkycoinCheckMessageSignature)
 	return chunks, nil
 }
 

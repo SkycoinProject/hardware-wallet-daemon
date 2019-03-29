@@ -21,6 +21,9 @@ type Config struct {
 	// Remote web interface address
 	WebInterfaceAddr string
 
+	// Disable CSRF check
+	DisableCSRF bool
+
 	// Disable Host, Origin and Referer header check in the wallet API
 	DisableHeaderCheck bool
 	// Comma separate list of hostnames to accept in the Host header, used to bypass the Host header check which only applies to localhost addresses
@@ -60,14 +63,17 @@ func NewConfig(port int, datadir string) Config {
 
 		// Timeout settings for http.Server
 		// https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
-		HTTPReadTimeout:  time.Second * 10,
-		HTTPWriteTimeout: time.Second * 60,
-		HTTPIdleTimeout:  time.Second * 120,
+		HTTPReadTimeout:  time.Minute * 10,
+		HTTPWriteTimeout: time.Minute * 10,
+		HTTPIdleTimeout:  time.Minute * 10,
 
 		// Logging
 		ColorLog:  true,
 		LogLevel:  "INFO",
 		LogToFile: false,
+
+		// disable csrf by default
+		DisableCSRF: true,
 
 		// Enable cpu profiling
 		ProfileCPU: false,
@@ -106,6 +112,7 @@ func (c *Config) RegisterFlags() {
 	flag.BoolVar(&help, "help", false, "Show help")
 	flag.IntVar(&c.WebInterfacePort, "web-interface-port", c.WebInterfacePort, "port to serve web interface on")
 	flag.StringVar(&c.WebInterfaceAddr, "web-interface-addr", c.WebInterfaceAddr, "addr to serve web interface on")
+	flag.BoolVar(&c.DisableCSRF, "disable-csrf", c.DisableCSRF, "disable CSRF check")
 	flag.BoolVar(&c.DisableHeaderCheck, "disable-header-check", c.DisableHeaderCheck, "disables the host, origin and referer header checks.")
 	flag.StringVar(&c.HostWhitelist, "host-whitelist", c.HostWhitelist, "Hostnames to whitelist in the Host header check. Only applies when the web interface is bound to localhost.")
 

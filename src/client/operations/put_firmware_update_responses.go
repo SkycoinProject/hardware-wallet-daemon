@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PutFirmwareUpdateReader) ReadResponse(response runtime.ClientResponse, 
 		}
 		return result, nil
 
-	case 409:
-		result := NewPutFirmwareUpdateConflict()
+	default:
+		result := NewPutFirmwareUpdateDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PutFirmwareUpdateOK struct {
 	Payload *models.HttpsuccessResponse
 }
 
-func (o *PutFirmwareUpdateOK) Error() string {
-	return fmt.Sprintf("[PUT /firmwareUpdate][%d] putFirmwareUpdateOK  %+v", 200, o.Payload)
-}
-
 func (o *PutFirmwareUpdateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HttpsuccessResponse)
@@ -73,24 +68,33 @@ func (o *PutFirmwareUpdateOK) readResponse(response runtime.ClientResponse, cons
 	return nil
 }
 
-// NewPutFirmwareUpdateConflict creates a PutFirmwareUpdateConflict with default headers values
-func NewPutFirmwareUpdateConflict() *PutFirmwareUpdateConflict {
-	return &PutFirmwareUpdateConflict{}
+// NewPutFirmwareUpdateDefault creates a PutFirmwareUpdateDefault with default headers values
+func NewPutFirmwareUpdateDefault(code int) *PutFirmwareUpdateDefault {
+	return &PutFirmwareUpdateDefault{
+		_statusCode: code,
+	}
 }
 
-/*PutFirmwareUpdateConflict handles this case with default header values.
+/*PutFirmwareUpdateDefault handles this case with default header values.
 
 error
 */
-type PutFirmwareUpdateConflict struct {
+type PutFirmwareUpdateDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PutFirmwareUpdateConflict) Error() string {
-	return fmt.Sprintf("[PUT /firmwareUpdate][%d] putFirmwareUpdateConflict  %+v", 409, o.Payload)
+// Code gets the status code for the put firmware update default response
+func (o *PutFirmwareUpdateDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PutFirmwareUpdateConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PutFirmwareUpdateDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PutFirmwareUpdateDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

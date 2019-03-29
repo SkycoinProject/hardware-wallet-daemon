@@ -12,3 +12,7 @@
 *.out
 
 .idea
+
+coverage.html
+coverage/
+*.coverage.out

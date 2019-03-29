@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostRecoveryReader) ReadResponse(response runtime.ClientResponse, consu
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostRecoveryConflict()
+	default:
+		result := NewPostRecoveryDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -54,16 +53,12 @@ func NewPostRecoveryOK() *PostRecoveryOK {
 intermediate response
 */
 type PostRecoveryOK struct {
-	Payload *models.IntermediateResponse
-}
-
-func (o *PostRecoveryOK) Error() string {
-	return fmt.Sprintf("[POST /recovery][%d] postRecoveryOK  %+v", 200, o.Payload)
+	Payload *models.HttpsuccessResponse
 }
 
 func (o *PostRecoveryOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.IntermediateResponse)
+	o.Payload = new(models.HttpsuccessResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -73,24 +68,33 @@ func (o *PostRecoveryOK) readResponse(response runtime.ClientResponse, consumer 
 	return nil
 }
 
-// NewPostRecoveryConflict creates a PostRecoveryConflict with default headers values
-func NewPostRecoveryConflict() *PostRecoveryConflict {
-	return &PostRecoveryConflict{}
+// NewPostRecoveryDefault creates a PostRecoveryDefault with default headers values
+func NewPostRecoveryDefault(code int) *PostRecoveryDefault {
+	return &PostRecoveryDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostRecoveryConflict handles this case with default header values.
+/*PostRecoveryDefault handles this case with default header values.
 
 error
 */
-type PostRecoveryConflict struct {
+type PostRecoveryDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostRecoveryConflict) Error() string {
-	return fmt.Sprintf("[POST /recovery][%d] postRecoveryConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post recovery default response
+func (o *PostRecoveryDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostRecoveryConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostRecoveryDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostRecoveryDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 

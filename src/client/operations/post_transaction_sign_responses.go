@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
@@ -32,15 +31,15 @@ func (o *PostTransactionSignReader) ReadResponse(response runtime.ClientResponse
 		}
 		return result, nil
 
-	case 409:
-		result := NewPostTransactionSignConflict()
+	default:
+		result := NewPostTransactionSignDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,10 +56,6 @@ type PostTransactionSignOK struct {
 	Payload *models.TransactionSignResponse
 }
 
-func (o *PostTransactionSignOK) Error() string {
-	return fmt.Sprintf("[POST /transactionSign][%d] postTransactionSignOK  %+v", 200, o.Payload)
-}
-
 func (o *PostTransactionSignOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.TransactionSignResponse)
@@ -73,24 +68,33 @@ func (o *PostTransactionSignOK) readResponse(response runtime.ClientResponse, co
 	return nil
 }
 
-// NewPostTransactionSignConflict creates a PostTransactionSignConflict with default headers values
-func NewPostTransactionSignConflict() *PostTransactionSignConflict {
-	return &PostTransactionSignConflict{}
+// NewPostTransactionSignDefault creates a PostTransactionSignDefault with default headers values
+func NewPostTransactionSignDefault(code int) *PostTransactionSignDefault {
+	return &PostTransactionSignDefault{
+		_statusCode: code,
+	}
 }
 
-/*PostTransactionSignConflict handles this case with default header values.
+/*PostTransactionSignDefault handles this case with default header values.
 
 error
 */
-type PostTransactionSignConflict struct {
+type PostTransactionSignDefault struct {
+	_statusCode int
+
 	Payload *models.HTTPErrorResponse
 }
 
-func (o *PostTransactionSignConflict) Error() string {
-	return fmt.Sprintf("[POST /transactionSign][%d] postTransactionSignConflict  %+v", 409, o.Payload)
+// Code gets the status code for the post transaction sign default response
+func (o *PostTransactionSignDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PostTransactionSignConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PostTransactionSignDefault) Error() string {
+	return o.Payload.Error.Message
+}
+
+func (o *PostTransactionSignDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.HTTPErrorResponse)
 
