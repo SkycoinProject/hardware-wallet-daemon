@@ -36,7 +36,6 @@ binary data
 		name         string
 		method       string
 		status       int
-		contentType  string
 		data         string
 		header       string
 		httpResponse HTTPResponse

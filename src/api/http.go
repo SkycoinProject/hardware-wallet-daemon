@@ -9,11 +9,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/NYTimes/gziphandler"
 	"github.com/gogo/protobuf/proto"
 	"github.com/rs/cors"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
@@ -143,7 +145,7 @@ func (s *Server) Shutdown() {
 	<-s.done
 }
 
-func create(host string, c Config, gateway *Gateway) (*Server, error) {
+func create(host string, c Config, gateway *Gateway) *Server {
 	if c.ReadTimeout == 0 {
 		c.ReadTimeout = defaultReadTimeout
 	}
@@ -173,9 +175,10 @@ func create(host string, c Config, gateway *Gateway) (*Server, error) {
 	return &Server{
 		server: srv,
 		done:   make(chan struct{}),
-	}, nil
+	}
 }
 
+// Create create a new http server
 func Create(host string, c Config, gateway *Gateway) (*Server, error) {
 	listener, err := net.Listen("tcp", host)
 	if err != nil {
@@ -186,13 +189,7 @@ func Create(host string, c Config, gateway *Gateway) (*Server, error) {
 	// we need to get the assigned address to know the full hostname
 	host = listener.Addr().String()
 
-	s, err := create(host, c, gateway)
-	if err != nil {
-		if closeErr := s.listener.Close(); closeErr != nil {
-			logger.WithError(err).Warning("s.listener.Close() error")
-		}
-		return nil, err
-	}
+	s := create(host, c, gateway)
 
 	s.listener = listener
 
@@ -240,13 +237,13 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		OptionsPassthrough: false,
 	})
 
-	headerCheck := func(apiVersion, host string, hostWhitelist []string, handler http.Handler) http.Handler {
+	headerCheck := func(host string, hostWhitelist []string, handler http.Handler) http.Handler {
 		handler = originRefererCheck(host, hostWhitelist, handler)
 		handler = hostCheck(host, hostWhitelist, handler)
 		return handler
 	}
 
-	webHandlerWithOptionals := func(apiVersion, endpoint string, handlerFunc http.Handler, checkCSRF, checkHeaders bool) {
+	webHandlerWithOptionals := func(endpoint string, handlerFunc http.Handler, checkCSRF, checkHeaders bool) {
 		handler := wh.ElapsedHandler(logger, handlerFunc)
 
 		handler = corsHandler.Handler(handler)
@@ -256,25 +253,25 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		}
 
 		if checkHeaders {
-			handler = headerCheck(apiVersion, c.host, c.hostWhitelist, handler)
+			handler = headerCheck(c.host, c.hostWhitelist, handler)
 		}
 
 		handler = gziphandler.GzipHandler(handler)
 		mux.Handle(endpoint, handler)
 	}
 
-	webHandler := func(apiVersion, endpoint string, handler http.Handler) {
+	webHandler := func(endpoint string, handler http.Handler) {
 		handler = wh.ElapsedHandler(logger, handler)
-		webHandlerWithOptionals(apiVersion1, endpoint, handler, !c.disableCSRF, !c.disableHeaderCheck)
+		webHandlerWithOptionals(endpoint, handler, !c.disableCSRF, !c.disableHeaderCheck)
 	}
 
 	webHandlerV1 := func(endpoint string, handler http.Handler) {
-		webHandler(apiVersion1, "/api/v1"+endpoint, handler)
+		webHandler("/api/"+apiVersion1+endpoint, handler)
 	}
 
 	// get the current CSRF token
 	csrfHandlerV1 := func(endpoint string, handler http.Handler) {
-		webHandlerWithOptionals(apiVersion1, "/api/v1"+endpoint, handler, false, !c.disableHeaderCheck)
+		webHandlerWithOptionals("/api/"+apiVersion1+endpoint, handler, false, !c.disableHeaderCheck)
 	}
 	csrfHandlerV1("/csrf", getCSRFToken(c.disableCSRF)) // csrf is always available, regardless of the API set
 
@@ -295,9 +292,9 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/transactionSign", transactionSign(usbGateway))
 	webHandlerV1("/wipe", wipe(usbGateway))
 
-	webHandlerV1("/intermediate/pinMatrix", PinMatrixRequestHandler(usbGateway))
-	webHandlerV1("/intermediate/passPhrase", PassphraseRequestHandler(usbGateway))
-	webHandlerV1("/intermediate/word", WordRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/pinMatrix", pinMatrixRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/passPhrase", passphraseRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/word", wordRequestHandler(usbGateway))
 
 	// emulator endpoints
 	webHandlerV1("/emulator/generateAddresses", generateAddresses(emulatorGateway))
@@ -314,9 +311,9 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/emulator/transactionSign", transactionSign(emulatorGateway))
 	webHandlerV1("/emulator/wipe", wipe(emulatorGateway))
 
-	webHandlerV1("/emulator/intermediate/pinMatrix", PinMatrixRequestHandler(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/passPhrase", PassphraseRequestHandler(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/word", WordRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/pinMatrix", pinMatrixRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/passPhrase", passphraseRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/word", wordRequestHandler(emulatorGateway))
 
 	return mux
 }
@@ -329,6 +326,7 @@ func parseBoolFlag(v string) (bool, error) {
 	return strconv.ParseBool(v)
 }
 
+// HandleFirmwareResponseMessages handles response messages from the firmware
 func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gateway Gatewayer, msg wire.Message) {
 	switch msg.Kind {
 	case uint16(messages.MessageType_MessageType_PinMatrixRequest):
@@ -420,6 +418,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 	// TransactionSign Response
 	case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
 		signatures, err := deviceWallet.DecodeResponseTransactionSign(msg)
+		spew.Dump(signatures)
 		if err != nil {
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
@@ -428,7 +427,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 
 		writeHTTPResponse(w, HTTPResponse{
 			Data: TransactionSignResponse{
-				Signatures: signatures,
+				Signatures: &signatures,
 			},
 		})
 	default:
@@ -437,11 +436,12 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 	}
 }
 
+// PinMatrixRequest request data from /api/v1/intermediate/pinMatrix
 type PinMatrixRequest struct {
 	Pin string `json:"pin"`
 }
 
-func PinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
+func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")
@@ -468,11 +468,12 @@ func PinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	}
 }
 
+// PassPhraseRequest request data from /api/v1/intermediate/passPhrases
 type PassPhraseRequest struct {
 	Passphrase string `json:"passphrase"`
 }
 
-func PassphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
+func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")
@@ -498,11 +499,12 @@ func PassphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	}
 }
 
+// WordRequest request data from /api/v1/intermediate/word
 type WordRequest struct {
 	Word string `json:"word"`
 }
 
-func WordRequestHandler(gateway Gatewayer) http.HandlerFunc {
+func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")

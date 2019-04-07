@@ -74,8 +74,8 @@ func (m *TransactionSignResponse) UnmarshalBinary(b []byte) error {
 // swagger:model TransactionSignResponseData
 type TransactionSignResponseData struct {
 
-	// signature
-	Signature []string `json:"signature"`
+	// signatures
+	Signatures []string `json:"signatures"`
 }
 
 // Validate validates this transaction sign response data

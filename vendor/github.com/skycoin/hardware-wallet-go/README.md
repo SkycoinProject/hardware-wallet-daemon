@@ -51,13 +51,7 @@ $ make dep
 
 #### Init proto submboule
 ```bash
-$ git submodule init 
-$ git submodule update
-```
-
-#### Generate go files
-```bash
-$ make vendor_proto
+$ make init
 ```
 
 ### Run

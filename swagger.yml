@@ -560,7 +560,7 @@ definitions:
       data:
         type: object
         properties:
-          signature:
+          signatures:
             type: array
             items:
               type: string

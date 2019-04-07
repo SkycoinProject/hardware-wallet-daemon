@@ -31,7 +31,8 @@
 
   [[prune.project]]
     name = "github.com/skycoin/hardware-wallet-go"
-    unused-packages = false
+     go-tests = false
+     unused-packages = false
 
 [[constraint]]
   name = "github.com/gogo/protobuf"
@@ -48,8 +49,6 @@
 [[constraint]]
   name = "github.com/skycoin/hardware-wallet-go"
   branch = "master"
-
-
 
 [[constraint]]
   branch = "master"

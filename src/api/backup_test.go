@@ -26,7 +26,6 @@ func TestBackup(t *testing.T) {
 		name                string
 		method              string
 		status              int
-		contentType         string
 		httpResponse        HTTPResponse
 		gatewayBackupResult wire.Message
 	}{

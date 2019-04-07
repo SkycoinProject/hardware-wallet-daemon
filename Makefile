@@ -2,6 +2,7 @@
 .PHONY: run lint format generate-client
 .PHONY: test integration-test-emulator integration-test-wallet
 .PHONY: clean-coverage update-golden-files merge-coverage
+.PHONY: mocks
 
 run: ## Run hardware wallet daemon
 	go run cmd/daemon/daemon.go
@@ -13,6 +14,10 @@ integration-test-emulator: ## Run emulator integration tests
 
 integration-test-wallet: ## Run wallet integration tests
 	GOCACHE=off ./ci-scripts/integration-test.sh -m wallet -n wallet-integration
+
+mocks: ## Create all mock files for unit tests
+		echo "Generating mock files"
+		go generate ./src/...
 
 lint: ## Run linters. Use make install-linters first.
 	vendorcheck ./...

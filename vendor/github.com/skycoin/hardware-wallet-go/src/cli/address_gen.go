@@ -56,6 +56,7 @@ func addressGenCmd() gcli.Command {
 				log.Error(err)
 				return
 			}
+
 			for msg.Kind != uint16(messages.MessageType_MessageType_ResponseSkycoinAddress) && msg.Kind != uint16(messages.MessageType_MessageType_Failure) {
 				if msg.Kind == uint16(messages.MessageType_MessageType_PinMatrixRequest) {
 					fmt.Printf("PinMatrixRequest response: ")
