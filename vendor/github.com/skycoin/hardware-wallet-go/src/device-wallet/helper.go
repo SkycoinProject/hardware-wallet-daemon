@@ -79,6 +79,7 @@ func (drv *Driver) GetDevice() (io.ReadWriteCloser, error) {
 	case DeviceTypeUSB:
 		dev, err = getUsbDevice()
 	}
+
 	if dev == nil && err == nil {
 		err = errors.New("No device connected")
 	}
@@ -177,18 +178,14 @@ func makeSkyWalletMessage(data []byte, msgID messages.MessageType) [][64]byte {
 }
 
 // Initialize send an init request to the device
-func initialize(dev io.ReadWriteCloser) error {
+func Initialize(dev io.ReadWriteCloser) error {
 	var chunks [][64]byte
 
-	initialize := &messages.Initialize{}
-	data, err := proto.Marshal(initialize)
+	chunks, err := MessageInitialize()
 	if err != nil {
 		return err
 	}
-
-	chunks = makeSkyWalletMessage(data, messages.MessageType_MessageType_Initialize)
 	_, err = sendToDevice(dev, chunks)
-
 	return err
 }
 

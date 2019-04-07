@@ -32,7 +32,6 @@ func TestWipe(t *testing.T) {
 		name              string
 		method            string
 		status            int
-		contentType       string
 		gatewayWipeResult wire.Message
 		httpResponse      HTTPResponse
 	}{

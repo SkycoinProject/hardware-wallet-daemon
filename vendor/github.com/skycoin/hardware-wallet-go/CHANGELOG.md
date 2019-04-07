@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add skycoin `v0.25.1` dependency.
 - Support in apply settings command for configuring device label.
 - Sign Skycoin transactions using `transactionSign` command.
+- Add `SimulateButtonPress` function to simulate emulator button press.
 
 ### Fixed
 

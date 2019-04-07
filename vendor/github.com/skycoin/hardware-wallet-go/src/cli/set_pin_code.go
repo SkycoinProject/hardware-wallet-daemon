@@ -36,7 +36,6 @@ func setPinCode() gcli.Command {
 				return
 			}
 
-			// TODO: can PinMatrixAck return MessageType_MessageType_PinMatrixRequest? figure out
 			for msg.Kind == uint16(messages.MessageType_MessageType_PinMatrixRequest) {
 				fmt.Printf("PinMatrixRequest response: ")
 				fmt.Scanln(&pinEnc)

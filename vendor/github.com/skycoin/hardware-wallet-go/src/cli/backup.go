@@ -34,6 +34,7 @@ func backupCmd() gcli.Command {
 				log.Error(err)
 				return
 			}
+
 			if msg.Kind == uint16(messages.MessageType_MessageType_PinMatrixRequest) {
 				var pinEnc string
 				fmt.Printf("PinMatrixRequest response: ")
@@ -44,7 +45,6 @@ func backupCmd() gcli.Command {
 					return
 				}
 
-				// TODO: can DeviceButtonAck return MessageType_MessageType_ButtonRequest? figure out
 				for msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
 					msg, err = device.ButtonAck()
 					if err != nil {

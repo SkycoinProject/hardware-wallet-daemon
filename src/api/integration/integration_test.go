@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,6 +14,8 @@ import (
 	"github.com/andreyvit/diff"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
+
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 
 	"github.com/skycoin/hardware-wallet-daemon/src/client"
 	"github.com/skycoin/hardware-wallet-daemon/src/client/operations"
@@ -85,7 +88,7 @@ func TestEmulatorGenerateAddresses(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeEmulator)
 
 	c := newEmulatorClient()
 
@@ -123,7 +126,7 @@ func TestEmulatorBackup(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeEmulator)
 
 	c := newEmulatorClient()
 
@@ -158,7 +161,7 @@ func TestEmulatorFeatures(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeEmulator)
 
 	c := newEmulatorClient()
 
@@ -199,7 +202,7 @@ func TestEmulatorRecovery(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeEmulator)
 
 	c := newEmulatorClient()
 
@@ -267,11 +270,11 @@ func TestEmulatorSetPinCode(t *testing.T) {
 }
 
 func TestEmulatorTransactionSign(t *testing.T) {
-	// if !doEmulator(t) {
-	// 	return
-	// }
+	if !doEmulator(t) {
+		return
+	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeEmulator)
 
 	c := newEmulatorClient()
 
@@ -309,7 +312,7 @@ func TestWalletGenerateAddresses(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeUSB)
 
 	c := newWalletClient()
 
@@ -348,7 +351,7 @@ func TestWalletBackup(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeUSB)
 
 	c := newWalletClient()
 
@@ -361,21 +364,22 @@ func TestWalletBackup(t *testing.T) {
 }
 
 func TestWalletCheckMessageSignature(t *testing.T) {
-	if !doWallet(t) {
-		return
-	}
+	// if !doWallet(t) {
+	// 	return
+	// }
 
 	c := newWalletClient()
+
 	params := operations.NewPostCheckMessageSignatureParams()
 	params.CheckMessageSignatureRequest = &models.CheckMessageSignatureRequest{
 		Address:   newStrPtr("2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"),
-		Message:   newStrPtr("Hello World!"),
-		Signature: newStrPtr("GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQTvMjokd3A4upPz4wyeAyKJEtRdRDGUvUgoGASpsTTUeMn"),
+		Message:   newStrPtr("Hello World"),
+		Signature: newStrPtr("6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300"),
 	}
 
 	resp, err := c.Operations.PostCheckMessageSignature(params)
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Verification success")
+	require.Equal(t, resp.Payload.Data, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw")
 }
 
 func TestWalletFeatures(t *testing.T) {
@@ -383,7 +387,7 @@ func TestWalletFeatures(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeUSB)
 
 	c := newWalletClient()
 
@@ -494,24 +498,35 @@ func TestWalletTransactionSign(t *testing.T) {
 		return
 	}
 
-	bootstrap(t)
+	bootstrap(t, deviceWallet.DeviceTypeUSB)
 
 	c := newWalletClient()
 
 	params := operations.NewPostTransactionSignParams()
 	params.TransactionSignRequest = &models.TransactionSignRequest{
-		Coins:           []string{"0.001"},
-		Hours:           []string{"1"},
-		Inputs:          []string{"82f1d93a04f8ae7a305c1a54efe0c21ac1be86777e60a4f0c2b8a6d0d957a645"},
+		Coins:           []string{"0.1"},
+		Hours:           []string{"2"},
+		Inputs:          []string{"181bd5656115172fe81451fae4fb56498a97744d89702e73da75ba91ed5200f9"},
 		InputIndexes:    []uint32{0},
-		OutputAddresses: []string{"2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"},
-		AddressIndexes:  []int64{0},
+		OutputAddresses: []string{"K9TzLrgqz7uXn3QJHGxmzdRByAzH33J2ot"},
 	}
 
 	resp, err := c.Operations.PostTransactionSign(params)
 	require.NoError(t, err)
+	require.Len(t, resp.Payload.Data.Signatures, 1)
 
-	spew.Dump(resp)
+	// verify the message signature
+	fmt.Println(resp.Payload.Data.Signatures[0])
+	verifParams := operations.NewPostCheckMessageSignatureParams()
+	verifParams.CheckMessageSignatureRequest = &models.CheckMessageSignatureRequest{
+		Address:   newStrPtr("2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"),
+		Message:   newStrPtr("d11c62b1e0e9abf629b1f5f4699cef9fbc504b45ceedf0047ead686979498218"),
+		Signature: newStrPtr(resp.Payload.Data.Signatures[0]),
+	}
+
+	verifResp, err := c.Operations.PostCheckMessageSignature(verifParams)
+	require.NoError(t, err)
+	require.Equal(t, verifResp.Payload.Data, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw")
 }
 
 func TestWalletWipe(t *testing.T) {
@@ -526,8 +541,16 @@ func TestWalletWipe(t *testing.T) {
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 }
 
-func bootstrap(t *testing.T) {
-	c := newEmulatorClient()
+func bootstrap(t *testing.T, deviceType deviceWallet.DeviceType) {
+	var c *client.HardwareWalletDaemon
+	switch deviceType {
+	case deviceWallet.DeviceTypeUSB:
+		c = newWalletClient()
+	case deviceWallet.DeviceTypeEmulator:
+		c = newEmulatorClient()
+	default:
+		t.Fatalf("invalid device type %v", deviceType)
+	}
 
 	// wipe existing data
 	resp, err := c.Operations.DeleteWipe(nil)

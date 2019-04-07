@@ -39,7 +39,6 @@ func TestRecovery(t *testing.T) {
 		name                  string
 		method                string
 		status                int
-		contentType           string
 		httpBody              *httpBody
 		usePassphrase         bool
 		wordCount             uint32

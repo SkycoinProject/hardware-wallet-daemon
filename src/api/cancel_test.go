@@ -25,7 +25,6 @@ func TestCancel(t *testing.T) {
 		name                string
 		method              string
 		status              int
-		contentType         string
 		httpResponse        HTTPResponse
 		gatewayCancelResult wire.Message
 	}{

@@ -1,6 +1,7 @@
 package devicewallet
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
@@ -232,9 +233,9 @@ func MessageSetMnemonic(mnemonic string) ([][64]byte, error) {
 }
 
 // MessageSignMessage prepare MessageSignMessage request
-func MessageSignMessage(addressN int, message string) ([][64]byte, error) {
+func MessageSignMessage(addressIndex int, message string) ([][64]byte, error) {
 	skycoinSignMessage := &messages.SkycoinSignMessage{
-		AddressN: proto.Uint32(uint32(addressN)),
+		AddressN: proto.Uint32(uint32(addressIndex)),
 		Message:  proto.String(message),
 	}
 
@@ -307,4 +308,30 @@ func MessageEntropyAck(bufferSize int) ([][64]byte, error) {
 	}
 	chunks := makeSkyWalletMessage(data, messages.MessageType_MessageType_EntropyAck)
 	return chunks, nil
+}
+
+// MessageInitialize prepare MessageInitialize request
+func MessageInitialize() ([][64]byte, error) {
+	initialize := &messages.Initialize{}
+	data, err := proto.Marshal(initialize)
+	if err != nil {
+		return nil, err
+	}
+
+	chunks := makeSkyWalletMessage(data, messages.MessageType_MessageType_Initialize)
+	return chunks, nil
+}
+
+// MessageSimulateButtonPress prespares a emulator button press simulation button
+func MessageSimulateButtonPress(buttonType ButtonType) (*bytes.Buffer, error) {
+	switch buttonType {
+	case ButtonLeft, ButtonRight, ButtonBoth:
+		msg := new(bytes.Buffer)
+		msg.Write([]byte{0, 1, 2, 3, 4, byte(buttonType)})
+
+		return msg, nil
+	default:
+		return nil, fmt.Errorf("invalid button type: %d", buttonType)
+	}
+
 }

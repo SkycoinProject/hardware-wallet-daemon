@@ -32,7 +32,6 @@ func TestSetPinCode(t *testing.T) {
 		name                    string
 		method                  string
 		status                  int
-		contentType             string
 		gatewaySetPinCodeResult wire.Message
 		httpResponse            HTTPResponse
 	}{

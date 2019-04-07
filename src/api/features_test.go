@@ -32,7 +32,6 @@ func TestFeatures(t *testing.T) {
 		name                  string
 		method                string
 		status                int
-		contentType           string
 		gatewayFeaturesResult wire.Message
 		httpResponse          HTTPResponse
 	}{

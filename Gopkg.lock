@@ -178,7 +178,7 @@
     "jwriter",
   ]
   pruneopts = "UT"
-  revision = "1de009706dbeb9d05f18586f0735fcdb7c524481"
+  revision = "1ea4449da9834f4d333f1cc461c374aea217d249"
 
 [[projects]]
   digest = "1:2fa7b0155cd54479a755c629de26f888a918e13f8857a2c442205d825368e084"
@@ -245,16 +245,16 @@
   version = "1.1.0"
 
 [[projects]]
-  digest = "1:e4c72127d910a96daf869a44f3dd563b86dbe6931a172863a0e99c5ff04b59e4"
+  digest = "1:fd61cf4ae1953d55df708acb6b91492d538f49c305b364a014049914495db426"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4"
-  version = "v1.4.0"
+  revision = "8bdbc7bcc01dcbb8ec23dc8a28e332258d25251f"
+  version = "v1.4.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:ee2b8156b2dffb1e04b9f764bf5aae19b671f9c185d11fe01095c949d5a71a75"
+  digest = "1:96a53d2c0f9b9a83ac6481db63359ff2ed0bd7f7a988946765026ebe6030e5d3"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/device-wallet",
@@ -263,8 +263,8 @@
     "src/device-wallet/usb/usbhid",
     "src/device-wallet/wire",
   ]
-  pruneopts = "T"
-  revision = "6146850cb5d82adf88ddd209090664541026c91c"
+  pruneopts = ""
+  revision = "5cfb1ed6f8dcb9f0424d5bddcf96178e8eefb71c"
 
 [[projects]]
   digest = "1:60a450854b4edf4cf42decf7646756e04e255eff8b0de67711292edc2ba7eca7"
@@ -308,11 +308,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:058e9504b9a79bfe86092974d05bb3298d2aa0c312d266d43148de289a5065d9"
+  digest = "1:bbe51412d9915d64ffaa96b51d409e070665efc5194fcf145c4a27d4133107a4"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "b7391e95e576cacdcdd422573063bc057239113d"
+  revision = "38d8ce5564a5b71b2e3a00553993f1b9a7ae852f"
 
 [[projects]]
   branch = "master"
@@ -320,18 +320,18 @@
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "UT"
-  revision = "e3b2ff56ed879efa686c9d09ed74f9bfe42f1a1d"
+  revision = "eb5bcb51f2a31c7d5141d810b70815c05d9c9146"
 
 [[projects]]
   branch = "master"
-  digest = "1:6b3e6ddcebac95be1d690dbd53b5aa2e520715becb7e521bb526ccf3b4c53c15"
+  digest = "1:503f66aac79cb9135d73679c7fa3e95a6fad82a3da399c505ea282b50ff03723"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "f49334f85ddcf0f08d7fb6dd7363e9e6d6b777eb"
+  revision = "4b34438f7a67ee5f45cc6132e2bad873a20324e9"
 
 [[projects]]
   digest = "1:0c56024909189aee3364b7f21a95a27459f718aa7c199a5c111c36cfffd9eaef"
