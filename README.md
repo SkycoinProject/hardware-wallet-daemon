@@ -1,7 +1,7 @@
 ![daemon logo](https://user-images.githubusercontent.com/8619106/55698557-0bfc2400-59e4-11e9-972d-e33b640ff9a6.png)
  
 # Hardware Wallet Daemon
-[![Build Status](https://travis-ci.org/skycoin/hardware-wallet-daemon.svg)](https://travis-ci.org/skycoin/hardware-wallet-damon)
+[![Build Status](https://travis-ci.org/skycoin/hardware-wallet-daemon.svg)](https://travis-ci.org/skycoin/hardware-wallet-daemon)
 [![GoDoc](https://godoc.org/github.com/skycoin/hardware-wallet-daemon?status.svg)](https://godoc.org/github.com/skycoin/hardware-walletd-daemon)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skycoin/hardware-wallet-daemon)](https://goreportcard.com/report/github.com/skycoin/hardware-wallet-daemon)
 
