@@ -5,7 +5,7 @@
 [![GoDoc](https://godoc.org/github.com/skycoin/hardware-wallet-daemon?status.svg)](https://godoc.org/github.com/skycoin/hardware-walletd-daemon)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skycoin/hardware-wallet-daemon)](https://goreportcard.com/report/github.com/skycoin/hardware-wallet-daemon)
 
-The hardware walllet daemon provides an HTTP API to interface with the wallets supported by the SkycoinFoundation.
+The hardware walllet daemon provides an HTTP API to interface with the wallets supported by skycoin.
 It uses the go bindings provided by the hardware wallet go [library](https://github.com/skycoin/hardware-wallet-go).
 
 ## Table of contents
@@ -290,7 +290,7 @@ Performs these actions before releasing:
 
 ## Responsible Disclosure
 
-Security flaws in the source of any software provided by the SkycoinFoundation or infrastructure can be sent to security@skycoin.net.
+Security flaws in the source of any software provided by skycoin or infrastructure can be sent to security@skycoin.net.
 Bounties are available for accepted critical bug reports.
 
 PGP Key for signing:
