@@ -64,7 +64,6 @@ paths:
         - in: formData
           name: label
           description: label for hardware wallet
-          required: true
           type: string
         - in: formData
           name: use-passphrase
@@ -446,10 +445,10 @@ definitions:
     properties:
       message:
         type: string
-        example: Hello World!
+        example: Hello World
       signature:
         type: string
-        example: GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQTvMjokd3A4upPz4wyeAyKJEtRdRDGUvUgoGASpsTTUeMn
+        example: 6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300
       address:
         type: string
         example: 2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw
