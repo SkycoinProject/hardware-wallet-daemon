@@ -1,7 +1,7 @@
 {
 	"data": {
 		"features": {
-			"bootloader_hash": "k3jy1kG+JbHZxi2cTSScekQK007/YkbZzyXWI6dVJns=",
+			"bootloader_hash": "foo",
 			"device_id": "foo",
 			"fw_major": 1,
 			"fw_minor": 7,

@@ -27,7 +27,7 @@ type Client struct {
 /*
 DeleteWipe clean all the configurations.
 */
-func (a *Client) DeleteWipe(params *DeleteWipeParams) (*DeleteWipeOK, error) {
+func (a *Client) DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteWipeOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDeleteWipeParams()
@@ -42,6 +42,7 @@ func (a *Client) DeleteWipe(params *DeleteWipeParams) (*DeleteWipeOK, error) {
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &DeleteWipeReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -53,9 +54,37 @@ func (a *Client) DeleteWipe(params *DeleteWipeParams) (*DeleteWipeOK, error) {
 }
 
 /*
+GetCsrf Returns csrf token
+*/
+func (a *Client) GetCsrf(params *GetCsrfParams) (*GetCsrfOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetCsrfParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetCsrf",
+		Method:             "GET",
+		PathPattern:        "/csrf",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetCsrfReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetCsrfOK), nil
+
+}
+
+/*
 GetFeatures Returns device information.
 */
-func (a *Client) GetFeatures(params *GetFeaturesParams) (*GetFeaturesOK, error) {
+func (a *Client) GetFeatures(params *GetFeaturesParams, authInfo runtime.ClientAuthInfoWriter) (*GetFeaturesOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetFeaturesParams()
@@ -70,6 +99,7 @@ func (a *Client) GetFeatures(params *GetFeaturesParams) (*GetFeaturesOK, error) 
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetFeaturesReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -83,7 +113,7 @@ func (a *Client) GetFeatures(params *GetFeaturesParams) (*GetFeaturesOK, error) 
 /*
 PostApplySettings Apply hardware wallet settings.
 */
-func (a *Client) PostApplySettings(params *PostApplySettingsParams) (*PostApplySettingsOK, error) {
+func (a *Client) PostApplySettings(params *PostApplySettingsParams, authInfo runtime.ClientAuthInfoWriter) (*PostApplySettingsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostApplySettingsParams()
@@ -98,6 +128,7 @@ func (a *Client) PostApplySettings(params *PostApplySettingsParams) (*PostApplyS
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostApplySettingsReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -111,7 +142,7 @@ func (a *Client) PostApplySettings(params *PostApplySettingsParams) (*PostApplyS
 /*
 PostBackup Start seed backup procedure.
 */
-func (a *Client) PostBackup(params *PostBackupParams) (*PostBackupOK, error) {
+func (a *Client) PostBackup(params *PostBackupParams, authInfo runtime.ClientAuthInfoWriter) (*PostBackupOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostBackupParams()
@@ -126,6 +157,7 @@ func (a *Client) PostBackup(params *PostBackupParams) (*PostBackupOK, error) {
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostBackupReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -139,7 +171,7 @@ func (a *Client) PostBackup(params *PostBackupParams) (*PostBackupOK, error) {
 /*
 PostCheckMessageSignature Check a message signature matches the given address.
 */
-func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignatureParams) (*PostCheckMessageSignatureOK, error) {
+func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignatureParams, authInfo runtime.ClientAuthInfoWriter) (*PostCheckMessageSignatureOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostCheckMessageSignatureParams()
@@ -154,6 +186,7 @@ func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignaturePara
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostCheckMessageSignatureReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -167,7 +200,7 @@ func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignaturePara
 /*
 PostGenerateAddresses Generate addresses for the hardware wallet seed.
 */
-func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams) (*PostGenerateAddressesOK, error) {
+func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateAddressesOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostGenerateAddressesParams()
@@ -182,6 +215,7 @@ func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams) (*Po
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostGenerateAddressesReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -195,7 +229,7 @@ func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams) (*Po
 /*
 PostGenerateMnemonic Generate mnemonic can be used to initialize the device with a random seed.
 */
-func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams) (*PostGenerateMnemonicOK, error) {
+func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateMnemonicOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostGenerateMnemonicParams()
@@ -210,6 +244,7 @@ func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams) (*Post
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostGenerateMnemonicReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -223,7 +258,7 @@ func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams) (*Post
 /*
 PostIntermediatePassPhrase passphrase ack request.
 */
-func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhraseParams) (*PostIntermediatePassPhraseOK, error) {
+func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhraseParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePassPhraseOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostIntermediatePassPhraseParams()
@@ -238,6 +273,7 @@ func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhrasePa
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostIntermediatePassPhraseReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -251,7 +287,7 @@ func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhrasePa
 /*
 PostIntermediatePinMatrix pin matrix ack request.
 */
-func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixParams) (*PostIntermediatePinMatrixOK, error) {
+func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePinMatrixOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostIntermediatePinMatrixParams()
@@ -266,6 +302,7 @@ func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixPara
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostIntermediatePinMatrixReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -279,7 +316,7 @@ func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixPara
 /*
 PostIntermediateWord word ack request.
 */
-func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams) (*PostIntermediateWordOK, error) {
+func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediateWordOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostIntermediateWordParams()
@@ -294,6 +331,7 @@ func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams) (*Post
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostIntermediateWordReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -307,7 +345,7 @@ func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams) (*Post
 /*
 PostRecovery Recover existing wallet using seed.
 */
-func (a *Client) PostRecovery(params *PostRecoveryParams) (*PostRecoveryOK, error) {
+func (a *Client) PostRecovery(params *PostRecoveryParams, authInfo runtime.ClientAuthInfoWriter) (*PostRecoveryOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostRecoveryParams()
@@ -322,6 +360,7 @@ func (a *Client) PostRecovery(params *PostRecoveryParams) (*PostRecoveryOK, erro
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostRecoveryReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -335,7 +374,7 @@ func (a *Client) PostRecovery(params *PostRecoveryParams) (*PostRecoveryOK, erro
 /*
 PostSetMnemonic Set mnemonic can be used to initialize the device with your own seed.
 */
-func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams) (*PostSetMnemonicOK, error) {
+func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams, authInfo runtime.ClientAuthInfoWriter) (*PostSetMnemonicOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostSetMnemonicParams()
@@ -350,6 +389,7 @@ func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams) (*PostSetMnemoni
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostSetMnemonicReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -363,7 +403,7 @@ func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams) (*PostSetMnemoni
 /*
 PostSetPinCode Configure a pin code on the device.
 */
-func (a *Client) PostSetPinCode(params *PostSetPinCodeParams) (*PostSetPinCodeOK, error) {
+func (a *Client) PostSetPinCode(params *PostSetPinCodeParams, authInfo runtime.ClientAuthInfoWriter) (*PostSetPinCodeOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostSetPinCodeParams()
@@ -378,6 +418,7 @@ func (a *Client) PostSetPinCode(params *PostSetPinCodeParams) (*PostSetPinCodeOK
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostSetPinCodeReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -391,7 +432,7 @@ func (a *Client) PostSetPinCode(params *PostSetPinCodeParams) (*PostSetPinCodeOK
 /*
 PostSignMessage Sign a message using the secret key at given index.
 */
-func (a *Client) PostSignMessage(params *PostSignMessageParams) (*PostSignMessageOK, error) {
+func (a *Client) PostSignMessage(params *PostSignMessageParams, authInfo runtime.ClientAuthInfoWriter) (*PostSignMessageOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostSignMessageParams()
@@ -406,6 +447,7 @@ func (a *Client) PostSignMessage(params *PostSignMessageParams) (*PostSignMessag
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostSignMessageReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -419,7 +461,7 @@ func (a *Client) PostSignMessage(params *PostSignMessageParams) (*PostSignMessag
 /*
 PostTransactionSign Sign a transaction with the hardware wallet.
 */
-func (a *Client) PostTransactionSign(params *PostTransactionSignParams) (*PostTransactionSignOK, error) {
+func (a *Client) PostTransactionSign(params *PostTransactionSignParams, authInfo runtime.ClientAuthInfoWriter) (*PostTransactionSignOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostTransactionSignParams()
@@ -434,6 +476,7 @@ func (a *Client) PostTransactionSign(params *PostTransactionSignParams) (*PostTr
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostTransactionSignReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -447,7 +490,7 @@ func (a *Client) PostTransactionSign(params *PostTransactionSignParams) (*PostTr
 /*
 PutCancel Cancels the current operation.
 */
-func (a *Client) PutCancel(params *PutCancelParams) (*PutCancelOK, error) {
+func (a *Client) PutCancel(params *PutCancelParams, authInfo runtime.ClientAuthInfoWriter) (*PutCancelOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPutCancelParams()
@@ -462,6 +505,7 @@ func (a *Client) PutCancel(params *PutCancelParams) (*PutCancelOK, error) {
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PutCancelReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
@@ -475,7 +519,7 @@ func (a *Client) PutCancel(params *PutCancelParams) (*PutCancelOK, error) {
 /*
 PutFirmwareUpdate Update firmware
 */
-func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams) (*PutFirmwareUpdateOK, error) {
+func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams, authInfo runtime.ClientAuthInfoWriter) (*PutFirmwareUpdateOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPutFirmwareUpdateParams()
@@ -490,6 +534,7 @@ func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams) (*PutFirmwar
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PutFirmwareUpdateReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})

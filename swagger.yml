@@ -13,6 +13,21 @@ info:
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
 
 paths:
+  /csrf:
+    get:
+      description: Returns csrf token
+      produces:
+        - application/json
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/CSRFResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+
   /generateAddresses:
     post:
       description: Generate addresses for the hardware wallet seed.
@@ -35,6 +50,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /applySettings:
     post:
@@ -62,6 +79,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /backup:
     post:
@@ -77,6 +96,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /cancel:
     put:
@@ -92,6 +113,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /checkMessageSignature:
     post:
@@ -115,6 +138,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /features:
     get:
@@ -130,7 +155,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
-
+      security:
+        - csrfAuth: []
 
   /firmwareUpdate:
     put:
@@ -146,6 +172,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /recovery:
     post:
@@ -177,6 +205,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /generateMnemonic:
     post:
@@ -204,6 +234,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /setMnemonic:
     post:
@@ -227,6 +259,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /setPinCode:
     post:
@@ -242,6 +276,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /signMessage:
     post:
@@ -265,6 +301,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /transactionSign:
     post:
@@ -288,6 +326,9 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
+
   /wipe:
     delete:
       description: clean all the configurations.
@@ -302,6 +343,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /intermediate/pinMatrix:
     post:
@@ -325,6 +368,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /intermediate/passPhrase:
     post:
@@ -348,6 +393,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /intermediate/word:
     post:
@@ -371,6 +418,8 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
 definitions:
   GenerateAddressesRequest:
@@ -564,6 +613,11 @@ definitions:
             type: array
             items:
               type: string
+  CSRFResponse:
+    type: object
+    properties:
+      csrf_token:
+        type: string
 
   HTTPSuccessResponse:
     type: object
@@ -581,4 +635,10 @@ definitions:
             type: string
           code:
             type: integer
-
+schemes:
+  - http
+securityDefinitions:
+  csrfAuth:
+    in: header
+    name: X-CSRF-TOKEN
+    type: apiKey
