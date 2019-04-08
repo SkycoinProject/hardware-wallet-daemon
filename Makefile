@@ -4,10 +4,19 @@
 .PHONY: clean-coverage update-golden-files merge-coverage
 .PHONY: mocks
 
+build: ## daemon build release
+	@mkdir -p release
+	go build -o ./release/skyd ./cmd/daemon
+
 run: ## Run hardware wallet daemon
-	go run cmd/daemon/daemon.go
+	./run.sh ${ARGS}
+
+run-help: ## Show daemon help
+	./run.sh -help
 
 test: ## Run tests for hardware wallet daemon
+	@mkdir -p coverage/
+	go test -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
 integration-test-emulator: ## Run emulator integration tests
 	GOCACHE=off ./ci-scripts/integration-test.sh -m emulator -n emulator-integration
@@ -15,9 +24,13 @@ integration-test-emulator: ## Run emulator integration tests
 integration-test-wallet: ## Run wallet integration tests
 	GOCACHE=off ./ci-scripts/integration-test.sh -m wallet -n wallet-integration
 
+check: test \
+    integration-test-emulator \
+    integration-test-wallet ## run unit and integration tests
+
 mocks: ## Create all mock files for unit tests
-		echo "Generating mock files"
-		go generate ./src/...
+	echo "Generating mock files"
+	go generate ./src/...
 
 lint: ## Run linters. Use make install-linters first.
 	vendorcheck ./...

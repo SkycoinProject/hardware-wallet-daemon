@@ -88,7 +88,7 @@ TEST_FAIL=$?
 
 echo "shutting down daemon"
 
-# Shutdown skycoin node
+# Shutdown daemon
 kill -s SIGINT $DAEMON_PID
 wait $DAEMON_PID
 

@@ -16,3 +16,5 @@
 coverage.html
 coverage/
 *.coverage.out
+
+release
