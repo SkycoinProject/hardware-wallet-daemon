@@ -26,11 +26,6 @@ func applySettings(gateway Gatewayer) http.HandlerFunc {
 		}
 
 		label := r.FormValue("label")
-		if label == "" {
-			resp := NewHTTPErrorResponse(http.StatusBadRequest, "missing label")
-			writeHTTPResponse(w, resp)
-			return
-		}
 
 		msg, err := gateway.ApplySettings(passphrase, label)
 		if err != nil {

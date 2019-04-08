@@ -81,16 +81,6 @@ func TestApplySettings(t *testing.T) {
 		},
 
 		{
-			name:         "400 - missing label",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "missing label"),
-			httpBody: &httpBody{
-				usePassphrase: "true",
-			},
-		},
-
-		{
 			name:   "200 - OK",
 			method: http.MethodPost,
 			status: http.StatusOK,
