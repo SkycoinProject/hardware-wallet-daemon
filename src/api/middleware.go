@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/skycoin/skycoin/src/util/iputil"
@@ -52,13 +51,7 @@ func hostCheck(host string, hostWhitelist []string, handler http.Handler) http.H
 			return true
 		}
 
-		// allow any localhost origin
-		lregex, err := regexp.Compile(`^https?://localhost|127.0.0.1:\d+$`)
-		if err != nil {
-			logger.Panic(err)
-		}
-
-		if lregex.MatchString(host) {
+		if corsRegex.MatchString(host) {
 			return true
 		}
 
@@ -108,13 +101,7 @@ func originRefererCheck(host string, hostWhitelist []string, handler http.Handle
 			return true
 		}
 
-		// allow any localhost origin
-		lregex, err := regexp.Compile(`^https?://localhost|127.0.0.1:\d+$`)
-		if err != nil {
-			logger.Panic(err)
-		}
-
-		if lregex.MatchString(host) {
+		if corsRegex.MatchString(host) {
 			return true
 		}
 

@@ -84,20 +84,20 @@ func TestCORS(t *testing.T) {
 			valid:  true,
 		},
 		{
-			name:   "options no whitelist",
+			name:   "options no whitelist different localhost port",
 			origin: "127.0.0.1:4000",
 			valid:  true,
 		},
 
 		{
-			name:    "options no whitelist",
+			name:    "options no whitelist skycoin wallet staging site",
 			origin:  "staging.wallet.skycoin.net",
 			valid:   true,
 			isHTTPS: true,
 		},
 
 		{
-			name:    "options no whitelist",
+			name:    "options no whitelist skycoin wallet staging site",
 			origin:  "wallet.skycoin.net",
 			valid:   true,
 			isHTTPS: true,
@@ -113,6 +113,12 @@ func TestCORS(t *testing.T) {
 		{
 			name:   "options no whitelist not whitelisted",
 			origin: "example.com",
+			valid:  false,
+		},
+
+		{
+			name:   "options no whitelist check vulnerable domain",
+			origin: "127a0a0a1:80",
 			valid:  false,
 		},
 	}
