@@ -38,6 +38,17 @@ var (
 	logger = logging.MustGetLogger("daemon-api")
 )
 
+// corsRegex matches all localhost origin headers
+var corsRegex *regexp.Regexp
+
+func init() {
+	var err error
+	corsRegex, err = regexp.Compile(`^https?://localhost|127\.0\.0\.1:\d+$`)
+	if err != nil {
+		logger.Panic(err)
+	}
+}
+
 type muxConfig struct {
 	host               string
 	enableCSRF         bool
@@ -204,18 +215,13 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		"https://staging.wallet.skycoin.net",
 		"https://wallet.skycoin.net",
 	}
+
 	for _, s := range c.hostWhitelist {
 		allowedOrigins = append(allowedOrigins, fmt.Sprintf("http://%s", s))
 	}
 
-	// allow any localhost orogin
-	lregex, err := regexp.Compile(`^https?://localhost:\d+$`)
-	if err != nil {
-		logger.Panic(err)
-	}
-
 	corsValidator := func(origin string) bool {
-		if lregex.MatchString(origin) {
+		if corsRegex.MatchString(origin) {
 			return true
 		}
 
