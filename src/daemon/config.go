@@ -21,8 +21,8 @@ type Config struct {
 	// Remote web interface address
 	WebInterfaceAddr string
 
-	// Disable CSRF check
-	DisableCSRF bool
+	// Enable CSRF check
+	EnableCSRF bool
 
 	// Disable Host, Origin and Referer header check in the wallet API
 	DisableHeaderCheck bool
@@ -73,7 +73,7 @@ func NewConfig(port int, datadir string) Config {
 		LogToFile: false,
 
 		// disable csrf by default
-		DisableCSRF: true,
+		EnableCSRF: false,
 
 		// Enable cpu profiling
 		ProfileCPU: false,
@@ -112,7 +112,7 @@ func (c *Config) RegisterFlags() {
 	flag.BoolVar(&help, "help", false, "Show help")
 	flag.IntVar(&c.WebInterfacePort, "web-interface-port", c.WebInterfacePort, "port to serve web interface on")
 	flag.StringVar(&c.WebInterfaceAddr, "web-interface-addr", c.WebInterfaceAddr, "addr to serve web interface on")
-	flag.BoolVar(&c.DisableCSRF, "disable-csrf", c.DisableCSRF, "disable CSRF check")
+	flag.BoolVar(&c.EnableCSRF, "enable-csrf", c.EnableCSRF, "enable CSRF check")
 	flag.BoolVar(&c.DisableHeaderCheck, "disable-header-check", c.DisableHeaderCheck, "disables the host, origin and referer header checks.")
 	flag.StringVar(&c.HostWhitelist, "host-whitelist", c.HostWhitelist, "Hostnames to whitelist in the Host header check. Only applies when the web interface is bound to localhost.")
 

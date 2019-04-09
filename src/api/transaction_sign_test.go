@@ -79,23 +79,6 @@ func TestSignTransaction(t *testing.T) {
 		},
 
 		{
-			name:        "400 - Missing AddressIndexes",
-			method:      http.MethodPost,
-			contentType: ContentTypeJSON,
-			status:      http.StatusBadRequest,
-			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				Hours:           []string{"2", "3"},
-			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "address_indexes is required"),
-		},
-
-		{
 			name:        "400 - Missing Coins",
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,

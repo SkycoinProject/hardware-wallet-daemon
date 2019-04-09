@@ -119,7 +119,7 @@ func verifyCSRFToken(headerToken string) error {
 // Method: GET
 // Response:
 //  csrf_token: CSRF token to use in POST requests
-func getCSRFToken(disabled bool) http.HandlerFunc {
+func getCSRFToken(enabled bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")
@@ -127,7 +127,7 @@ func getCSRFToken(disabled bool) http.HandlerFunc {
 			return
 		}
 
-		if disabled {
+		if !enabled {
 			logger.Warning("CSRF check disabled")
 			resp := NewHTTPErrorResponse(http.StatusNotFound, "")
 			writeHTTPResponse(w, resp)
@@ -150,9 +150,9 @@ func getCSRFToken(disabled bool) http.HandlerFunc {
 }
 
 // CSRFCheck verifies X-CSRF-Token header value
-func CSRFCheck(disabled bool, handler http.Handler) http.Handler {
+func CSRFCheck(enabled bool, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !disabled {
+		if enabled {
 			switch r.Method {
 			case http.MethodPost, http.MethodPut, http.MethodDelete:
 				token := r.Header.Get(CSRFHeaderName)

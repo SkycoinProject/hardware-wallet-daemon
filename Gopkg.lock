@@ -254,7 +254,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:96a53d2c0f9b9a83ac6481db63359ff2ed0bd7f7a988946765026ebe6030e5d3"
+  digest = "1:9459f74bfe2b9d96dc9fbf7869a7314b3119a456ad5b1049a8323f6b0e1e494e"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/device-wallet",
@@ -264,7 +264,7 @@
     "src/device-wallet/wire",
   ]
   pruneopts = ""
-  revision = "5cfb1ed6f8dcb9f0424d5bddcf96178e8eefb71c"
+  revision = "4c8487be020bc5d296fcd2a5650a8e0b32329422"
 
 [[projects]]
   digest = "1:60a450854b4edf4cf42decf7646756e04e255eff8b0de67711292edc2ba7eca7"
