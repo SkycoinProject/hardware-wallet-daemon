@@ -518,42 +518,48 @@ definitions:
         type: string
         example: Hello World!
 
-  TransactionSignRequest:
+  TransactionInput:
     type: object
     required:
-      - inputs
-      - input_indexes
-      - output_addresses
+      - index
+      - hash
+    properties:
+      index:
+        type: integer
+      hash:
+        type: string
+
+  TransactionOutput:
+    type: object
+    required:
+      - address_index
+      - address
       - coins
       - hours
     properties:
-      inputs:
-        type: array
-        items:
-          type: string
-      input_indexes:
-        type: array
-        items:
-          type: integer
-          format: uint32
-      output_addresses:
-        type: array
-        items:
-          type: string
+      address_index:
+        type: integer
+      address:
+        type: string
       coins:
-        type: array
-        items:
-          type: integer
-          format: string
+        type: string
       hours:
+        type: string
+
+  TransactionSignRequest:
+    type: object
+    required:
+      - transaction_inputs
+      - transaction_outputs
+    properties:
+      transaction_inputs:
         type: array
         items:
-          type: integer
-          format: string
-      address_indexes:
+          $ref: '#/definitions/TransactionInput'
+      transaction_outputs:
         type: array
         items:
-          type: integer
+          $ref: '#/definitions/TransactionOutput'
 
   PinMatrixRequest:
     type: object

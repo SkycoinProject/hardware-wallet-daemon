@@ -381,35 +381,28 @@ Sign a transaction with the hardware wallet.
 URI: /api/v1/transaction_sign
 Method: POST
 Args: {
-    "inputs": "<inputs>", 
-    "input_indexes": "<input_indexes>", 
-    "output_addresses": "<output_addresses>", 
-    "coins": "<coins>", 
-    "hours": "<hours>", 
-    "address_indexes": "<address_indexes>"
-    }
+    "transaction_inputs": [{"index": <index<, "hash":"<hash>"}],
+    "transaction_outputs": [{"address_index": <address_index>,"address":"<address>","coins":"<coins>","hours":"<hours>"}],
+   } 
 ```
 
 **Parameters**
-- `inputs`: Hashes of the inputs of the transaction we expect the device to sign.
-- `input_indexes`: Indexes of the inputs in the wallet.
-- `output_addresses`: Addresses of the output for the transaction.
-- `coins`: Amount of coins.
-- `hours`: Number of hours.
-- `address_indexes`: If the address is a return address tell its index in the wallet.
-
+- transaction_inputs: List of objects with the following fields:
+  * `index`: Index of the address, in the hardware wallet, to which the input belongs.
+  * `hash`: Input hash.
+- transaction_outputs: List of objects with the following fields:
+  * `address_index`: If the output is used for returning coins/hours to one of the addresses of the hardware
+  * `address`: Skycoin address in `Base58` format.
+  wallet, this parameter must contain the index of the address in the hardware wallet, so that the user is
+  not asked for confirmation for this specific output. If this is not the case, this parameter is not necessary.
+  * `coins`: Output coins.
+  * `hours`: Output hours.
 
 Example:
 ```sh
 $ curl http://127.0.0.1:9510/api/v1/transaction_sign \
   -H 'Content-Type: application/json' \
-  -d '{"inputs": ["e3411a073376d2abf2e3231023fca48f2396c575871764276d6206350207cde4"],
-    "input_indexes": [0],
-    "output_addresses": ["2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"],
-    "coins": ["0.5"],
-    "hours": ["1"],
-    "address_indexes": [1]
-   	}
+  -d '{"transaction_inputs":[{"index":0,"hash":"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},{"index":1,"hash":"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"}],"transaction_outputs":[{"address_index":null,"address":"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG","coins":"2","hours":"2"},{"address_index":null,"address":"2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8","coins":"3","hours":"3"}]}'
 ```
 
 ### Wipe
