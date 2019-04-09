@@ -2,13 +2,15 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/skycoin/skycoin/src/cipher"
+	"github.com/skycoin/skycoin/src/util/droplet"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	"github.com/stretchr/testify/require"
 )
@@ -29,6 +31,7 @@ func TestSignTransaction(t *testing.T) {
 		contentType                  string
 		httpBody                     string
 		gatewaySignTransactionResult wire.Message
+		err                          string
 		httpResponse                 HTTPResponse
 	}{
 		{
@@ -47,35 +50,40 @@ func TestSignTransaction(t *testing.T) {
 		},
 
 		{
-			name:        "400 - Missing Inputs",
+			name:        "400 - Input Hash Empty",
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,
 			status:      http.StatusBadRequest,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				Hours:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), ""}, {newUint32Ptr(1), ""},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "2", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "inputs is required"),
+			err:          "input hash cannot be empty",
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "input hash cannot be empty"),
 		},
 
 		{
-			name:        "400 - Missing InputIndexes",
+			name:        "400 - Input Index Empty",
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,
 			status:      http.StatusBadRequest,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				Hours:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{nil, "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{nil, "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "2", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "input_indexes is required"),
+			err:          "input index cannot be empty",
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "input index cannot be empty"),
 		},
 
 		{
@@ -84,15 +92,16 @@ func TestSignTransaction(t *testing.T) {
 			contentType: ContentTypeJSON,
 			status:      http.StatusBadRequest,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Hours:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "coins is required"),
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "coins cannot be empty"),
 		},
 
 		{
@@ -101,15 +110,16 @@ func TestSignTransaction(t *testing.T) {
 			contentType: ContentTypeJSON,
 			status:      http.StatusBadRequest,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "hours is required"),
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "hours cannot be empty"),
 		},
 
 		{
@@ -118,69 +128,70 @@ func TestSignTransaction(t *testing.T) {
 			contentType: ContentTypeJSON,
 			status:      http.StatusBadRequest,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:   []uint32{0, 1},
-				Coins:          []string{"2", "3"},
-				Hours:          []string{"2", "3"},
-				AddressIndexes: []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Coins: "2", Hours: "2"},
+					{Coins: "3", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "output_addresses is required"),
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "address cannot be empty"),
 		},
 
 		{
-			name:        "422 - Input - InputIndexes mismatch",
+			name:        "422 - Invalid checksum",
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,
 			status:      http.StatusUnprocessableEntity,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				Hours:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsas5JZ3uBatnkaMgg9pN965JvG", Coins: "2", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "inputs length not equal to input_indexes length"),
+			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, cipher.ErrAddressInvalidChecksum.Error()),
 		},
 
 		{
-			name:        "422 - OutputAddresses - Coins mismatch",
+			name:        "422 - Missing Output Addresses",
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,
 			status:      http.StatusUnprocessableEntity,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2"},
-				Hours:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "0.000000001010111001", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "output_addresses length not equal to coins length"),
+			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, droplet.ErrTooManyDecimals.Error()),
 		},
 
 		{
-			name:        "422 - OutputAddresses - Hours mismatch",
+			name:        "422 - Missing Output Addresses",
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,
 			status:      http.StatusUnprocessableEntity,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				Hours:           []string{"2"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "1", Hours: "0.2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
 			}),
-			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "output_addresses length not equal to hours length"),
+			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "strconv.ParseUint: parsing \"0.2\": invalid syntax"),
 		},
 
 		{
@@ -189,19 +200,21 @@ func TestSignTransaction(t *testing.T) {
 			contentType: ContentTypeJSON,
 			status:      http.StatusConflict,
 			httpBody: toJSON(t, &TransactionSignRequest{
-				Inputs: []string{
-					"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663",
-					"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				InputIndexes:    []uint32{0, 1},
-				OutputAddresses: []string{"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8"},
-				Coins:           []string{"2", "3"},
-				Hours:           []string{"2", "3"},
-				AddressIndexes:  []int{0, 1},
+				TransactionInputs: []TransactionInput{
+					{newUint32Ptr(0), "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{newUint32Ptr(1), "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "2", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
 			}),
 			gatewaySignTransactionResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
 			},
+
+			err:          "failure msg",
 			httpResponse: NewHTTPErrorResponse(http.StatusConflict, "failure msg"),
 		},
 	}
@@ -216,12 +229,14 @@ func TestSignTransaction(t *testing.T) {
 					endpoint = "/emulator" + endpoint
 				}
 
-				var body TransactionSignRequest
-				err := json.Unmarshal([]byte(tc.httpBody), &body)
-				if err == nil {
-					ins, outs, err := body.TransactionParams()
+				if tc.err != "" {
+					var body TransactionSignRequest
+					err := json.Unmarshal([]byte(tc.httpBody), &body)
 					if err == nil {
-						gateway.On("TransactionSign", ins, outs).Return(tc.gatewaySignTransactionResult, nil)
+						ins, outs, err := body.TransactionParams()
+						if err == nil {
+							gateway.On("TransactionSign", ins, outs).Return(tc.gatewaySignTransactionResult, nil)
+						}
 					}
 				}
 
@@ -250,6 +265,9 @@ func TestSignTransaction(t *testing.T) {
 
 				if rsp.Data == nil {
 					require.Nil(t, tc.httpResponse.Data)
+					if tc.err != "" {
+						require.Equal(t, tc.err, rsp.Error.Message)
+					}
 				} else {
 					require.NotNil(t, tc.httpResponse.Data)
 				}

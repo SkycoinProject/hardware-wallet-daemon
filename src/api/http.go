@@ -529,3 +529,7 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 func newStrPtr(s string) *string {
 	return &s
 }
+
+func newUint32Ptr(n uint32) *uint32 {
+	return &n
+}

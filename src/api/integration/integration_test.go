@@ -325,12 +325,20 @@ func TestEmulatorTransactionSign(t *testing.T) {
 
 	params := operations.NewPostTransactionSignParams()
 	params.TransactionSignRequest = &models.TransactionSignRequest{
-		Coins:           []string{"0.001"},
-		Hours:           []string{"1"},
-		Inputs:          []string{"82f1d93a04f8ae7a305c1a54efe0c21ac1be86777e60a4f0c2b8a6d0d957a645"},
-		InputIndexes:    []uint32{0},
-		OutputAddresses: []string{"2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"},
-		AddressIndexes:  []int64{0},
+		TransactionInputs: []*models.TransactionInput{
+			{
+				Index: newInt64Ptr(0),
+				Hash:  newStrPtr("181bd5656115172fe81451fae4fb56498a97744d89702e73da75ba91ed5200f9"),
+			},
+		},
+
+		TransactionOutputs: []*models.TransactionOutput{
+			{
+				Address: newStrPtr("K9TzLrgqz7uXn3QJHGxmzdRByAzH33J2ot"),
+				Coins:   newStrPtr("0.1"),
+				Hours:   newStrPtr("2"),
+			},
+		},
 	}
 
 	resp, err := c.Operations.PostTransactionSign(params, addCSRFHeader(t, c))
@@ -554,9 +562,9 @@ func TestWalletSetPinCode(t *testing.T) {
 }
 
 func TestWalletTransactionSign(t *testing.T) {
-	if !doWallet(t) {
-		return
-	}
+	// if !doWallet(t) {
+	// 	return
+	// }
 
 	bootstrap(t, deviceWallet.DeviceTypeUSB)
 
@@ -564,11 +572,20 @@ func TestWalletTransactionSign(t *testing.T) {
 
 	params := operations.NewPostTransactionSignParams()
 	params.TransactionSignRequest = &models.TransactionSignRequest{
-		Coins:           []string{"0.1"},
-		Hours:           []string{"2"},
-		Inputs:          []string{"181bd5656115172fe81451fae4fb56498a97744d89702e73da75ba91ed5200f9"},
-		InputIndexes:    []uint32{0},
-		OutputAddresses: []string{"K9TzLrgqz7uXn3QJHGxmzdRByAzH33J2ot"},
+		TransactionInputs: []*models.TransactionInput{
+			{
+				Index: newInt64Ptr(0),
+				Hash:  newStrPtr("181bd5656115172fe81451fae4fb56498a97744d89702e73da75ba91ed5200f9"),
+			},
+		},
+
+		TransactionOutputs: []*models.TransactionOutput{
+			{
+				Address: newStrPtr("K9TzLrgqz7uXn3QJHGxmzdRByAzH33J2ot"),
+				Coins:   newStrPtr("0.1"),
+				Hours:   newStrPtr("2"),
+			},
+		},
 	}
 
 	resp, err := c.Operations.PostTransactionSign(params, addCSRFHeader(t, c))

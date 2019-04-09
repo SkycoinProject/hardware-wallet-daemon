@@ -3,24 +3,34 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"github.com/gogo/protobuf/proto"
+	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/skycoin/src/cipher"
+	"github.com/skycoin/skycoin/src/util/droplet"
 	"net/http"
 	"strconv"
-
-	"github.com/gogo/protobuf/proto"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
-	"github.com/skycoin/skycoin/src/util/droplet"
 )
 
 // TODO(therealssj): add more validation
 
 // TransactionSignRequest is request data for /api/v1/transaction_sign
 type TransactionSignRequest struct {
-	Inputs          []string `json:"inputs"`
-	InputIndexes    []uint32 `json:"input_indexes"`
-	OutputAddresses []string `json:"output_addresses"`
-	Coins           []string `json:"coins"`
-	Hours           []string `json:"hours"`
-	AddressIndexes  []int    `json:"address_indexes"`
+	TransactionInputs  []TransactionInput  `json:"transaction_inputs"`
+	TransactionOutputs []TransactionOutput `json:"transaction_outputs"`
+}
+
+// TransactionInput is a skycoin transaction input
+type TransactionInput struct {
+	Index *uint32 `json:"index"` // pointer to differentiate between 0 and nil
+	Hash  string  `json:"hash"`
+}
+
+// TransactionOutput is a skycoin transaction output
+type TransactionOutput struct {
+	AddressIndex *uint32 `json:"address_index"` // pointer to differentiate between 0 and nil
+	Address      string  `json:"address"`
+	Coins        string  `json:"coins"`
+	Hours        string  `json:"hours"`
 }
 
 // TransactionSignResponse is data returned by POST /api/v1/transaction_sign
@@ -79,24 +89,32 @@ func transactionSign(gateway Gatewayer) http.HandlerFunc {
 }
 
 func (r *TransactionSignRequest) validate() error {
-	if len(r.Inputs) == 0 {
-		return errors.New("inputs is required")
+	if len(r.TransactionInputs) == 0 {
+		return errors.New("inputs are required")
 	}
 
-	if len(r.InputIndexes) == 0 {
-		return errors.New("input_indexes is required")
+	for _, input := range r.TransactionInputs {
+		if input.Hash == "" {
+			return errors.New("input hash cannot be empty")
+		}
+
+		if input.Index == nil {
+			return errors.New("input index cannot be empty")
+		}
 	}
 
-	if len(r.Coins) == 0 {
-		return errors.New("coins is required")
-	}
+	for _, output := range r.TransactionOutputs {
+		if output.Address == "" {
+			return errors.New("address cannot be empty")
+		}
 
-	if len(r.Hours) == 0 {
-		return errors.New("hours is required")
-	}
+		if output.Coins == "" {
+			return errors.New("coins cannot be empty")
+		}
 
-	if len(r.OutputAddresses) == 0 {
-		return errors.New("output_addresses is required")
+		if output.Hours == "" {
+			return errors.New("hours cannot be empty")
+		}
 	}
 
 	return nil
@@ -104,46 +122,46 @@ func (r *TransactionSignRequest) validate() error {
 
 // TransactionParams returns params for a transaction from the request data
 func (r *TransactionSignRequest) TransactionParams() ([]*messages.SkycoinTransactionInput, []*messages.SkycoinTransactionOutput, error) {
-	if len(r.Inputs) != len(r.InputIndexes) {
-		return nil, nil, errors.New("inputs length not equal to input_indexes length")
-	}
-
-	if len(r.OutputAddresses) != len(r.Coins) {
-		return nil, nil, errors.New("output_addresses length not equal to coins length")
-
-	}
-
-	if len(r.OutputAddresses) != len(r.Hours) {
-		return nil, nil, errors.New("output_addresses length not equal to hours length")
-	}
-
 	var transactionInputs []*messages.SkycoinTransactionInput
 	var transactionOutputs []*messages.SkycoinTransactionOutput
-	for i, input := range r.Inputs {
+
+	for _, input := range r.TransactionInputs {
 		var transactionInput messages.SkycoinTransactionInput
-		transactionInput.HashIn = proto.String(input)
-		transactionInput.Index = proto.Uint32(r.InputIndexes[i])
+
+		transactionInput.HashIn = proto.String(input.Hash)
+
+		if input.Index != nil {
+			transactionInput.Index = proto.Uint32(*input.Index)
+		}
 		transactionInputs = append(transactionInputs, &transactionInput)
 	}
-	for i, output := range r.OutputAddresses {
+
+	for _, output := range r.TransactionOutputs {
 		var transactionOutput messages.SkycoinTransactionOutput
-		transactionOutput.Address = proto.String(output)
 
-		coins, err := droplet.FromString(r.Coins[i])
+		_, err := cipher.DecodeBase58Address(output.Address)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		hours, err := strconv.ParseUint(r.Hours[i], 10, 64)
+		coins, err := droplet.FromString(output.Coins)
 		if err != nil {
 			return nil, nil, err
 		}
 
+		hours, err := strconv.ParseUint(output.Hours, 10, 64)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		transactionOutput.Address = proto.String(output.Address)
 		transactionOutput.Coin = proto.Uint64(coins)
 		transactionOutput.Hour = proto.Uint64(hours)
-		if i < len(r.AddressIndexes) {
-			transactionOutput.AddressIndex = proto.Uint32(uint32(r.AddressIndexes[i]))
+
+		if output.AddressIndex != nil {
+			transactionOutput.AddressIndex = proto.Uint32(*output.AddressIndex)
 		}
+
 		transactionOutputs = append(transactionOutputs, &transactionOutput)
 	}
 

@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -17,51 +19,24 @@ import (
 // swagger:model TransactionSignRequest
 type TransactionSignRequest struct {
 
-	// address indexes
-	AddressIndexes []int64 `json:"address_indexes"`
-
-	// coins
+	// transaction inputs
 	// Required: true
-	Coins []string `json:"coins"`
+	TransactionInputs []*TransactionInput `json:"transaction_inputs"`
 
-	// hours
+	// transaction outputs
 	// Required: true
-	Hours []string `json:"hours"`
-
-	// input indexes
-	// Required: true
-	InputIndexes []uint32 `json:"input_indexes"`
-
-	// inputs
-	// Required: true
-	Inputs []string `json:"inputs"`
-
-	// output addresses
-	// Required: true
-	OutputAddresses []string `json:"output_addresses"`
+	TransactionOutputs []*TransactionOutput `json:"transaction_outputs"`
 }
 
 // Validate validates this transaction sign request
 func (m *TransactionSignRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateCoins(formats); err != nil {
+	if err := m.validateTransactionInputs(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateHours(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateInputIndexes(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateInputs(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOutputAddresses(formats); err != nil {
+	if err := m.validateTransactionOutputs(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -71,46 +46,51 @@ func (m *TransactionSignRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *TransactionSignRequest) validateCoins(formats strfmt.Registry) error {
+func (m *TransactionSignRequest) validateTransactionInputs(formats strfmt.Registry) error {
 
-	if err := validate.Required("coins", "body", m.Coins); err != nil {
+	if err := validate.Required("transaction_inputs", "body", m.TransactionInputs); err != nil {
 		return err
+	}
+
+	for i := 0; i < len(m.TransactionInputs); i++ {
+		if swag.IsZero(m.TransactionInputs[i]) { // not required
+			continue
+		}
+
+		if m.TransactionInputs[i] != nil {
+			if err := m.TransactionInputs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("transaction_inputs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
 }
 
-func (m *TransactionSignRequest) validateHours(formats strfmt.Registry) error {
+func (m *TransactionSignRequest) validateTransactionOutputs(formats strfmt.Registry) error {
 
-	if err := validate.Required("hours", "body", m.Hours); err != nil {
+	if err := validate.Required("transaction_outputs", "body", m.TransactionOutputs); err != nil {
 		return err
 	}
 
-	return nil
-}
+	for i := 0; i < len(m.TransactionOutputs); i++ {
+		if swag.IsZero(m.TransactionOutputs[i]) { // not required
+			continue
+		}
 
-func (m *TransactionSignRequest) validateInputIndexes(formats strfmt.Registry) error {
+		if m.TransactionOutputs[i] != nil {
+			if err := m.TransactionOutputs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("transaction_outputs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
 
-	if err := validate.Required("input_indexes", "body", m.InputIndexes); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *TransactionSignRequest) validateInputs(formats strfmt.Registry) error {
-
-	if err := validate.Required("inputs", "body", m.Inputs); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *TransactionSignRequest) validateOutputAddresses(formats strfmt.Registry) error {
-
-	if err := validate.Required("output_addresses", "body", m.OutputAddresses); err != nil {
-		return err
 	}
 
 	return nil
