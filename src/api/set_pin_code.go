@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// URI: /api/v1/setPinCode
+// URI: /api/v1/set_pin_code
 // Method: POST
 func setPinCode(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

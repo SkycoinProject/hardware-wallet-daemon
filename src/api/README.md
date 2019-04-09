@@ -33,7 +33,7 @@ The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v
 Generate addresses for the hardware wallet seed.
 
 ```
-URI: /api/v1/generateAddresses
+URI: /api/v1/generate_addresses
 Method: POST
 Content-Type: application/json
 Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_address": "<confirm_address>"}
@@ -46,7 +46,7 @@ Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_addr
 
 Example:
 ```sh
-$ curl http://127.0.0.1:9510/api/v1/generateAddresses \
+$ curl http://127.0.0.1:9510/api/v1/generate_addresses \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 2, "start_index": 0}'
 ```
@@ -67,18 +67,17 @@ Response:
 Apply hardware wallet settings.
 
 ```
-URI: /api/v1/applySettings
+URI: /api/v1/apply_settings
 Method: POST
-Args:
-    label: label for hardware wallet
-    use-passphrase: (boolean) ask for passphrase before starting operation
+Content-Type: application/json
+Args: {"label": "<label for hardware wallet>", "use_passphrase": "<ask for passphrase before starting operation>"}
 ```
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:9510/api/v1/applySettings \
-   -H 'Content-Type: application/x-www-form-urlencoded' \
-   -d 'label=skywallet'
+$ curl -X POST http://127.0.0.1:9510/api/v1/apply_settings \
+   -H 'Content-Type: application/json' \
+   -d '{"label": "skywallet", "use_passphrase": false}'
 ```
 
 Response:
@@ -148,7 +147,7 @@ Response:
 Check a message signature matches the given address.
 
 ```
-URI: /api/v1/checkMessageSignature
+URI: /api/v1/check_message_signature
 Method: POST
 Content-Type: application/json
 Args: {"message": "<message>", "signature": "<signature>", "address": "<address>"}
@@ -161,7 +160,7 @@ Args: {"message": "<message>", "signature": "<signature>", "address": "<address>
 
 Example:
 ```sh
-curl -X POST http://127.0.0.1:9510/api/v1/checkMessageSignature \
+curl -X POST http://127.0.0.1:9510/api/v1/check_message_signature \
 -H 'Content-Type: application/json' \
 -d '{"message": "Hello World", "signature": "6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300", "address": "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"}'
 ```
@@ -183,22 +182,20 @@ Response:
 ```json
 {
     "data": {
-        "features": {
-            "vendor": "Skycoin Foundation",
-            "major_version": 1,
-            "minor_version": 6,
-            "patch_version": 1,
-            "device_id": "92FD1C8A06E401ABC524DF1C",
-            "pin_protection": false,
-            "passphrase_protection": false,
-            "label": "skywallet",
-            "initialized": true,
-            "bootloader_hash": "/V5yWwVclKtbpzZW/M1CeuNxQZQZTv5ia6OIOiVu5C8=",
-            "pin_cached": false,
-            "passphrase_cached": false,
-            "needs_backup": false,
-            "model": "1"
-        }
+        "vendor": "Skycoin Foundation",
+        "major_version": 1,
+        "minor_version": 6,
+        "patch_version": 1,
+        "device_id": "92FD1C8A06E401ABC524DF1C",
+        "pin_protection": false,
+        "passphrase_protection": false,
+        "label": "skywallet",
+        "initialized": true,
+        "bootloader_hash": "/V5yWwVclKtbpzZW/M1CeuNxQZQZTv5ia6OIOiVu5C8=",
+        "pin_cached": false,
+        "passphrase_cached": false,
+        "needs_backup": false,
+        "model": "1"
     }
 }
 ```
@@ -208,7 +205,7 @@ Response:
 Update device firmware
 
 ```
-URI: /api/v1/firmwareUpdate
+URI: /api/v1/firmware_update
 Method: PUT
 Args:
     file: firmware file
@@ -223,19 +220,19 @@ The device needs to be wiped if already initialized.
 ```
 URI: /api/v1/recovery
 Method: POST
-Args:
-    word-count: mnemonic seed length
-    use-passphrase: (boolean) ask for passphrase before starting operation
-    dry-run: (bool) perform dry-run recovery workflow (for safe mnemonic validation).
+Content-Type: application/json
+Args: {
+        "word_count": "<mnemonic seed length>", 
+        "use_passphrase": "<ask for passphrase before starting operation>", 
+        "dry_run": "<perform dry-run recovery workflow (for safe mnemonic validation)>"
+      }
 ```
 
 Example:
 ```sh
 $ curl -X POST http://127.0.0.1:9510/api/v1/recovery \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'word-count=$word-count' \
-  -d 'use-passphrase=$use-passphrase' \
-  -d 'dry-run=$dry-run'
+  -H 'Content-Type: application/json' \
+  -d '{"word_count": 12, "use_passphrase": false, "dry_run": true}'
 ```
 
 Response Flow:
@@ -254,19 +251,17 @@ Response Flow:
 Generate mnemonic can be used to initialize the device with a random seed.
 
 ```
-URI: /api/v1/generateMnemonic
+URI: /api/v1/generate_mnemonic
 Method: POST
-Args:
-    word-count: mnemonic seed length
-    use-passphrase: (bool) ask for passphrase before starting operation
+Content-Type: application/json
+Args: {"word_count": "<mnemonic seed length>", "use_passphrase": "<ask for passphrase before starting operation>"}
 ```
 
 Example:
 ```sh
-$ curl http://127.0.0.1:9510/api/v1/generateMnemonic \
-  -H 'Content-Type: x-www-form-urlencoded' 
-  -d 'word-count=12' \
-  -d 'use-passphrase=$use-passphrase'
+$ curl http://127.0.0.1:9510/api/v1/generate_mnemonic \
+  -H 'Content-Type: application/json' \
+  -d '{"word_count": 12, "use_passphrase": false}'
 ```
 
 Response:
@@ -282,17 +277,17 @@ Set mnemonic can be used to initialize the device with your own seed.
 > The seed needs to be a valid bip39 seed.
 
 ```
-URI: /api/v1/setMnemonic
+URI: /api/v1/set_mnemonic
 Method: POST
-Args:
-    mnemonic: bip39 mnemonic seed [required]
+Content-Type: application/json
+Args: {"mnemonic": "<bip39 mnemonic seed>"}
 ```
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:9510/api/v1/setMnemonic\
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'mnemonic=$mnemonic'
+$ curl -X POST http://127.0.0.1:9510/api/v1/set_mnemonic \
+  -H 'Content-Type: application/json' \
+  -d '{"mnemonic": "cloud flower upset remain green metal below cup stem infant art thank"}'
 ```
 
 Response:
@@ -318,13 +313,13 @@ Response:
 Configure a pin code on the device.
 
 ```
-URI: /api/v1/setPinCode
+URI: /api/v1/set_pin_code
 Method: POST
 ```
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:9510/api/v1/setPinCode
+$ curl -X POST http://127.0.0.1:9510/api/v1/set_pin_code
 ```
 
 Response Flow:
@@ -351,7 +346,7 @@ Response Flow:
 Sign a message using the secret key at given index.
 
 ```
-URI: /api/v1/signMessage
+URI: /api/v1/sign_message
 Method: POST
 Args: {
     "address_n": <address_n>, 
@@ -365,7 +360,7 @@ Args: {
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:9510/api/v1/signMessage \
+$ curl -X POST http://127.0.0.1:9510/api/v1/sign_message \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 0, "message": "hello world"}'
 ```
@@ -383,7 +378,7 @@ Response:
 Sign a transaction with the hardware wallet.
 
 ```
-URI: /api/v1/transactionSign
+URI: /api/v1/transaction_sign
 Method: POST
 Args: {
     "inputs": "<inputs>", 
@@ -406,7 +401,7 @@ Args: {
 
 Example:
 ```sh
-$ curl http://127.0.0.1:9510/api/v1/transactionSign \
+$ curl http://127.0.0.1:9510/api/v1/transaction_sign \
   -H 'Content-Type: application/json' \
   -d '{"inputs": ["e3411a073376d2abf2e3231023fca48f2396c575871764276d6206350207cde4"],
     "input_indexes": [0],

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"strings"
 	"testing"
 
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
@@ -14,11 +14,6 @@ import (
 )
 
 func TestApplySettings(t *testing.T) {
-	type httpBody struct {
-		usePassphrase string
-		label         string
-	}
-
 	failureMsg := messages.Failure{
 		Code:    messages.FailureType_Failure_NotInitialized.Enum(),
 		Message: newStrPtr("failure msg"),
@@ -39,9 +34,7 @@ func TestApplySettings(t *testing.T) {
 		method                     string
 		status                     int
 		contentType                string
-		httpBody                   *httpBody
-		label                      string
-		usePassphrase              bool
+		httpBody                   string
 		gatewayApplySettingsResult wire.Message
 		httpResponse               HTTPResponse
 	}{
@@ -53,13 +46,11 @@ func TestApplySettings(t *testing.T) {
 		},
 
 		{
-			name:         "400 - invalid passphrase",
+			name:         "415 - Unsupported Media Type",
 			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for use-passphrase"),
-			httpBody: &httpBody{
-				usePassphrase: "foo",
-			},
+			contentType:  ContentTypeForm,
+			status:       http.StatusUnsupportedMediaType,
+			httpResponse: NewHTTPErrorResponse(http.StatusUnsupportedMediaType, ""),
 		},
 
 		{
@@ -67,12 +58,10 @@ func TestApplySettings(t *testing.T) {
 			method:      http.MethodPost,
 			contentType: ContentTypeJSON,
 			status:      http.StatusConflict,
-			httpBody: &httpBody{
-				label:         "foo",
-				usePassphrase: "false",
-			},
-			label:         "foo",
-			usePassphrase: false,
+			httpBody: toJSON(t, &ApplySettingsRequest{
+				UsePassphrase: true,
+				Label:         "foo",
+			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
@@ -84,12 +73,10 @@ func TestApplySettings(t *testing.T) {
 			name:   "200 - OK",
 			method: http.MethodPost,
 			status: http.StatusOK,
-			httpBody: &httpBody{
-				label:         "foo",
-				usePassphrase: "false",
-			},
-			label:         "foo",
-			usePassphrase: false,
+			httpBody: toJSON(t, &ApplySettingsRequest{
+				UsePassphrase: true,
+				Label:         "foo",
+			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
@@ -103,31 +90,28 @@ func TestApplySettings(t *testing.T) {
 	for _, deviceType := range []deviceWallet.DeviceType{deviceWallet.DeviceTypeUSB, deviceWallet.DeviceTypeEmulator} {
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				endpoint := "/applySettings"
+				endpoint := "/apply_settings"
 				gateway := &MockGatewayer{}
 
 				if deviceType == deviceWallet.DeviceTypeEmulator {
 					endpoint = "/emulator" + endpoint
 				}
 
-				v := url.Values{}
-				if tc.httpBody != nil {
-					if tc.httpBody.usePassphrase != "" {
-						v.Add("use-passphrase", tc.httpBody.usePassphrase)
-					}
-
-					if tc.httpBody.label != "" {
-						v.Add("label", tc.httpBody.label)
-					}
-					if len(v) > 0 {
-						endpoint += "?" + v.Encode()
-					}
+				var body ApplySettingsRequest
+				err := json.Unmarshal([]byte(tc.httpBody), &body)
+				if err == nil {
+					gateway.On("ApplySettings", body.UsePassphrase, body.Label).Return(tc.gatewayApplySettingsResult, nil)
 				}
 
-				gateway.On("ApplySettings", tc.usePassphrase, tc.label).Return(tc.gatewayApplySettingsResult, nil)
-
-				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
+				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
 				require.NoError(t, err)
+
+				contentType := tc.contentType
+				if contentType == "" {
+					contentType = ContentTypeJSON
+				}
+
+				req.Header.Set("Content-Type", contentType)
 
 				rr := httptest.NewRecorder()
 				handler := newServerMux(defaultMuxConfig(), gateway, gateway)

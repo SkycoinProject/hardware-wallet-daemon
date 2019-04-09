@@ -123,9 +123,7 @@ func TestGenerateAddresses(t *testing.T) {
 				Data: responseMsgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: GenerateAddressesResponse{
-					Addresses: []string{"2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", "zC8GAQGQBfwk7vtTxVoRG7iMperHNuyYPs"},
-				},
+				Data: []string{"2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", "zC8GAQGQBfwk7vtTxVoRG7iMperHNuyYPs"},
 			},
 		},
 	}
@@ -133,7 +131,7 @@ func TestGenerateAddresses(t *testing.T) {
 	for _, deviceType := range []deviceWallet.DeviceType{deviceWallet.DeviceTypeUSB, deviceWallet.DeviceTypeEmulator} {
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				endpoint := "/generateAddresses"
+				endpoint := "/generate_addresses"
 				gateway := &MockGatewayer{}
 
 				if deviceType == deviceWallet.DeviceTypeEmulator {
@@ -174,11 +172,11 @@ func TestGenerateAddresses(t *testing.T) {
 					require.Nil(t, tc.httpResponse.Data)
 				} else {
 					require.NotNil(t, tc.httpResponse.Data)
-					var resp GenerateAddressesResponse
+					var resp []string
 					err = json.Unmarshal(rsp.Data, &resp)
 					require.NoError(t, err)
 
-					require.Equal(t, tc.httpResponse.Data.(GenerateAddressesResponse), resp)
+					require.Equal(t, tc.httpResponse.Data.([]string), resp)
 				}
 			})
 		}

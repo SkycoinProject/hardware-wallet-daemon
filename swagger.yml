@@ -28,7 +28,7 @@ paths:
           schema:
             $ref: '#/definitions/HTTPErrorResponse'
 
-  /generateAddresses:
+  /generate_addresses:
     post:
       description: Generate addresses for the hardware wallet seed.
       consumes:
@@ -38,7 +38,7 @@ paths:
       parameters:
         - in: body
           name: GenerateAddressesRequest
-          description: GenerateAddressesRequest is request data for /api/generateAddresses
+          description: GenerateAddressesRequest is request data for /api/v1/generate_addresses
           schema:
             $ref: '#/definitions/GenerateAddressesRequest'
       responses:
@@ -53,22 +53,19 @@ paths:
       security:
         - csrfAuth: []
 
-  /applySettings:
+  /apply_settings:
     post:
       description: Apply hardware wallet settings.
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
-        - in: formData
-          name: label
-          description: label for hardware wallet
-          type: string
-        - in: formData
-          name: use-passphrase
-          type: boolean
-          description: ask for passphrase before starting operation
+        - in: body
+          name: ApplySettingsRequest
+          description: ApplySettingsRequest is request data for /api/v1/apply_settings
+          schema:
+            $ref: '#/definitions/ApplySettingsRequest'
       responses:
         200:
           description: success
@@ -115,7 +112,7 @@ paths:
       security:
         - csrfAuth: []
 
-  /checkMessageSignature:
+  /check_message_signature:
     post:
       description: Check a message signature matches the given address.
       consumes:
@@ -125,7 +122,7 @@ paths:
       parameters:
         - in: body
           name: CheckMessageSignatureRequest
-          description: CheckMessageSignatureRequest is request data for /api/checkMessageSignature
+          description: CheckMessageSignatureRequest is request data for /api/v1/check_message_signature
           schema:
             $ref: '#/definitions/CheckMessageSignatureRequest'
       responses:
@@ -157,7 +154,7 @@ paths:
       security:
         - csrfAuth: []
 
-  /firmwareUpdate:
+  /firmware_update:
     put:
       description: Update firmware
       produces:
@@ -178,23 +175,15 @@ paths:
     post:
       description: Recover existing wallet using seed.
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
-        - in: formData
-          name: word-count
-          description: mnemonic seed length
-          required: true
-          type: integer
-        - in: formData
-          name: use-passphrase
-          description: ask for passphrase before starting operation
-          type: boolean
-        - in: formData
-          name: dry-run
-          description: perform dry-run recovery workflow (for safe mnemonic validation)
-          type: boolean
+        - in: body
+          name: RecoveryRequest
+          description: RecoveryRequest is request data for /api/v1/check_message_signature
+          schema:
+            $ref: '#/definitions/RecoveryRequest'
       responses:
         200:
           description: intermediate response
@@ -207,23 +196,19 @@ paths:
       security:
         - csrfAuth: []
 
-  /generateMnemonic:
+  /generate_mnemonic:
     post:
       description: Generate mnemonic can be used to initialize the device with a random seed.
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
-        - in: formData
-          name: word-count
-          description: mnemonic seed length
-          required: true
-          type: integer
-        - in: formData
-          name: use-passphrase
-          description: ask for passphrase before starting operation
-          type: boolean
+        - in: body
+          name: GenerateMnemonicRequest
+          description: GenerateMnemonicRequest is request data for /api/v1/generate_mnemonic
+          schema:
+            $ref: '#/definitions/GenerateMnemonicRequest'
       responses:
         200:
           description: successful operation
@@ -236,19 +221,19 @@ paths:
       security:
         - csrfAuth: []
 
-  /setMnemonic:
+  /set_mnemonic:
     post:
       description: Set mnemonic can be used to initialize the device with your own seed.
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
-        - name: mnemonic
-          in: formData
-          description: bip39 mnemonic seed
-          required: true
-          type: string
+        - in: body
+          name: SetMnemonicRequest
+          description: SetMnemonicRequest is request data for /api/v1/set_mnemonic
+          schema:
+            $ref: '#/definitions/SetMnemonicRequest'
       responses:
         200:
           description: success
@@ -261,7 +246,7 @@ paths:
       security:
         - csrfAuth: []
 
-  /setPinCode:
+  /set_pin_code:
     post:
       description: Configure a pin code on the device.
       produces:
@@ -278,7 +263,7 @@ paths:
       security:
         - csrfAuth: []
 
-  /signMessage:
+  /sign_message:
     post:
       description: Sign a message using the secret key at given index.
       consumes:
@@ -303,7 +288,7 @@ paths:
       security:
         - csrfAuth: []
 
-  /transactionSign:
+  /transaction_sign:
     post:
       description: Sign a transaction with the hardware wallet.
       consumes:
@@ -344,6 +329,7 @@ paths:
             $ref: '#/definitions/HTTPErrorResponse'
       security:
         - csrfAuth: []
+
   /connected:
     get:
       description: check whether device is connected or not.
@@ -365,7 +351,7 @@ paths:
         - csrfAuth: []
 
 
-  /intermediate/pinMatrix:
+  /intermediate/pin_matrix:
     post:
       description: pin matrix ack request.
       consumes:
@@ -375,7 +361,7 @@ paths:
       parameters:
         - in: body
           name: PinMatrixRequest
-          description: PinMatrixRequest is request data for /api/v1/intermediate/pinMatrix
+          description: PinMatrixRequest is request data for /api/v1/intermediate/pin_matrix
           schema:
             $ref: '#/definitions/PinMatrixRequest'
       responses:
@@ -390,7 +376,7 @@ paths:
       security:
         - csrfAuth: []
 
-  /intermediate/passPhrase:
+  /intermediate/passphrase:
     post:
       description: passphrase ack request.
       consumes:
@@ -399,10 +385,10 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: PassPhraseRequest
-          description: PassPhraseRequest is request data for /api/v1/intermediate/passPhrase
+          name: PassphraseRequest
+          description: PassPhraseRequest is request data for /api/v1/intermediate/passphrase
           schema:
-            $ref: '#/definitions/PinMatrixRequest'
+            $ref: '#/definitions/PassphraseRequest'
       responses:
         200:
           description: success
@@ -456,6 +442,16 @@ definitions:
         type: boolean
         example: false
 
+  ApplySettingsRequest:
+    type: object
+    properties:
+      label:
+        type: string
+        example: "foo"
+      use_passphrase:
+        type: boolean
+        example: false
+
   CheckMessageSignatureRequest:
     type: object
     required:
@@ -472,6 +468,42 @@ definitions:
       address:
         type: string
         example: 2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw
+
+  RecoveryRequest:
+    type: object
+    required:
+      - word_count
+    properties:
+      word_count:
+        type: integer
+        example: 32
+      use_passphrase:
+        type: boolean
+        example: false
+      dry_run:
+        type: boolean
+        example: false
+
+  GenerateMnemonicRequest:
+    type: object
+    required:
+      - word_count
+    properties:
+      word_count:
+        type: integer
+        example: 32
+      use_passphrase:
+        type: boolean
+        example: false
+
+  SetMnemonicRequest:
+    type: object
+    required:
+      - mnemonic
+    properties:
+      mnemonic:
+        type: string
+        example: "cloud flower upset remain green metal below cup stem infant art thank"
 
   SignMessageRequest:
     type: object
@@ -531,7 +563,7 @@ definitions:
       pin:
         type: string
 
-  PassPhraseRequest:
+  PassphraseRequest:
     type: object
     required:
       - passphrase
@@ -551,95 +583,81 @@ definitions:
     type: object
     properties:
       data:
-        type: object
-        properties:
-          addresses:
-            type: array
-            items:
-              type: string
+        type: array
+        items:
+          type: string
 
   FeaturesResponse:
     type: object
     properties:
       data:
         type: object
+        required:
+          - vendor
+          - passphrase_protection
+          - pin_protection
+          - passphrase_cached
+          - needs_backup
+          - fw_patch
+          - fw_minor
+          - fw_major
+          - pin_cached
+          - initialized
         properties:
-          features:
-            type: object
-            required:
-              - vendor
-              - passphrase_protection
-              - pin_protection
-              - passphrase_cached
-              - needs_backup
-              - fw_patch
-              - fw_minor
-              - fw_major
-              - pin_cached
-              - initialized
-            properties:
-              vendor:
-                type: string
-              major_version:
-                type: integer
-              minor_version:
-                type: integer
-              patch_version:
-                type: integer
-              device_id:
-                type: string
-              pin_protection:
-                type: boolean
-              passphrase_protection:
-                type: boolean
-              label:
-                type: string
-              initialized:
-                type: boolean
-              bootloader_hash:
-                type: string
-              pin_cached:
-                type: boolean
-              passphrase_cached:
-                type: boolean
-              needs_backup:
-                type: boolean
-              model:
-                type: string
-              fw_major:
-                type: integer
-              fw_minor:
-                type: integer
-              fw_patch:
-                type: integer
+          vendor:
+            type: string
+          major_version:
+            type: integer
+          minor_version:
+            type: integer
+          patch_version:
+            type: integer
+          device_id:
+            type: string
+          pin_protection:
+            type: boolean
+          passphrase_protection:
+            type: boolean
+          label:
+            type: string
+          initialized:
+            type: boolean
+          bootloader_hash:
+            type: string
+          pin_cached:
+            type: boolean
+          passphrase_cached:
+            type: boolean
+          needs_backup:
+            type: boolean
+          model:
+            type: string
+          fw_major:
+            type: integer
+          fw_minor:
+            type: integer
+          fw_patch:
+            type: integer
 
   SignMessageResponse:
     type: object
     properties:
       data:
-        type: object
-        properties:
-          signature:
-            type: string
+        type: string
 
   TransactionSignResponse:
     type: object
     properties:
       data:
-        type: object
-        properties:
-          signatures:
-            type: array
-            items:
-              type: string
+        type: array
+        items:
+          type: string
+
   CSRFResponse:
     type: object
     properties:
       data:
-        type: object
-        properties:
-          csrf_token:
-            type: string
+        type: string
 
   HTTPSuccessResponse:
     type: object
@@ -657,8 +675,10 @@ definitions:
             type: string
           code:
             type: integer
+
 schemes:
   - http
+
 securityDefinitions:
   csrfAuth:
     in: header

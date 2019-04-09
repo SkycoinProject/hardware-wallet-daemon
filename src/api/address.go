@@ -5,20 +5,15 @@ import (
 	"net/http"
 )
 
-// GenerateAddressesRequest is request data for /api/v1/generateAddresses
+// GenerateAddressesRequest is request data for /api/v1/generate_addresses
 type GenerateAddressesRequest struct {
 	AddressN       int  `json:"address_n"`
 	StartIndex     int  `json:"start_index"`
 	ConfirmAddress bool `json:"confirm_address"`
 }
 
-// GenerateAddressesResponse is returned by POST /api/v1/generateAddresses
-type GenerateAddressesResponse struct {
-	Addresses []string `json:"addresses"`
-}
-
 // generateAddresses generates addresses for hardware wallet.
-// URI: /api/v1/generateAddresses
+// URI: /api/v1/generate_addresses
 // Method: POST
 // Args: JSON Body
 func generateAddresses(gateway Gatewayer) http.HandlerFunc {

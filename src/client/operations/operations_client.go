@@ -151,9 +151,9 @@ func (a *Client) PostApplySettings(params *PostApplySettingsParams, authInfo run
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostApplySettings",
 		Method:             "POST",
-		PathPattern:        "/applySettings",
+		PathPattern:        "/apply_settings",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostApplySettingsReader{formats: a.formats},
@@ -209,7 +209,7 @@ func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignaturePara
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostCheckMessageSignature",
 		Method:             "POST",
-		PathPattern:        "/checkMessageSignature",
+		PathPattern:        "/check_message_signature",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -238,7 +238,7 @@ func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams, auth
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostGenerateAddresses",
 		Method:             "POST",
-		PathPattern:        "/generateAddresses",
+		PathPattern:        "/generate_addresses",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -267,9 +267,9 @@ func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams, authIn
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostGenerateMnemonic",
 		Method:             "POST",
-		PathPattern:        "/generateMnemonic",
+		PathPattern:        "/generate_mnemonic",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostGenerateMnemonicReader{formats: a.formats},
@@ -285,23 +285,23 @@ func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams, authIn
 }
 
 /*
-PostIntermediatePassPhrase passphrase ack request.
+PostIntermediatePassphrase passphrase ack request.
 */
-func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhraseParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePassPhraseOK, error) {
+func (a *Client) PostIntermediatePassphrase(params *PostIntermediatePassphraseParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePassphraseOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPostIntermediatePassPhraseParams()
+		params = NewPostIntermediatePassphraseParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostIntermediatePassPhrase",
+		ID:                 "PostIntermediatePassphrase",
 		Method:             "POST",
-		PathPattern:        "/intermediate/passPhrase",
+		PathPattern:        "/intermediate/passphrase",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &PostIntermediatePassPhraseReader{formats: a.formats},
+		Reader:             &PostIntermediatePassphraseReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -309,7 +309,7 @@ func (a *Client) PostIntermediatePassPhrase(params *PostIntermediatePassPhrasePa
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostIntermediatePassPhraseOK), nil
+	return result.(*PostIntermediatePassphraseOK), nil
 
 }
 
@@ -325,7 +325,7 @@ func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixPara
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostIntermediatePinMatrix",
 		Method:             "POST",
-		PathPattern:        "/intermediate/pinMatrix",
+		PathPattern:        "/intermediate/pin_matrix",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -385,7 +385,7 @@ func (a *Client) PostRecovery(params *PostRecoveryParams, authInfo runtime.Clien
 		Method:             "POST",
 		PathPattern:        "/recovery",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostRecoveryReader{formats: a.formats},
@@ -412,9 +412,9 @@ func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams, authInfo runtime
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostSetMnemonic",
 		Method:             "POST",
-		PathPattern:        "/setMnemonic",
+		PathPattern:        "/set_mnemonic",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostSetMnemonicReader{formats: a.formats},
@@ -441,7 +441,7 @@ func (a *Client) PostSetPinCode(params *PostSetPinCodeParams, authInfo runtime.C
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostSetPinCode",
 		Method:             "POST",
-		PathPattern:        "/setPinCode",
+		PathPattern:        "/set_pin_code",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -470,7 +470,7 @@ func (a *Client) PostSignMessage(params *PostSignMessageParams, authInfo runtime
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostSignMessage",
 		Method:             "POST",
-		PathPattern:        "/signMessage",
+		PathPattern:        "/sign_message",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -499,7 +499,7 @@ func (a *Client) PostTransactionSign(params *PostTransactionSignParams, authInfo
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostTransactionSign",
 		Method:             "POST",
-		PathPattern:        "/transactionSign",
+		PathPattern:        "/transaction_sign",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -557,7 +557,7 @@ func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams, authInfo run
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PutFirmwareUpdate",
 		Method:             "PUT",
-		PathPattern:        "/firmwareUpdate",
+		PathPattern:        "/firmware_update",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},

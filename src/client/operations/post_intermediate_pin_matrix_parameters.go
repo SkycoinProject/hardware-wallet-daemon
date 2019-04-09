@@ -64,7 +64,7 @@ for the post intermediate pin matrix operation typically these are written to a 
 type PostIntermediatePinMatrixParams struct {
 
 	/*PinMatrixRequest
-	  PinMatrixRequest is request data for /api/v1/intermediate/pinMatrix
+	  PinMatrixRequest is request data for /api/v1/intermediate/pin_matrix
 
 	*/
 	PinMatrixRequest *models.PinMatrixRequest

@@ -64,7 +64,7 @@ for the post generate addresses operation typically these are written to a http.
 type PostGenerateAddressesParams struct {
 
 	/*GenerateAddressesRequest
-	  GenerateAddressesRequest is request data for /api/generateAddresses
+	  GenerateAddressesRequest is request data for /api/v1/generate_addresses
 
 	*/
 	GenerateAddressesRequest *models.GenerateAddressesRequest

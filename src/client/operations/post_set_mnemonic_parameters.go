@@ -15,6 +15,8 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/skycoin/hardware-wallet-daemon/src/models"
 )
 
 // NewPostSetMnemonicParams creates a new PostSetMnemonicParams object
@@ -61,11 +63,11 @@ for the post set mnemonic operation typically these are written to a http.Reques
 */
 type PostSetMnemonicParams struct {
 
-	/*Mnemonic
-	  bip39 mnemonic seed
+	/*SetMnemonicRequest
+	  SetMnemonicRequest is request data for /api/v1/set_mnemonic
 
 	*/
-	Mnemonic string
+	SetMnemonicRequest *models.SetMnemonicRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -105,15 +107,15 @@ func (o *PostSetMnemonicParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithMnemonic adds the mnemonic to the post set mnemonic params
-func (o *PostSetMnemonicParams) WithMnemonic(mnemonic string) *PostSetMnemonicParams {
-	o.SetMnemonic(mnemonic)
+// WithSetMnemonicRequest adds the setMnemonicRequest to the post set mnemonic params
+func (o *PostSetMnemonicParams) WithSetMnemonicRequest(setMnemonicRequest *models.SetMnemonicRequest) *PostSetMnemonicParams {
+	o.SetSetMnemonicRequest(setMnemonicRequest)
 	return o
 }
 
-// SetMnemonic adds the mnemonic to the post set mnemonic params
-func (o *PostSetMnemonicParams) SetMnemonic(mnemonic string) {
-	o.Mnemonic = mnemonic
+// SetSetMnemonicRequest adds the setMnemonicRequest to the post set mnemonic params
+func (o *PostSetMnemonicParams) SetSetMnemonicRequest(setMnemonicRequest *models.SetMnemonicRequest) {
+	o.SetMnemonicRequest = setMnemonicRequest
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -124,11 +126,8 @@ func (o *PostSetMnemonicParams) WriteToRequest(r runtime.ClientRequest, reg strf
 	}
 	var res []error
 
-	// form param mnemonic
-	frMnemonic := o.Mnemonic
-	fMnemonic := frMnemonic
-	if fMnemonic != "" {
-		if err := r.SetFormParam("mnemonic", fMnemonic); err != nil {
+	if o.SetMnemonicRequest != nil {
+		if err := r.SetBodyParam(o.SetMnemonicRequest); err != nil {
 			return err
 		}
 	}

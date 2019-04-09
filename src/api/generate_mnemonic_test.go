@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"strings"
 	"testing"
 
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
@@ -14,11 +14,6 @@ import (
 )
 
 func TestGenerateMnemonic(t *testing.T) {
-	type httpBody struct {
-		usePassphrase string
-		wordCount     string
-	}
-
 	successMsg := messages.Success{
 		Message: newStrPtr("Mnemonic successfully configured"),
 	}
@@ -38,9 +33,8 @@ func TestGenerateMnemonic(t *testing.T) {
 		name                          string
 		method                        string
 		status                        int
-		httpBody                      *httpBody
-		usePassphrase                 bool
-		wordCount                     uint32
+		contentType                   string
+		httpBody                      string
 		httpResponse                  HTTPResponse
 		gatewayGenerateMnemonicResult wire.Message
 	}{
@@ -52,35 +46,11 @@ func TestGenerateMnemonic(t *testing.T) {
 		},
 
 		{
-			name:         "400 - invalid passphrase",
+			name:         "415 - Unsupported Media Type",
 			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for use-passphrase"),
-			httpBody: &httpBody{
-				usePassphrase: "foo",
-				wordCount:     "12",
-			},
-		},
-
-		{
-			name:         "400 - missing word-count",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "missing word-count"),
-			httpBody: &httpBody{
-				usePassphrase: "true",
-			},
-		},
-
-		{
-			name:         "400 - invalid word-count",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value foo for word-count"),
-			httpBody: &httpBody{
-				usePassphrase: "true",
-				wordCount:     "foo",
-			},
+			contentType:  ContentTypeForm,
+			status:       http.StatusUnsupportedMediaType,
+			httpResponse: NewHTTPErrorResponse(http.StatusUnsupportedMediaType, ""),
 		},
 
 		{
@@ -88,16 +58,13 @@ func TestGenerateMnemonic(t *testing.T) {
 			method:       http.MethodPost,
 			status:       http.StatusConflict,
 			httpResponse: NewHTTPErrorResponse(http.StatusConflict, "failure msg"),
-			httpBody: &httpBody{
-				wordCount:     "12",
-				usePassphrase: "false",
-			},
+			httpBody: toJSON(t, &GenerateMnemonicRequest{
+				WordCount: 12,
+			}),
 			gatewayGenerateMnemonicResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
 			},
-			wordCount:     12,
-			usePassphrase: false,
 		},
 
 		{
@@ -107,16 +74,13 @@ func TestGenerateMnemonic(t *testing.T) {
 			httpResponse: HTTPResponse{
 				Data: *successMsg.Message,
 			},
-			httpBody: &httpBody{
-				wordCount:     "12",
-				usePassphrase: "false",
-			},
+			httpBody: toJSON(t, &GenerateMnemonicRequest{
+				WordCount: 12,
+			}),
 			gatewayGenerateMnemonicResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
 			},
-			wordCount:     12,
-			usePassphrase: false,
 		},
 	}
 
@@ -124,30 +88,27 @@ func TestGenerateMnemonic(t *testing.T) {
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
 				gateway := &MockGatewayer{}
-				endpoint := "/generateMnemonic"
+				endpoint := "/generate_mnemonic"
 
 				if deviceType == deviceWallet.DeviceTypeEmulator {
 					endpoint = "/emulator" + endpoint
 				}
 
-				v := url.Values{}
-				if tc.httpBody != nil {
-					if tc.httpBody.usePassphrase != "" {
-						v.Add("use-passphrase", tc.httpBody.usePassphrase)
-					}
-
-					if tc.httpBody.wordCount != "" {
-						v.Add("word-count", tc.httpBody.wordCount)
-					}
-					if len(v) > 0 {
-						endpoint += "?" + v.Encode()
-					}
+				var body GenerateMnemonicRequest
+				err := json.Unmarshal([]byte(tc.httpBody), &body)
+				if err == nil {
+					gateway.On("GenerateMnemonic", body.WordCount, body.UsePassphrase).Return(tc.gatewayGenerateMnemonicResult, nil)
 				}
 
-				gateway.On("GenerateMnemonic", tc.wordCount, tc.usePassphrase).Return(tc.gatewayGenerateMnemonicResult, nil)
-
-				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
+				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
 				require.NoError(t, err)
+
+				contentType := tc.contentType
+				if contentType == "" {
+					contentType = ContentTypeJSON
+				}
+
+				req.Header.Set("Content-Type", contentType)
 
 				rr := httptest.NewRecorder()
 				handler := newServerMux(defaultMuxConfig(), gateway, gateway)

@@ -13,9 +13,10 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/skycoin/hardware-wallet-daemon/src/models"
 )
 
 // NewPostApplySettingsParams creates a new PostApplySettingsParams object
@@ -62,16 +63,11 @@ for the post apply settings operation typically these are written to a http.Requ
 */
 type PostApplySettingsParams struct {
 
-	/*Label
-	  label for hardware wallet
+	/*ApplySettingsRequest
+	  ApplySettingsRequest is request data for /api/v1/apply_settings
 
 	*/
-	Label *string
-	/*UsePassphrase
-	  ask for passphrase before starting operation
-
-	*/
-	UsePassphrase *bool
+	ApplySettingsRequest *models.ApplySettingsRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -111,26 +107,15 @@ func (o *PostApplySettingsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithLabel adds the label to the post apply settings params
-func (o *PostApplySettingsParams) WithLabel(label *string) *PostApplySettingsParams {
-	o.SetLabel(label)
+// WithApplySettingsRequest adds the applySettingsRequest to the post apply settings params
+func (o *PostApplySettingsParams) WithApplySettingsRequest(applySettingsRequest *models.ApplySettingsRequest) *PostApplySettingsParams {
+	o.SetApplySettingsRequest(applySettingsRequest)
 	return o
 }
 
-// SetLabel adds the label to the post apply settings params
-func (o *PostApplySettingsParams) SetLabel(label *string) {
-	o.Label = label
-}
-
-// WithUsePassphrase adds the usePassphrase to the post apply settings params
-func (o *PostApplySettingsParams) WithUsePassphrase(usePassphrase *bool) *PostApplySettingsParams {
-	o.SetUsePassphrase(usePassphrase)
-	return o
-}
-
-// SetUsePassphrase adds the usePassphrase to the post apply settings params
-func (o *PostApplySettingsParams) SetUsePassphrase(usePassphrase *bool) {
-	o.UsePassphrase = usePassphrase
+// SetApplySettingsRequest adds the applySettingsRequest to the post apply settings params
+func (o *PostApplySettingsParams) SetApplySettingsRequest(applySettingsRequest *models.ApplySettingsRequest) {
+	o.ApplySettingsRequest = applySettingsRequest
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -141,36 +126,10 @@ func (o *PostApplySettingsParams) WriteToRequest(r runtime.ClientRequest, reg st
 	}
 	var res []error
 
-	if o.Label != nil {
-
-		// form param label
-		var frLabel string
-		if o.Label != nil {
-			frLabel = *o.Label
+	if o.ApplySettingsRequest != nil {
+		if err := r.SetBodyParam(o.ApplySettingsRequest); err != nil {
+			return err
 		}
-		fLabel := frLabel
-		if fLabel != "" {
-			if err := r.SetFormParam("label", fLabel); err != nil {
-				return err
-			}
-		}
-
-	}
-
-	if o.UsePassphrase != nil {
-
-		// form param use-passphrase
-		var frUsePassphrase bool
-		if o.UsePassphrase != nil {
-			frUsePassphrase = *o.UsePassphrase
-		}
-		fUsePassphrase := swag.FormatBool(frUsePassphrase)
-		if fUsePassphrase != "" {
-			if err := r.SetFormParam("use-passphrase", fUsePassphrase); err != nil {
-				return err
-			}
-		}
-
 	}
 
 	if len(res) > 0 {

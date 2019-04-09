@@ -13,16 +13,16 @@ const configuredHost = "127.0.0.1:9510"
 
 func defaultMuxConfig() muxConfig {
 	return muxConfig{
-		host:        configuredHost,
+		host:       configuredHost,
 		enableCSRF: false,
 	}
 }
 
 var endpointsMethods = map[string][]string{
-	"/api/v1/generateAddresses": []string{
+	"/api/v1/generate_addresses": []string{
 		http.MethodPost,
 	},
-	"/api/v1/applySettings": []string{
+	"/api/v1/apply_settings": []string{
 		http.MethodPost,
 	},
 	"/api/v1/backup": []string{
@@ -31,32 +31,35 @@ var endpointsMethods = map[string][]string{
 	"/api/v1/cancel": []string{
 		http.MethodPut,
 	},
-	"/api/v1/checkMessageSignature": []string{
+	"/api/v1/check_message_signature": []string{
 		http.MethodPost,
 	},
 	"/api/v1/features": []string{
 		http.MethodGet,
 	},
-	"/api/v1/generateMnemonic": []string{
+	"/api/v1/generate_mnemonic": []string{
 		http.MethodPost,
 	},
 	"/api/v1/recovery": []string{
 		http.MethodPost,
 	},
-	"/api/v1/setMnemonic": []string{
+	"/api/v1/set_mnemonic": []string{
 		http.MethodPost,
 	},
-	"/api/v1/setPinCode": []string{
+	"/api/v1/set_pin_code": []string{
 		http.MethodPost,
 	},
-	"/api/v1/signMessage": []string{
+	"/api/v1/sign_message": []string{
 		http.MethodPost,
 	},
-	"/api/v1/transactionSign": []string{
+	"/api/v1/transaction_sign": []string{
 		http.MethodPost,
 	},
 	"/api/v1/wipe": []string{
 		http.MethodDelete,
+	},
+	"/api/v1/connected": []string{
+		http.MethodGet,
 	},
 }
 

@@ -59,7 +59,7 @@ binary data
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			endpoint := "/firmwareUpdate"
+			endpoint := "/firmware_update"
 			gateway := &MockGatewayer{}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"strings"
 	"testing"
 
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
@@ -14,12 +14,6 @@ import (
 )
 
 func TestRecovery(t *testing.T) {
-	type httpBody struct {
-		usePassphrase string
-		wordCount     string
-		dryRun        string
-	}
-
 	failureMsg := messages.Failure{
 		Code:    messages.FailureType_Failure_NotInitialized.Enum(),
 		Message: newStrPtr("failure msg"),
@@ -39,10 +33,8 @@ func TestRecovery(t *testing.T) {
 		name                  string
 		method                string
 		status                int
-		httpBody              *httpBody
-		usePassphrase         bool
-		wordCount             uint32
-		dryRun                bool
+		contentType           string
+		httpBody              string
 		httpResponse          HTTPResponse
 		gatewayRecoveryResult wire.Message
 	}{
@@ -54,51 +46,11 @@ func TestRecovery(t *testing.T) {
 		},
 
 		{
-			name:         "400 - invalid passphrase",
+			name:         "415 - Unsupported Media Type",
 			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for use-passphrase"),
-			httpBody: &httpBody{
-				usePassphrase: "foo",
-				wordCount:     "2",
-				dryRun:        "true",
-			},
-		},
-
-		{
-			name:         "400 - missing word-count",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "missing word-count"),
-			httpBody: &httpBody{
-				usePassphrase: "true",
-				dryRun:        "true",
-			},
-		},
-
-		{
-			name:         "400 - invalid word-count",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value foo for word-count"),
-			httpBody: &httpBody{
-				usePassphrase: "true",
-				wordCount:     "foo",
-				dryRun:        "true",
-			},
-		},
-
-		{
-			name:         "400 - invalid dry-run",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for dry-run"),
-			httpBody: &httpBody{
-				usePassphrase: "false",
-				wordCount:     "2",
-				dryRun:        "foo",
-			},
-			wordCount: 2,
+			contentType:  ContentTypeForm,
+			status:       http.StatusUnsupportedMediaType,
+			httpResponse: NewHTTPErrorResponse(http.StatusUnsupportedMediaType, ""),
 		},
 
 		{
@@ -106,18 +58,13 @@ func TestRecovery(t *testing.T) {
 			method:       http.MethodPost,
 			status:       http.StatusConflict,
 			httpResponse: NewHTTPErrorResponse(http.StatusConflict, "failure msg"),
-			httpBody: &httpBody{
-				usePassphrase: "false",
-				wordCount:     "2",
-				dryRun:        "true",
-			},
+			httpBody: toJSON(t, &RecoveryRequest{
+				WordCount: 2,
+			}),
 			gatewayRecoveryResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
 			},
-			wordCount:     2,
-			dryRun:        true,
-			usePassphrase: false,
 		},
 
 		{
@@ -127,18 +74,13 @@ func TestRecovery(t *testing.T) {
 			httpResponse: HTTPResponse{
 				Data: "recovery success msg",
 			},
-			httpBody: &httpBody{
-				usePassphrase: "false",
-				wordCount:     "2",
-				dryRun:        "true",
-			},
+			httpBody: toJSON(t, &RecoveryRequest{
+				WordCount: 12,
+			}),
 			gatewayRecoveryResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
 			},
-			wordCount:     2,
-			dryRun:        true,
-			usePassphrase: false,
 		},
 	}
 
@@ -152,29 +94,21 @@ func TestRecovery(t *testing.T) {
 					endpoint = "/emulator" + endpoint
 				}
 
-				v := url.Values{}
-				if tc.httpBody != nil {
-					if tc.httpBody.usePassphrase != "" {
-						v.Add("use-passphrase", tc.httpBody.usePassphrase)
-					}
-
-					if tc.httpBody.wordCount != "" {
-						v.Add("word-count", tc.httpBody.wordCount)
-					}
-
-					if tc.httpBody.dryRun != "" {
-						v.Add("dry-run", tc.httpBody.dryRun)
-					}
-
-					if len(v) > 0 {
-						endpoint += "?" + v.Encode()
-					}
+				var body RecoveryRequest
+				err := json.Unmarshal([]byte(tc.httpBody), &body)
+				if err == nil {
+					gateway.On("Recovery", body.WordCount, body.UsePassphrase, body.DryRun).Return(tc.gatewayRecoveryResult, nil)
 				}
 
-				gateway.On("Recovery", tc.wordCount, tc.usePassphrase, tc.dryRun).Return(tc.gatewayRecoveryResult, nil)
-
-				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
+				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
 				require.NoError(t, err)
+
+				contentType := tc.contentType
+				if contentType == "" {
+					contentType = ContentTypeJSON
+				}
+
+				req.Header.Set("Content-Type", contentType)
 
 				rr := httptest.NewRecorder()
 				handler := newServerMux(defaultMuxConfig(), gateway, gateway)
