@@ -2,11 +2,12 @@ package api
 
 import (
 	"encoding/json"
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConnected(t *testing.T) {

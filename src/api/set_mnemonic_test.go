@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"strings"
 	"testing"
 
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
@@ -14,10 +14,6 @@ import (
 )
 
 func TestSetMnemonic(t *testing.T) {
-	type httpBody struct {
-		mnemonic string
-	}
-
 	failureMsg := messages.Failure{
 		Code:    messages.FailureType_Failure_NotInitialized.Enum(),
 		Message: newStrPtr("failure msg"),
@@ -37,7 +33,8 @@ func TestSetMnemonic(t *testing.T) {
 		name                     string
 		method                   string
 		status                   int
-		httpBody                 *httpBody
+		contentType              string
+		httpBody                 string
 		gatewaySetMnemonicResult wire.Message
 		httpResponse             HTTPResponse
 	}{
@@ -49,14 +46,6 @@ func TestSetMnemonic(t *testing.T) {
 		},
 
 		{
-			name:         "400 - missing mnemonic",
-			method:       http.MethodPost,
-			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "mnemonic is required"),
-			httpBody:     &httpBody{},
-		},
-
-		{
 			name:   "409 - Failure msg",
 			method: http.MethodPost,
 			status: http.StatusConflict,
@@ -64,9 +53,9 @@ func TestSetMnemonic(t *testing.T) {
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
 			},
-			httpBody: &httpBody{
-				mnemonic: "cloud flower upset remain green metal below cup stem infant art thank",
-			},
+			httpBody: toJSON(t, &SetMnemonicRequest{
+				Mnemonic: "cloud flower upset remain green metal below cup stem infant art thank",
+			}),
 			httpResponse: NewHTTPErrorResponse(http.StatusConflict, "failure msg"),
 		},
 
@@ -78,9 +67,9 @@ func TestSetMnemonic(t *testing.T) {
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
 			},
-			httpBody: &httpBody{
-				mnemonic: "cloud flower upset remain green metal below cup stem infant art thank",
-			},
+			httpBody: toJSON(t, &SetMnemonicRequest{
+				Mnemonic: "cloud flower upset remain green metal below cup stem infant art thank",
+			}),
 			httpResponse: HTTPResponse{
 				Data: "setmnemonic success msg",
 			},
@@ -90,30 +79,28 @@ func TestSetMnemonic(t *testing.T) {
 	for _, deviceType := range []deviceWallet.DeviceType{deviceWallet.DeviceTypeUSB, deviceWallet.DeviceTypeEmulator} {
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				endpoint := "/setMnemonic"
+				endpoint := "/set_mnemonic"
 				gateway := &MockGatewayer{}
 
 				if deviceType == deviceWallet.DeviceTypeEmulator {
 					endpoint = "/emulator" + endpoint
 				}
 
-				v := url.Values{}
-				if tc.httpBody != nil {
-					if tc.httpBody.mnemonic != "" {
-						v.Add("mnemonic", tc.httpBody.mnemonic)
-					}
-
-					if len(v) > 0 {
-						endpoint += "?" + v.Encode()
-					}
+				var body SetMnemonicRequest
+				err := json.Unmarshal([]byte(tc.httpBody), &body)
+				if err == nil {
+					gateway.On("SetMnemonic", body.Mnemonic).Return(tc.gatewaySetMnemonicResult, nil)
 				}
 
-				if tc.httpBody != nil {
-					gateway.On("SetMnemonic", tc.httpBody.mnemonic).Return(tc.gatewaySetMnemonicResult, nil)
-				}
-
-				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
+				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
 				require.NoError(t, err)
+
+				contentType := tc.contentType
+				if contentType == "" {
+					contentType = ContentTypeJSON
+				}
+
+				req.Header.Set("Content-Type", contentType)
 
 				rr := httptest.NewRecorder()
 				handler := newServerMux(defaultMuxConfig(), gateway, gateway)

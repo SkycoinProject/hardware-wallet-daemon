@@ -13,9 +13,10 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/skycoin/hardware-wallet-daemon/src/models"
 )
 
 // NewPostRecoveryParams creates a new PostRecoveryParams object
@@ -62,21 +63,11 @@ for the post recovery operation typically these are written to a http.Request
 */
 type PostRecoveryParams struct {
 
-	/*DryRun
-	  perform dry-run recovery workflow (for safe mnemonic validation)
+	/*RecoveryRequest
+	  RecoveryRequest is request data for /api/v1/check_message_signature
 
 	*/
-	DryRun *bool
-	/*UsePassphrase
-	  ask for passphrase before starting operation
-
-	*/
-	UsePassphrase *bool
-	/*WordCount
-	  mnemonic seed length
-
-	*/
-	WordCount int64
+	RecoveryRequest *models.RecoveryRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -116,37 +107,15 @@ func (o *PostRecoveryParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithDryRun adds the dryRun to the post recovery params
-func (o *PostRecoveryParams) WithDryRun(dryRun *bool) *PostRecoveryParams {
-	o.SetDryRun(dryRun)
+// WithRecoveryRequest adds the recoveryRequest to the post recovery params
+func (o *PostRecoveryParams) WithRecoveryRequest(recoveryRequest *models.RecoveryRequest) *PostRecoveryParams {
+	o.SetRecoveryRequest(recoveryRequest)
 	return o
 }
 
-// SetDryRun adds the dryRun to the post recovery params
-func (o *PostRecoveryParams) SetDryRun(dryRun *bool) {
-	o.DryRun = dryRun
-}
-
-// WithUsePassphrase adds the usePassphrase to the post recovery params
-func (o *PostRecoveryParams) WithUsePassphrase(usePassphrase *bool) *PostRecoveryParams {
-	o.SetUsePassphrase(usePassphrase)
-	return o
-}
-
-// SetUsePassphrase adds the usePassphrase to the post recovery params
-func (o *PostRecoveryParams) SetUsePassphrase(usePassphrase *bool) {
-	o.UsePassphrase = usePassphrase
-}
-
-// WithWordCount adds the wordCount to the post recovery params
-func (o *PostRecoveryParams) WithWordCount(wordCount int64) *PostRecoveryParams {
-	o.SetWordCount(wordCount)
-	return o
-}
-
-// SetWordCount adds the wordCount to the post recovery params
-func (o *PostRecoveryParams) SetWordCount(wordCount int64) {
-	o.WordCount = wordCount
+// SetRecoveryRequest adds the recoveryRequest to the post recovery params
+func (o *PostRecoveryParams) SetRecoveryRequest(recoveryRequest *models.RecoveryRequest) {
+	o.RecoveryRequest = recoveryRequest
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -157,43 +126,8 @@ func (o *PostRecoveryParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.
 	}
 	var res []error
 
-	if o.DryRun != nil {
-
-		// form param dry-run
-		var frDryRun bool
-		if o.DryRun != nil {
-			frDryRun = *o.DryRun
-		}
-		fDryRun := swag.FormatBool(frDryRun)
-		if fDryRun != "" {
-			if err := r.SetFormParam("dry-run", fDryRun); err != nil {
-				return err
-			}
-		}
-
-	}
-
-	if o.UsePassphrase != nil {
-
-		// form param use-passphrase
-		var frUsePassphrase bool
-		if o.UsePassphrase != nil {
-			frUsePassphrase = *o.UsePassphrase
-		}
-		fUsePassphrase := swag.FormatBool(frUsePassphrase)
-		if fUsePassphrase != "" {
-			if err := r.SetFormParam("use-passphrase", fUsePassphrase); err != nil {
-				return err
-			}
-		}
-
-	}
-
-	// form param word-count
-	frWordCount := o.WordCount
-	fWordCount := swag.FormatInt64(frWordCount)
-	if fWordCount != "" {
-		if err := r.SetFormParam("word-count", fWordCount); err != nil {
+	if o.RecoveryRequest != nil {
+		if err := r.SetBodyParam(o.RecoveryRequest); err != nil {
 			return err
 		}
 	}

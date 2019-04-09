@@ -64,7 +64,7 @@ for the post check message signature operation typically these are written to a 
 type PostCheckMessageSignatureParams struct {
 
 	/*CheckMessageSignatureRequest
-	  CheckMessageSignatureRequest is request data for /api/checkMessageSignature
+	  CheckMessageSignatureRequest is request data for /api/v1/check_message_signature
 
 	*/
 	CheckMessageSignatureRequest *models.CheckMessageSignatureRequest

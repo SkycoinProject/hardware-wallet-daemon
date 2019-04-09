@@ -1,20 +1,18 @@
 {
 	"data": {
-		"features": {
-			"bootloader_hash": "foo",
-			"device_id": "foo",
-			"fw_major": 1,
-			"fw_minor": 7,
-			"fw_patch": 0,
-			"initialized": true,
-			"label": "foo",
-			"model": "1",
-			"needs_backup": true,
-			"passphrase_cached": false,
-			"passphrase_protection": false,
-			"pin_cached": false,
-			"pin_protection": false,
-			"vendor": "Skycoin Foundation"
-		}
+		"bootloader_hash": "foo",
+		"device_id": "foo",
+		"fw_major": 1,
+		"fw_minor": 7,
+		"fw_patch": 0,
+		"initialized": true,
+		"label": "foo",
+		"model": "1",
+		"needs_backup": true,
+		"passphrase_cached": false,
+		"passphrase_protection": false,
+		"pin_cached": false,
+		"pin_protection": false,
+		"vendor": "Skycoin Foundation"
 	}
 }

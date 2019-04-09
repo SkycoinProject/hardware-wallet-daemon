@@ -75,64 +75,6 @@ func (m *FeaturesResponse) UnmarshalBinary(b []byte) error {
 // swagger:model FeaturesResponseData
 type FeaturesResponseData struct {
 
-	// features
-	Features *FeaturesResponseDataFeatures `json:"features,omitempty"`
-}
-
-// Validate validates this features response data
-func (m *FeaturesResponseData) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateFeatures(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *FeaturesResponseData) validateFeatures(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Features) { // not required
-		return nil
-	}
-
-	if m.Features != nil {
-		if err := m.Features.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("data" + "." + "features")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *FeaturesResponseData) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *FeaturesResponseData) UnmarshalBinary(b []byte) error {
-	var res FeaturesResponseData
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
-// FeaturesResponseDataFeatures features response data features
-// swagger:model FeaturesResponseDataFeatures
-type FeaturesResponseDataFeatures struct {
-
 	// bootloader hash
 	BootloaderHash string `json:"bootloader_hash,omitempty"`
 
@@ -195,8 +137,8 @@ type FeaturesResponseDataFeatures struct {
 	Vendor *string `json:"vendor"`
 }
 
-// Validate validates this features response data features
-func (m *FeaturesResponseDataFeatures) Validate(formats strfmt.Registry) error {
+// Validate validates this features response data
+func (m *FeaturesResponseData) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateFwMajor(formats); err != nil {
@@ -245,90 +187,90 @@ func (m *FeaturesResponseDataFeatures) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validateFwMajor(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validateFwMajor(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"fw_major", "body", m.FwMajor); err != nil {
+	if err := validate.Required("data"+"."+"fw_major", "body", m.FwMajor); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validateFwMinor(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validateFwMinor(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"fw_minor", "body", m.FwMinor); err != nil {
+	if err := validate.Required("data"+"."+"fw_minor", "body", m.FwMinor); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validateFwPatch(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validateFwPatch(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"fw_patch", "body", m.FwPatch); err != nil {
+	if err := validate.Required("data"+"."+"fw_patch", "body", m.FwPatch); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validateInitialized(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validateInitialized(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"initialized", "body", m.Initialized); err != nil {
+	if err := validate.Required("data"+"."+"initialized", "body", m.Initialized); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validateNeedsBackup(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validateNeedsBackup(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"needs_backup", "body", m.NeedsBackup); err != nil {
+	if err := validate.Required("data"+"."+"needs_backup", "body", m.NeedsBackup); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validatePassphraseCached(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validatePassphraseCached(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"passphrase_cached", "body", m.PassphraseCached); err != nil {
+	if err := validate.Required("data"+"."+"passphrase_cached", "body", m.PassphraseCached); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validatePassphraseProtection(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validatePassphraseProtection(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"passphrase_protection", "body", m.PassphraseProtection); err != nil {
+	if err := validate.Required("data"+"."+"passphrase_protection", "body", m.PassphraseProtection); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validatePinCached(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validatePinCached(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"pin_cached", "body", m.PinCached); err != nil {
+	if err := validate.Required("data"+"."+"pin_cached", "body", m.PinCached); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validatePinProtection(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validatePinProtection(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"pin_protection", "body", m.PinProtection); err != nil {
+	if err := validate.Required("data"+"."+"pin_protection", "body", m.PinProtection); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *FeaturesResponseDataFeatures) validateVendor(formats strfmt.Registry) error {
+func (m *FeaturesResponseData) validateVendor(formats strfmt.Registry) error {
 
-	if err := validate.Required("data"+"."+"features"+"."+"vendor", "body", m.Vendor); err != nil {
+	if err := validate.Required("data"+"."+"vendor", "body", m.Vendor); err != nil {
 		return err
 	}
 
@@ -336,7 +278,7 @@ func (m *FeaturesResponseDataFeatures) validateVendor(formats strfmt.Registry) e
 }
 
 // MarshalBinary interface implementation
-func (m *FeaturesResponseDataFeatures) MarshalBinary() ([]byte, error) {
+func (m *FeaturesResponseData) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -344,8 +286,8 @@ func (m *FeaturesResponseDataFeatures) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *FeaturesResponseDataFeatures) UnmarshalBinary(b []byte) error {
-	var res FeaturesResponseDataFeatures
+func (m *FeaturesResponseData) UnmarshalBinary(b []byte) error {
+	var res FeaturesResponseData
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

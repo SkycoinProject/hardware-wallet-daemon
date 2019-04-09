@@ -144,7 +144,7 @@ func getCSRFToken(enabled bool) http.HandlerFunc {
 		}
 
 		writeHTTPResponse(w, HTTPResponse{
-			Data: &map[string]string{"csrf_token": csrfToken},
+			Data: csrfToken,
 		})
 	}
 }

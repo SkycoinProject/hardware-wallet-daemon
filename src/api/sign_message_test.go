@@ -95,7 +95,7 @@ func TestSignMessage(t *testing.T) {
 	for _, deviceType := range []deviceWallet.DeviceType{deviceWallet.DeviceTypeUSB, deviceWallet.DeviceTypeEmulator} {
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				endpoint := "/signMessage"
+				endpoint := "/sign_message"
 				gateway := &MockGatewayer{}
 
 				if deviceType == deviceWallet.DeviceTypeEmulator {

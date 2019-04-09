@@ -8,7 +8,6 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -17,38 +16,11 @@ import (
 type TransactionSignResponse struct {
 
 	// data
-	Data *TransactionSignResponseData `json:"data,omitempty"`
+	Data []string `json:"data"`
 }
 
 // Validate validates this transaction sign response
 func (m *TransactionSignResponse) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateData(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *TransactionSignResponse) validateData(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Data) { // not required
-		return nil
-	}
-
-	if m.Data != nil {
-		if err := m.Data.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("data")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -63,37 +35,6 @@ func (m *TransactionSignResponse) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *TransactionSignResponse) UnmarshalBinary(b []byte) error {
 	var res TransactionSignResponse
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
-// TransactionSignResponseData transaction sign response data
-// swagger:model TransactionSignResponseData
-type TransactionSignResponseData struct {
-
-	// signatures
-	Signatures []string `json:"signatures"`
-}
-
-// Validate validates this transaction sign response data
-func (m *TransactionSignResponseData) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *TransactionSignResponseData) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *TransactionSignResponseData) UnmarshalBinary(b []byte) error {
-	var res TransactionSignResponseData
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

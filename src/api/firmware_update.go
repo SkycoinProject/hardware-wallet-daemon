@@ -11,7 +11,7 @@ const (
 	maxUploadSize = 1024 * 1024 // 1 MB
 )
 
-// URI: /api/v1/firmwareUpdate
+// URI: /api/v1/firmware_update
 // Method: PUT
 // Args:
 //  file: firmware file

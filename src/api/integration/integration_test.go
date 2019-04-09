@@ -73,8 +73,8 @@ func addCSRFHeader(t *testing.T, c *client.HardwareWalletDaemon) runtime.ClientA
 		if useCSRF(t) {
 			csrfResp, err := c.Operations.GetCsrf(nil)
 			require.NoError(t, err)
-			require.NotNil(t, csrfResp.Payload.Data.CsrfToken)
-			return req.SetHeaderParam(api.CSRFHeaderName, csrfResp.Payload.Data.CsrfToken)
+			require.NotNil(t, csrfResp.Payload.Data)
+			return req.SetHeaderParam(api.CSRFHeaderName, csrfResp.Payload.Data)
 		}
 
 		return nil
@@ -146,7 +146,9 @@ func TestEmulatorApplySettings(t *testing.T) {
 	c := newEmulatorClient()
 
 	params := operations.NewPostApplySettingsParams()
-	params.SetLabel(newStrPtr("skywallet"))
+	params.ApplySettingsRequest = &models.ApplySettingsRequest{
+		Label: "skywallet",
+	}
 
 	resp, err := c.Operations.PostApplySettings(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -203,8 +205,9 @@ func TestEmulatorFeatures(t *testing.T) {
 	var expected models.FeaturesResponse
 
 	// set variable parameters to empty string
-	resp.Payload.Data.Features.DeviceID = "foo"
-	resp.Payload.Data.Features.Label = "foo"
+	resp.Payload.Data.DeviceID = "foo"
+	resp.Payload.Data.Label = "foo"
+	resp.Payload.Data.BootloaderHash = "foo"
 
 	checkGoldenFile(t, "features.golden", TestData{*resp.Payload, &expected})
 }
@@ -222,7 +225,9 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
-	mnemonicParams.SetWordCount(12)
+	mnemonicParams.GenerateMnemonicRequest = &models.GenerateMnemonicRequest{
+		WordCount: newInt64Ptr(12),
+	}
 
 	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -242,7 +247,9 @@ func TestEmulatorRecovery(t *testing.T) {
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	params := operations.NewPostRecoveryParams()
-	params.SetWordCount(12)
+	params.RecoveryRequest = &models.RecoveryRequest{
+		WordCount: newInt64Ptr(12),
+	}
 
 	recoveryResp, err := c.Operations.PostRecovery(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -268,7 +275,9 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 
 	mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
 	params := operations.NewPostSetMnemonicParams()
-	params.SetMnemonic(mnemonic)
+	params.SetMnemonicRequest = &models.SetMnemonicRequest{
+		Mnemonic: newStrPtr(mnemonic),
+	}
 
 	resp, err := c.Operations.PostSetMnemonic(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -343,7 +352,7 @@ func TestEmulatorWipe(t *testing.T) {
 }
 
 // ---------------------------- HW Wallet Tests ---------------------------- //
-func TestWalletGenerateAddresses(t *testing.T) {
+func TestWalletGeGenerateAddresses(t *testing.T) {
 	if !doWallet(t) {
 		return
 	}
@@ -374,7 +383,9 @@ func TestWalletApplySettings(t *testing.T) {
 	c := newWalletClient()
 
 	params := operations.NewPostApplySettingsParams()
-	params.SetLabel(newStrPtr("skywallet"))
+	params.ApplySettingsRequest = &models.ApplySettingsRequest{
+		Label: "skywallet",
+	}
 
 	resp, err := c.Operations.PostApplySettings(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -433,9 +444,9 @@ func TestWalletFeatures(t *testing.T) {
 	var expected models.FeaturesResponse
 
 	// set variable parameters to empty string
-	resp.Payload.Data.Features.DeviceID = "foo"
-	resp.Payload.Data.Features.Label = "foo"
-	resp.Payload.Data.Features.BootloaderHash = "foo"
+	resp.Payload.Data.DeviceID = "foo"
+	resp.Payload.Data.Label = "foo"
+	resp.Payload.Data.BootloaderHash = "foo"
 
 	checkGoldenFile(t, "features.golden", TestData{*resp.Payload, &expected})
 }
@@ -453,7 +464,9 @@ func TestWalletGenerateMnemonic(t *testing.T) {
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
-	mnemonicParams.SetWordCount(12)
+	mnemonicParams.GenerateMnemonicRequest = &models.GenerateMnemonicRequest{
+		WordCount: newInt64Ptr(12),
+	}
 
 	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -473,7 +486,9 @@ func TestWalletRecovery(t *testing.T) {
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	params := operations.NewPostRecoveryParams()
-	params.SetWordCount(12)
+	params.RecoveryRequest = &models.RecoveryRequest{
+		WordCount: newInt64Ptr(12),
+	}
 
 	recoveryResp, err := c.Operations.PostRecovery(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -499,7 +514,9 @@ func TestWalletSetMnemonic(t *testing.T) {
 
 	mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
 	params := operations.NewPostSetMnemonicParams()
-	params.SetMnemonic(mnemonic)
+	params.SetMnemonicRequest = &models.SetMnemonicRequest{
+		Mnemonic: newStrPtr(mnemonic),
+	}
 
 	resp, err := c.Operations.PostSetMnemonic(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
@@ -556,15 +573,15 @@ func TestWalletTransactionSign(t *testing.T) {
 
 	resp, err := c.Operations.PostTransactionSign(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Len(t, resp.Payload.Data.Signatures, 1)
+	require.Len(t, resp.Payload.Data, 1)
 
 	// verify the message signature
-	fmt.Println(resp.Payload.Data.Signatures[0])
+	fmt.Println(resp.Payload.Data[0])
 	verifParams := operations.NewPostCheckMessageSignatureParams()
 	verifParams.CheckMessageSignatureRequest = &models.CheckMessageSignatureRequest{
 		Address:   newStrPtr("2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"),
 		Message:   newStrPtr("d11c62b1e0e9abf629b1f5f4699cef9fbc504b45ceedf0047ead686979498218"),
-		Signature: newStrPtr(resp.Payload.Data.Signatures[0]),
+		Signature: newStrPtr(resp.Payload.Data[0]),
 	}
 
 	verifResp, err := c.Operations.PostCheckMessageSignature(verifParams, addCSRFHeader(t, c))
@@ -593,7 +610,7 @@ func TestWalletConnected(t *testing.T) {
 	c := newWalletClient()
 
 	resp, err := c.Operations.GetConnected(nil, nil)
-	require.NoError(t ,err)
+	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, true)
 }
 
@@ -614,10 +631,12 @@ func bootstrap(t *testing.T, deviceType deviceWallet.DeviceType) {
 		require.NoError(t, err)
 		require.Equal(t, resp.Payload.Data, "Device wiped")
 
-		// set new mnemonic
+		// set mnemonic
 		mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
 		mnemonicParams := operations.NewPostSetMnemonicParams()
-		mnemonicParams.SetMnemonic(mnemonic)
+		mnemonicParams.SetMnemonicRequest = &models.SetMnemonicRequest{
+			Mnemonic: newStrPtr(mnemonic),
+		}
 
 		mnemonicResp, err := c.Operations.PostSetMnemonic(mnemonicParams, addCSRFHeader(t, c))
 		require.NoError(t, err)

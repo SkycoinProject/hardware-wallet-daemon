@@ -62,9 +62,7 @@ func TestFeatures(t *testing.T) {
 				Data: featuresMsgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: FeaturesResponse{
-					Features: featuresMsg,
-				},
+				Data: featuresMsg,
 			},
 		},
 	}
@@ -101,11 +99,11 @@ func TestFeatures(t *testing.T) {
 					require.Nil(t, tc.httpResponse.Data)
 				} else {
 					require.NotNil(t, tc.httpResponse.Data)
-					var resp FeaturesResponse
+					var resp *messages.Features
 					err = json.Unmarshal(rsp.Data, &resp)
 					require.NoError(t, err)
 
-					require.Equal(t, tc.httpResponse.Data.(FeaturesResponse), resp)
+					require.Equal(t, tc.httpResponse.Data.(*messages.Features), resp)
 				}
 			})
 		}

@@ -9,13 +9,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/NYTimes/gziphandler"
 	"github.com/gogo/protobuf/proto"
 	"github.com/rs/cors"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
@@ -282,45 +280,44 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	csrfHandlerV1("/csrf", getCSRFToken(c.enableCSRF)) // csrf is always available, regardless of the API set
 
 	// hw wallet endpoints
-	webHandlerV1("/generateAddresses", generateAddresses(usbGateway))
-	webHandlerV1("/applySettings", applySettings(usbGateway))
+	webHandlerV1("/generate_addresses", generateAddresses(usbGateway))
+	webHandlerV1("/apply_settings", applySettings(usbGateway))
 	webHandlerV1("/backup", backup(usbGateway))
 	webHandlerV1("/cancel", cancel(usbGateway))
-	webHandlerV1("/checkMessageSignature", checkMessageSignature(usbGateway))
+	webHandlerV1("/check_message_signature", checkMessageSignature(usbGateway))
 	webHandlerV1("/features", features(usbGateway))
-	webHandlerV1("/firmwareUpdate", firmwareUpdate(usbGateway))
-	webHandlerV1("/generateMnemonic", generateMnemonic(usbGateway))
+	webHandlerV1("/firmware_update", firmwareUpdate(usbGateway))
+	webHandlerV1("/generate_mnemonic", generateMnemonic(usbGateway))
 	webHandlerV1("/recovery", recovery(usbGateway))
-	webHandlerV1("/setMnemonic", setMnemonic(usbGateway))
-	webHandlerV1("/setPinCode", setPinCode(usbGateway))
-	webHandlerV1("/signMessage", signMessage(usbGateway))
-	webHandlerV1("/transactionSign", transactionSign(usbGateway))
+	webHandlerV1("/set_mnemonic", setMnemonic(usbGateway))
+	webHandlerV1("/set_pin_code", setPinCode(usbGateway))
+	webHandlerV1("/sign_message", signMessage(usbGateway))
+	webHandlerV1("/transaction_sign", transactionSign(usbGateway))
 	webHandlerV1("/wipe", wipe(usbGateway))
 	webHandlerV1("/connected", connected(usbGateway))
 
-	webHandlerV1("/intermediate/pinMatrix", pinMatrixRequestHandler(usbGateway))
-	webHandlerV1("/intermediate/passPhrase", passphraseRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/pin_matrix", pinMatrixRequestHandler(usbGateway))
+	webHandlerV1("/intermediate/passphrase", passphraseRequestHandler(usbGateway))
 	webHandlerV1("/intermediate/word", wordRequestHandler(usbGateway))
 
 	// emulator endpoints
-	webHandlerV1("/emulator/generateAddresses", generateAddresses(emulatorGateway))
-	webHandlerV1("/emulator/applySettings", applySettings(emulatorGateway))
+	webHandlerV1("/emulator/generate_addresses", generateAddresses(emulatorGateway))
+	webHandlerV1("/emulator/apply_settings", applySettings(emulatorGateway))
 	webHandlerV1("/emulator/backup", backup(emulatorGateway))
 	webHandlerV1("/emulator/cancel", cancel(emulatorGateway))
-	webHandlerV1("/emulator/checkMessageSignature", checkMessageSignature(emulatorGateway))
+	webHandlerV1("/emulator/checkMessage_signature", checkMessageSignature(emulatorGateway))
 	webHandlerV1("/emulator/features", features(emulatorGateway))
-	webHandlerV1("/emulator/generateMnemonic", generateMnemonic(emulatorGateway))
+	webHandlerV1("/emulator/generate_mnemonic", generateMnemonic(emulatorGateway))
 	webHandlerV1("/emulator/recovery", recovery(emulatorGateway))
-	webHandlerV1("/emulator/setMnemonic", setMnemonic(emulatorGateway))
-	webHandlerV1("/emulator/setPinCode", setPinCode(emulatorGateway))
-	webHandlerV1("/emulator/signMessage", signMessage(emulatorGateway))
-	webHandlerV1("/emulator/transactionSign", transactionSign(emulatorGateway))
+	webHandlerV1("/emulator/set_mnemonic", setMnemonic(emulatorGateway))
+	webHandlerV1("/emulator/set_pin_code", setPinCode(emulatorGateway))
+	webHandlerV1("/emulator/sign_message", signMessage(emulatorGateway))
+	webHandlerV1("/emulator/transaction_sign", transactionSign(emulatorGateway))
 	webHandlerV1("/emulator/wipe", wipe(emulatorGateway))
 	webHandlerV1("/emulator/connected", connected(emulatorGateway))
 
-
-	webHandlerV1("/emulator/intermediate/pinMatrix", pinMatrixRequestHandler(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/passPhrase", passphraseRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/pin_matrix", pinMatrixRequestHandler(emulatorGateway))
+	webHandlerV1("/emulator/intermediate/passphrase", passphraseRequestHandler(emulatorGateway))
 	webHandlerV1("/emulator/intermediate/word", wordRequestHandler(emulatorGateway))
 
 	return mux
@@ -390,9 +387,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 		}
 
 		writeHTTPResponse(w, HTTPResponse{
-			Data: GenerateAddressesResponse{
-				Addresses: addresses,
-			},
+			Data: addresses,
 		})
 	// Features Response
 	case uint16(messages.MessageType_MessageType_Features):
@@ -405,9 +400,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 		}
 
 		writeHTTPResponse(w, HTTPResponse{
-			Data: FeaturesResponse{
-				Features: features,
-			},
+			Data: features,
 		})
 	// SignMessage Response
 	case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
@@ -419,14 +412,11 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 		}
 
 		writeHTTPResponse(w, HTTPResponse{
-			Data: SignMessageResponse{
-				Signature: signature,
-			},
+			Data: signature,
 		})
 	// TransactionSign Response
 	case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
 		signatures, err := deviceWallet.DecodeResponseTransactionSign(msg)
-		spew.Dump(signatures)
 		if err != nil {
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
@@ -434,9 +424,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 		}
 
 		writeHTTPResponse(w, HTTPResponse{
-			Data: TransactionSignResponse{
-				Signatures: &signatures,
-			},
+			Data: &signatures,
 		})
 	default:
 		resp := NewHTTPErrorResponse(http.StatusInternalServerError, fmt.Sprintf("recevied unexpected response message type: %s", messages.MessageType(msg.Kind)))
@@ -444,7 +432,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gate
 	}
 }
 
-// PinMatrixRequest request data from /api/v1/intermediate/pinMatrix
+// PinMatrixRequest request data from /api/v1/intermediate/pin_matrix
 type PinMatrixRequest struct {
 	Pin string `json:"pin"`
 }
@@ -476,7 +464,7 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	}
 }
 
-// PassPhraseRequest request data from /api/v1/intermediate/passPhrases
+// PassPhraseRequest request data from /api/v1/intermediate/passphrases
 type PassPhraseRequest struct {
 	Passphrase string `json:"passphrase"`
 }

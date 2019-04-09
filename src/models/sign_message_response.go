@@ -8,7 +8,6 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -17,38 +16,11 @@ import (
 type SignMessageResponse struct {
 
 	// data
-	Data *SignMessageResponseData `json:"data,omitempty"`
+	Data string `json:"data,omitempty"`
 }
 
 // Validate validates this sign message response
 func (m *SignMessageResponse) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateData(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *SignMessageResponse) validateData(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Data) { // not required
-		return nil
-	}
-
-	if m.Data != nil {
-		if err := m.Data.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("data")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -63,37 +35,6 @@ func (m *SignMessageResponse) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *SignMessageResponse) UnmarshalBinary(b []byte) error {
 	var res SignMessageResponse
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
-// SignMessageResponseData sign message response data
-// swagger:model SignMessageResponseData
-type SignMessageResponseData struct {
-
-	// signature
-	Signature string `json:"signature,omitempty"`
-}
-
-// Validate validates this sign message response data
-func (m *SignMessageResponseData) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *SignMessageResponseData) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *SignMessageResponseData) UnmarshalBinary(b []byte) error {
-	var res SignMessageResponseData
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

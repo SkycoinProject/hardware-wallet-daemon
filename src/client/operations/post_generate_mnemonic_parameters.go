@@ -13,9 +13,10 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/skycoin/hardware-wallet-daemon/src/models"
 )
 
 // NewPostGenerateMnemonicParams creates a new PostGenerateMnemonicParams object
@@ -62,16 +63,11 @@ for the post generate mnemonic operation typically these are written to a http.R
 */
 type PostGenerateMnemonicParams struct {
 
-	/*UsePassphrase
-	  ask for passphrase before starting operation
+	/*GenerateMnemonicRequest
+	  GenerateMnemonicRequest is request data for /api/v1/generate_mnemonic
 
 	*/
-	UsePassphrase *bool
-	/*WordCount
-	  mnemonic seed length
-
-	*/
-	WordCount int64
+	GenerateMnemonicRequest *models.GenerateMnemonicRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -111,26 +107,15 @@ func (o *PostGenerateMnemonicParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithUsePassphrase adds the usePassphrase to the post generate mnemonic params
-func (o *PostGenerateMnemonicParams) WithUsePassphrase(usePassphrase *bool) *PostGenerateMnemonicParams {
-	o.SetUsePassphrase(usePassphrase)
+// WithGenerateMnemonicRequest adds the generateMnemonicRequest to the post generate mnemonic params
+func (o *PostGenerateMnemonicParams) WithGenerateMnemonicRequest(generateMnemonicRequest *models.GenerateMnemonicRequest) *PostGenerateMnemonicParams {
+	o.SetGenerateMnemonicRequest(generateMnemonicRequest)
 	return o
 }
 
-// SetUsePassphrase adds the usePassphrase to the post generate mnemonic params
-func (o *PostGenerateMnemonicParams) SetUsePassphrase(usePassphrase *bool) {
-	o.UsePassphrase = usePassphrase
-}
-
-// WithWordCount adds the wordCount to the post generate mnemonic params
-func (o *PostGenerateMnemonicParams) WithWordCount(wordCount int64) *PostGenerateMnemonicParams {
-	o.SetWordCount(wordCount)
-	return o
-}
-
-// SetWordCount adds the wordCount to the post generate mnemonic params
-func (o *PostGenerateMnemonicParams) SetWordCount(wordCount int64) {
-	o.WordCount = wordCount
+// SetGenerateMnemonicRequest adds the generateMnemonicRequest to the post generate mnemonic params
+func (o *PostGenerateMnemonicParams) SetGenerateMnemonicRequest(generateMnemonicRequest *models.GenerateMnemonicRequest) {
+	o.GenerateMnemonicRequest = generateMnemonicRequest
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -141,27 +126,8 @@ func (o *PostGenerateMnemonicParams) WriteToRequest(r runtime.ClientRequest, reg
 	}
 	var res []error
 
-	if o.UsePassphrase != nil {
-
-		// form param use-passphrase
-		var frUsePassphrase bool
-		if o.UsePassphrase != nil {
-			frUsePassphrase = *o.UsePassphrase
-		}
-		fUsePassphrase := swag.FormatBool(frUsePassphrase)
-		if fUsePassphrase != "" {
-			if err := r.SetFormParam("use-passphrase", fUsePassphrase); err != nil {
-				return err
-			}
-		}
-
-	}
-
-	// form param word-count
-	frWordCount := o.WordCount
-	fWordCount := swag.FormatInt64(frWordCount)
-	if fWordCount != "" {
-		if err := r.SetFormParam("word-count", fWordCount); err != nil {
+	if o.GenerateMnemonicRequest != nil {
+		if err := r.SetBodyParam(o.GenerateMnemonicRequest); err != nil {
 			return err
 		}
 	}

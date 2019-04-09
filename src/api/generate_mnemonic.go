@@ -1,16 +1,19 @@
 package api
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
-	"strconv"
 )
 
-// URI: /api/v1/generateMnemonic
+// GenerateMnemonicRequest is request data for /api/v1/generate_mnemonic
+type GenerateMnemonicRequest struct {
+	WordCount     uint32 `json:"word_count"`
+	UsePassphrase bool   `json:"use_passphrase"`
+}
+
+// URI: /api/v1/generate_mnemonic
 // Method: POST
-// Args:
-//  word-count: mnemonic seed length
-//  use-passphrase: (bool) ask for passphrase before starting operation
+// Args: JSON Body
 func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -19,30 +22,23 @@ func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
+		if r.Header.Get("Content-Type") != ContentTypeJSON {
+			resp := NewHTTPErrorResponse(http.StatusUnsupportedMediaType, "")
+			writeHTTPResponse(w, resp)
+			return
+		}
+
 		// TODO(therealssj): validate word count input for semantic errors?
 
-		wordCount := r.FormValue("word-count")
-		if wordCount == "" {
-			resp := NewHTTPErrorResponse(http.StatusBadRequest, "missing word-count")
+		var req GenerateMnemonicRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			resp := NewHTTPErrorResponse(http.StatusBadRequest, err.Error())
 			writeHTTPResponse(w, resp)
 			return
 		}
+		defer r.Body.Close()
 
-		wc, err := strconv.ParseUint(wordCount, 10, 32)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusBadRequest, fmt.Sprintf("invalid value %s for word-count", wordCount))
-			writeHTTPResponse(w, resp)
-			return
-		}
-
-		usePassphrase, err := parseBoolFlag(r.FormValue("use-passphrase"))
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for use-passphrase")
-			writeHTTPResponse(w, resp)
-			return
-		}
-
-		msg, err := gateway.GenerateMnemonic(uint32(wc), usePassphrase)
+		msg, err := gateway.GenerateMnemonic(req.WordCount, req.UsePassphrase)
 		if err != nil {
 			logger.Errorf("generateMnemonic failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
