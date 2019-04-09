@@ -23,7 +23,7 @@ The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v
         - [Sign Message](#sign-message)
         - [Transaction Sign](#transaction-sign)
         - [Wipe](#wipe)
-        
+        - [Connected](#connected)
     
 
 <!-- /MarkdownTOC -->
@@ -46,7 +46,7 @@ Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_addr
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/v1/generateAddresses \
+$ curl http://127.0.0.1:9510/api/v1/generateAddresses \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 2, "start_index": 0}'
 ```
@@ -76,7 +76,7 @@ Args:
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/v1/applySettings \
+$ curl -X POST http://127.0.0.1:9510/api/v1/applySettings \
    -H 'Content-Type: application/x-www-form-urlencoded' \
    -d 'label=skywallet'
 ```
@@ -98,7 +98,7 @@ Method: POST
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/v1/backup
+$ curl -X POST http://127.0.0.1:9510/api/v1/backup
 ```
 
 Response Flow:
@@ -134,7 +134,7 @@ Method: PUT
 
 Example:
 ```sh
-$ curl -X PUT http://127.0.0.1:6430/api/v1/cancel
+$ curl -X PUT http://127.0.0.1:9510/api/v1/cancel
 ```
 
 Response:
@@ -161,7 +161,7 @@ Args: {"message": "<message>", "signature": "<signature>", "address": "<address>
 
 Example:
 ```sh
-curl -X POST http://127.0.0.1:6430/api/v1/checkMessageSignature \
+curl -X POST http://127.0.0.1:9510/api/v1/checkMessageSignature \
 -H 'Content-Type: application/json' \
 -d '{"message": "Hello World", "signature": "6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300", "address": "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"}'
 ```
@@ -176,7 +176,7 @@ Method: GET
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/v1/features
+$ curl http://127.0.0.1:9510/api/v1/features
 ```
 
 Response:
@@ -231,7 +231,7 @@ Args:
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/v1/recovery \
+$ curl -X POST http://127.0.0.1:9510/api/v1/recovery \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'word-count=$word-count' \
   -d 'use-passphrase=$use-passphrase' \
@@ -263,7 +263,7 @@ Args:
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/v1/generateMnemonic \
+$ curl http://127.0.0.1:9510/api/v1/generateMnemonic \
   -H 'Content-Type: x-www-form-urlencoded' 
   -d 'word-count=12' \
   -d 'use-passphrase=$use-passphrase'
@@ -290,7 +290,7 @@ Args:
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/v1/setMnemonic\
+$ curl -X POST http://127.0.0.1:9510/api/v1/setMnemonic\
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'mnemonic=$mnemonic'
 ```
@@ -324,7 +324,7 @@ Method: POST
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/v1/setPinCode
+$ curl -X POST http://127.0.0.1:9510/api/v1/setPinCode
 ```
 
 Response Flow:
@@ -365,7 +365,7 @@ Args: {
 
 Example:
 ```sh
-$ curl -X POST http://127.0.0.1:6430/api/v1/signMessage \
+$ curl -X POST http://127.0.0.1:9510/api/v1/signMessage \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 0, "message": "hello world"}'
 ```
@@ -406,7 +406,7 @@ Args: {
 
 Example:
 ```sh
-$ curl http://127.0.0.1:6430/api/v1/transactionSign \
+$ curl http://127.0.0.1:9510/api/v1/transactionSign \
   -H 'Content-Type: application/json' \
   -d '{"inputs": ["e3411a073376d2abf2e3231023fca48f2396c575871764276d6206350207cde4"],
     "input_indexes": [0],
@@ -427,7 +427,7 @@ Method: DELETE
 
 Example:
 ```sh
-$ curl -X DELETE http://127.0.0.1:6430/api/v1/wipe
+$ curl -X DELETE http://127.0.0.1:9510/api/v1/wipe
 ```
 
 Response:
@@ -436,3 +436,24 @@ Response:
     "data": "Device wiped"
 }
 ```
+
+### Connected
+Connected tells whether the device is currently connected or not.
+
+```
+URI: /api/v1/connected
+Method: GET
+```
+
+Example:
+```sh
+$ curl -X GET http://127.0.0.1:9510/api/v1/conected
+```
+
+Response:
+```json
+{
+    "data": true
+}
+```
+

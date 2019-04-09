@@ -15,7 +15,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/rs/cors"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
@@ -286,11 +286,11 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/generateMnemonic", generateMnemonic(usbGateway))
 	webHandlerV1("/recovery", recovery(usbGateway))
 	webHandlerV1("/setMnemonic", setMnemonic(usbGateway))
-
 	webHandlerV1("/setPinCode", setPinCode(usbGateway))
 	webHandlerV1("/signMessage", signMessage(usbGateway))
 	webHandlerV1("/transactionSign", transactionSign(usbGateway))
 	webHandlerV1("/wipe", wipe(usbGateway))
+	webHandlerV1("/connected", connected(usbGateway))
 
 	webHandlerV1("/intermediate/pinMatrix", pinMatrixRequestHandler(usbGateway))
 	webHandlerV1("/intermediate/passPhrase", passphraseRequestHandler(usbGateway))
@@ -310,6 +310,8 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	webHandlerV1("/emulator/signMessage", signMessage(emulatorGateway))
 	webHandlerV1("/emulator/transactionSign", transactionSign(emulatorGateway))
 	webHandlerV1("/emulator/wipe", wipe(emulatorGateway))
+	webHandlerV1("/emulator/connected", connected(emulatorGateway))
+
 
 	webHandlerV1("/emulator/intermediate/pinMatrix", pinMatrixRequestHandler(emulatorGateway))
 	webHandlerV1("/emulator/intermediate/passPhrase", passphraseRequestHandler(emulatorGateway))

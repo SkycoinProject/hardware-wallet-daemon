@@ -66,7 +66,7 @@ type PostApplySettingsParams struct {
 	  label for hardware wallet
 
 	*/
-	Label string
+	Label *string
 	/*UsePassphrase
 	  ask for passphrase before starting operation
 
@@ -112,13 +112,13 @@ func (o *PostApplySettingsParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithLabel adds the label to the post apply settings params
-func (o *PostApplySettingsParams) WithLabel(label string) *PostApplySettingsParams {
+func (o *PostApplySettingsParams) WithLabel(label *string) *PostApplySettingsParams {
 	o.SetLabel(label)
 	return o
 }
 
 // SetLabel adds the label to the post apply settings params
-func (o *PostApplySettingsParams) SetLabel(label string) {
+func (o *PostApplySettingsParams) SetLabel(label *string) {
 	o.Label = label
 }
 
@@ -141,13 +141,20 @@ func (o *PostApplySettingsParams) WriteToRequest(r runtime.ClientRequest, reg st
 	}
 	var res []error
 
-	// form param label
-	frLabel := o.Label
-	fLabel := frLabel
-	if fLabel != "" {
-		if err := r.SetFormParam("label", fLabel); err != nil {
-			return err
+	if o.Label != nil {
+
+		// form param label
+		var frLabel string
+		if o.Label != nil {
+			frLabel = *o.Label
 		}
+		fLabel := frLabel
+		if fLabel != "" {
+			if err := r.SetFormParam("label", fLabel); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	if o.UsePassphrase != nil {
