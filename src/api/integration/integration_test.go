@@ -114,7 +114,7 @@ func TestEmulatorApplySettings(t *testing.T) {
 	c := newEmulatorClient()
 
 	params := operations.NewPostApplySettingsParams()
-	params.SetLabel("skywallet")
+	params.SetLabel(newStrPtr("skywallet"))
 
 	resp, err := c.Operations.PostApplySettings(params, nil)
 	require.NoError(t, err)
@@ -342,7 +342,7 @@ func TestWalletApplySettings(t *testing.T) {
 	c := newWalletClient()
 
 	params := operations.NewPostApplySettingsParams()
-	params.SetLabel("skywallet")
+	params.SetLabel(newStrPtr("skywallet"))
 
 	resp, err := c.Operations.PostApplySettings(params, nil)
 	require.NoError(t, err)
@@ -550,6 +550,18 @@ func TestWalletWipe(t *testing.T) {
 	resp, err := c.Operations.DeleteWipe(nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
+}
+
+func TestWalletConnected(t *testing.T) {
+	if !doWallet(t) {
+		return
+	}
+
+	c := newWalletClient()
+
+	resp, err := c.Operations.GetConnected(nil, nil)
+	require.NoError(t ,err)
+	require.Equal(t, resp.Payload.Data, true)
 }
 
 func bootstrap(t *testing.T, deviceType deviceWallet.DeviceType) {

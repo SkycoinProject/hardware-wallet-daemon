@@ -54,6 +54,35 @@ func (a *Client) DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAut
 }
 
 /*
+GetConnected check whether device is connected or not.
+*/
+func (a *Client) GetConnected(params *GetConnectedParams, authInfo runtime.ClientAuthInfoWriter) (*GetConnectedOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetConnectedParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetConnected",
+		Method:             "GET",
+		PathPattern:        "/connected",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetConnectedReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetConnectedOK), nil
+
+}
+
+/*
 GetCsrf Returns csrf token
 */
 func (a *Client) GetCsrf(params *GetCsrfParams) (*GetCsrfOK, error) {

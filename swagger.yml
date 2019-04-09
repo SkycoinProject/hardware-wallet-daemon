@@ -344,6 +344,26 @@ paths:
             $ref: '#/definitions/HTTPErrorResponse'
       security:
         - csrfAuth: []
+  /connected:
+    get:
+      description: check whether device is connected or not.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            type: object
+            properties:
+              data:
+                type: boolean
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
+
 
   /intermediate/pinMatrix:
     post:
