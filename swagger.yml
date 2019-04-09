@@ -635,8 +635,11 @@ definitions:
   CSRFResponse:
     type: object
     properties:
-      csrf_token:
-        type: string
+      data:
+        type: object
+        properties:
+          csrf_token:
+            type: string
 
   HTTPSuccessResponse:
     type: object

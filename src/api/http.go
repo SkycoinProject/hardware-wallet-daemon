@@ -40,7 +40,7 @@ var (
 
 type muxConfig struct {
 	host               string
-	disableCSRF        bool
+	enableCSRF         bool
 	disableHeaderCheck bool
 	hostWhitelist      []string
 }
@@ -54,7 +54,7 @@ type Server struct {
 
 // Config configures Server
 type Config struct {
-	DisableCSRF        bool
+	EnableCSRF         bool
 	DisableHeaderCheck bool
 	HostWhitelist      []string
 	ReadTimeout        time.Duration
@@ -158,7 +158,7 @@ func create(host string, c Config, gateway *Gateway) *Server {
 
 	mc := muxConfig{
 		host:               host,
-		disableCSRF:        c.DisableCSRF,
+		enableCSRF:         c.EnableCSRF,
 		disableHeaderCheck: c.DisableHeaderCheck,
 		hostWhitelist:      c.HostWhitelist,
 	}
@@ -249,7 +249,7 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		handler = corsHandler.Handler(handler)
 
 		if checkCSRF {
-			handler = CSRFCheck(c.disableCSRF, handler)
+			handler = CSRFCheck(c.enableCSRF, handler)
 		}
 
 		if checkHeaders {
@@ -262,7 +262,7 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 
 	webHandler := func(endpoint string, handler http.Handler) {
 		handler = wh.ElapsedHandler(logger, handler)
-		webHandlerWithOptionals(endpoint, handler, !c.disableCSRF, !c.disableHeaderCheck)
+		webHandlerWithOptionals(endpoint, handler, c.enableCSRF, !c.disableHeaderCheck)
 	}
 
 	webHandlerV1 := func(endpoint string, handler http.Handler) {
@@ -273,7 +273,7 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	csrfHandlerV1 := func(endpoint string, handler http.Handler) {
 		webHandlerWithOptionals("/api/"+apiVersion1+endpoint, handler, false, !c.disableHeaderCheck)
 	}
-	csrfHandlerV1("/csrf", getCSRFToken(c.disableCSRF)) // csrf is always available, regardless of the API set
+	csrfHandlerV1("/csrf", getCSRFToken(c.enableCSRF)) // csrf is always available, regardless of the API set
 
 	// hw wallet endpoints
 	webHandlerV1("/generateAddresses", generateAddresses(usbGateway))

@@ -291,6 +291,20 @@ func (_m *MockDevicer) Recovery(wordCount uint32, usePassphrase bool, dryRun boo
 	return r0, r1
 }
 
+// SetAutoPressButton provides a mock function with given fields: simulateButtonPress, simulateButtonType
+func (_m *MockDevicer) SetAutoPressButton(simulateButtonPress bool, simulateButtonType ButtonType) error {
+	ret := _m.Called(simulateButtonPress, simulateButtonType)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(bool, ButtonType) error); ok {
+		r0 = rf(simulateButtonPress, simulateButtonType)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // SetMnemonic provides a mock function with given fields: mnemonic
 func (_m *MockDevicer) SetMnemonic(mnemonic string) (wire.Message, error) {
 	ret := _m.Called(mnemonic)
@@ -312,20 +326,20 @@ func (_m *MockDevicer) SetMnemonic(mnemonic string) (wire.Message, error) {
 	return r0, r1
 }
 
-// SignMessage provides a mock function with given fields: addressN, message
-func (_m *MockDevicer) SignMessage(addressN int, message string) (wire.Message, error) {
-	ret := _m.Called(addressN, message)
+// SignMessage provides a mock function with given fields: addressIndex, message
+func (_m *MockDevicer) SignMessage(addressIndex int, message string) (wire.Message, error) {
+	ret := _m.Called(addressIndex, message)
 
 	var r0 wire.Message
 	if rf, ok := ret.Get(0).(func(int, string) wire.Message); ok {
-		r0 = rf(addressN, message)
+		r0 = rf(addressIndex, message)
 	} else {
 		r0 = ret.Get(0).(wire.Message)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(int, string) error); ok {
-		r1 = rf(addressN, message)
+		r1 = rf(addressIndex, message)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -311,7 +311,20 @@ func (d *Device) FirmwareUpload(payload []byte, hash [32]byte) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Success %d! FirmwareErase %s\n", erasemsg.Kind, erasemsg.Data)
+
+	switch erasemsg.Kind {
+	case uint16(messages.MessageType_MessageType_Success):
+		log.Printf("Success %d! FirmwareErase %s\n", erasemsg.Kind, erasemsg.Data)
+	case uint16(messages.MessageType_MessageType_Failure):
+		msg, err := DecodeFailMsg(erasemsg)
+		if err != nil {
+			return err
+		}
+
+		return errors.New(msg)
+	default:
+		return fmt.Errorf("received unexpected message type: %s", messages.MessageType(erasemsg.Kind))
+	}
 
 	log.Printf("Hash: %x\n", hash)
 
@@ -323,7 +336,20 @@ func (d *Device) FirmwareUpload(payload []byte, hash [32]byte) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Success %d! FirmwareUpload %s\n", uploadmsg.Kind, uploadmsg.Data)
+
+	switch uploadmsg.Kind {
+	case uint16(messages.MessageType_MessageType_Success):
+		log.Printf("Success %d! FirmwareUpload %s\n", uploadmsg.Kind, uploadmsg.Data)
+	case uint16(messages.MessageType_MessageType_Failure):
+		msg, err := DecodeFailMsg(erasemsg)
+		if err != nil {
+			return err
+		}
+
+		return errors.New(msg)
+	default:
+		return fmt.Errorf("received unexpected message type: %s", messages.MessageType(erasemsg.Kind))
+	}
 
 	// Send ButtonAck
 	chunks, err = MessageButtonAck()
@@ -401,7 +427,7 @@ func (d *Device) Recovery(wordCount uint32, usePassphrase, dryRun bool) (wire.Me
 	if err != nil {
 		return msg, err
 	}
-	log.Printf("Recovery device %d! Answer is: %s\n", msg.Kind, msg.Data)
+	log.Printf("Recovery device response kind is: %d\n", msg.Kind)
 
 	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
 		msg, err = d.ButtonAck()

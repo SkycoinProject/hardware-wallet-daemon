@@ -8,8 +8,14 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
+
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
+
+	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
 	"github.com/andreyvit/diff"
 	"github.com/davecgh/go-spew/spew"
@@ -47,6 +53,32 @@ func newEmulatorClient() *client.HardwareWalletDaemon {
 	c := client.NewHTTPClientWithConfig(nil, cfg)
 
 	return c
+}
+
+func useCSRF(t *testing.T) bool {
+	x := os.Getenv("USE_CSRF")
+
+	if x == "" {
+		return false
+	}
+
+	useCSRF, err := strconv.ParseBool(x)
+	require.NoError(t, err)
+	return useCSRF
+}
+
+// addCSRFHeader is used to add the CSRF Header param
+func addCSRFHeader(t *testing.T, c *client.HardwareWalletDaemon) runtime.ClientAuthInfoWriterFunc {
+	return func(req runtime.ClientRequest, _ strfmt.Registry) error {
+		if useCSRF(t) {
+			csrfResp, err := c.Operations.GetCsrf(nil)
+			require.NoError(t, err)
+			require.NotNil(t, csrfResp.Payload.Data.CsrfToken)
+			return req.SetHeaderParam(api.CSRFHeaderName, csrfResp.Payload.Data.CsrfToken)
+		}
+
+		return nil
+	}
 }
 
 func mode(t *testing.T) string {
@@ -99,7 +131,7 @@ func TestEmulatorGenerateAddresses(t *testing.T) {
 		StartIndex:     0,
 	}
 
-	resp, err := c.Operations.PostGenerateAddresses(params, nil)
+	resp, err := c.Operations.PostGenerateAddresses(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 
 	var expected models.GenerateAddressesResponse
@@ -116,7 +148,7 @@ func TestEmulatorApplySettings(t *testing.T) {
 	params := operations.NewPostApplySettingsParams()
 	params.SetLabel(newStrPtr("skywallet"))
 
-	resp, err := c.Operations.PostApplySettings(params, nil)
+	resp, err := c.Operations.PostApplySettings(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Settings applied")
 }
@@ -133,7 +165,7 @@ func TestEmulatorBackup(t *testing.T) {
 	// increase timeout as wallet backup takes time
 	params := operations.NewPostBackupParamsWithTimeout(time.Minute * 10)
 
-	resp, err := c.Operations.PostBackup(params, nil)
+	resp, err := c.Operations.PostBackup(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device backed up!")
 }
@@ -151,7 +183,7 @@ func TestEmulatorCheckMessageSignature(t *testing.T) {
 		Signature: newStrPtr("GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQTvMjokd3A4upPz4wyeAyKJEtRdRDGUvUgoGASpsTTUeMn"),
 	}
 
-	resp, err := c.Operations.PostCheckMessageSignature(params, nil)
+	resp, err := c.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Verification success")
 }
@@ -165,7 +197,7 @@ func TestEmulatorFeatures(t *testing.T) {
 
 	c := newEmulatorClient()
 
-	resp, err := c.Operations.GetFeatures(nil, nil)
+	resp, err := c.Operations.GetFeatures(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 
 	var expected models.FeaturesResponse
@@ -185,14 +217,14 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 	c := newEmulatorClient()
 
 	// wipe existing data
-	resp, err := c.Operations.DeleteWipe(nil, nil)
+	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
 	mnemonicParams.SetWordCount(12)
 
-	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, nil)
+	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, mnemonicResp.Payload.Data, "Mnemonic successfully configured")
 }
@@ -205,14 +237,14 @@ func TestEmulatorRecovery(t *testing.T) {
 	c := newEmulatorClient()
 
 	// wipe existing data
-	resp, err := c.Operations.DeleteWipe(nil, nil)
+	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	params := operations.NewPostRecoveryParams()
 	params.SetWordCount(12)
 
-	recoveryResp, err := c.Operations.PostRecovery(params, nil)
+	recoveryResp, err := c.Operations.PostRecovery(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, recoveryResp.Payload.Data, "WordRequest")
 
@@ -221,7 +253,7 @@ func TestEmulatorRecovery(t *testing.T) {
 		Word: newStrPtr("foobar"),
 	}
 
-	wordParamsResp, err := c.Operations.PostIntermediateWord(wordParams, nil)
+	wordParamsResp, err := c.Operations.PostIntermediateWord(wordParams, addCSRFHeader(t, c))
 	require.Nil(t, wordParamsResp)
 	// match that it contains any of the two available error responses.
 	require.Subset(t, [2]string{"Wrong word retyped", "Word not found in a wordlist"}, [1]string{err.Error()})
@@ -238,7 +270,7 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 	params := operations.NewPostSetMnemonicParams()
 	params.SetMnemonic(mnemonic)
 
-	resp, err := c.Operations.PostSetMnemonic(params, nil)
+	resp, err := c.Operations.PostSetMnemonic(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, mnemonic)
 }
@@ -250,7 +282,7 @@ func TestEmulatorSetPinCode(t *testing.T) {
 
 	c := newEmulatorClient()
 
-	resp, err := c.Operations.PostSetPinCode(nil, nil)
+	resp, err := c.Operations.PostSetPinCode(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "PinMatrixRequest")
 
@@ -259,7 +291,7 @@ func TestEmulatorSetPinCode(t *testing.T) {
 		Pin: newStrPtr("123"),
 	}
 
-	pinAckResp, err := c.Operations.PostIntermediatePinMatrix(params, nil)
+	pinAckResp, err := c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, pinAckResp.Payload.Data, "PinMatrixRequest")
 
@@ -268,7 +300,7 @@ func TestEmulatorSetPinCode(t *testing.T) {
 		Pin: newStrPtr("123"),
 	}
 
-	pinAckResp, err = c.Operations.PostIntermediatePinMatrix(params, nil)
+	pinAckResp, err = c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.Nil(t, pinAckResp)
 	require.Equal(t, err.Error(), "PIN mismatch")
 }
@@ -292,7 +324,7 @@ func TestEmulatorTransactionSign(t *testing.T) {
 		AddressIndexes:  []int64{0},
 	}
 
-	resp, err := c.Operations.PostTransactionSign(params, nil)
+	resp, err := c.Operations.PostTransactionSign(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 
 	spew.Dump(resp)
@@ -305,7 +337,7 @@ func TestEmulatorWipe(t *testing.T) {
 
 	c := newEmulatorClient()
 
-	resp, err := c.Operations.DeleteWipe(nil, nil)
+	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 }
@@ -327,7 +359,7 @@ func TestWalletGenerateAddresses(t *testing.T) {
 		StartIndex:     0,
 	}
 
-	resp, err := c.Operations.PostGenerateAddresses(params, nil)
+	resp, err := c.Operations.PostGenerateAddresses(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 
 	var expected models.GenerateAddressesResponse
@@ -344,7 +376,7 @@ func TestWalletApplySettings(t *testing.T) {
 	params := operations.NewPostApplySettingsParams()
 	params.SetLabel(newStrPtr("skywallet"))
 
-	resp, err := c.Operations.PostApplySettings(params, nil)
+	resp, err := c.Operations.PostApplySettings(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Settings applied")
 
@@ -362,7 +394,7 @@ func TestWalletBackup(t *testing.T) {
 	// increase timeout as wallet backup takes time
 	params := operations.NewPostBackupParamsWithTimeout(time.Minute * 10)
 
-	resp, err := c.Operations.PostBackup(params, nil)
+	resp, err := c.Operations.PostBackup(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device backed up!")
 }
@@ -381,7 +413,7 @@ func TestWalletCheckMessageSignature(t *testing.T) {
 		Signature: newStrPtr("6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300"),
 	}
 
-	resp, err := c.Operations.PostCheckMessageSignature(params, nil)
+	resp, err := c.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw")
 }
@@ -395,7 +427,7 @@ func TestWalletFeatures(t *testing.T) {
 
 	c := newWalletClient()
 
-	resp, err := c.Operations.GetFeatures(nil, nil)
+	resp, err := c.Operations.GetFeatures(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 
 	var expected models.FeaturesResponse
@@ -416,14 +448,14 @@ func TestWalletGenerateMnemonic(t *testing.T) {
 	c := newWalletClient()
 
 	// wipe existing data
-	resp, err := c.Operations.DeleteWipe(nil, nil)
+	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
 	mnemonicParams.SetWordCount(12)
 
-	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, nil)
+	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, mnemonicResp.Payload.Data, "Mnemonic successfully configured")
 }
@@ -436,14 +468,14 @@ func TestWalletRecovery(t *testing.T) {
 	c := newWalletClient()
 
 	// wipe existing data
-	resp, err := c.Operations.DeleteWipe(nil, nil)
+	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 
 	params := operations.NewPostRecoveryParams()
 	params.SetWordCount(12)
 
-	recoveryResp, err := c.Operations.PostRecovery(params, nil)
+	recoveryResp, err := c.Operations.PostRecovery(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, recoveryResp.Payload.Data, "WordRequest")
 
@@ -452,7 +484,7 @@ func TestWalletRecovery(t *testing.T) {
 		Word: newStrPtr("foobar"),
 	}
 
-	wordParamsResp, err := c.Operations.PostIntermediateWord(wordParams, nil)
+	wordParamsResp, err := c.Operations.PostIntermediateWord(wordParams, addCSRFHeader(t, c))
 	require.Nil(t, wordParamsResp)
 	// match that it contains any of the two available error responses.
 	require.Subset(t, [2]string{"Wrong word retyped", "Word not found in a wordlist"}, [1]string{err.Error()})
@@ -469,7 +501,7 @@ func TestWalletSetMnemonic(t *testing.T) {
 	params := operations.NewPostSetMnemonicParams()
 	params.SetMnemonic(mnemonic)
 
-	resp, err := c.Operations.PostSetMnemonic(params, nil)
+	resp, err := c.Operations.PostSetMnemonic(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, mnemonic)
 }
@@ -481,7 +513,7 @@ func TestWalletSetPinCode(t *testing.T) {
 
 	c := newWalletClient()
 
-	resp, err := c.Operations.PostSetPinCode(nil, nil)
+	resp, err := c.Operations.PostSetPinCode(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "PinMatrixRequest")
 
@@ -490,7 +522,7 @@ func TestWalletSetPinCode(t *testing.T) {
 		Pin: newStrPtr("123"),
 	}
 
-	pinAckResp, err := c.Operations.PostIntermediatePinMatrix(params, nil)
+	pinAckResp, err := c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, pinAckResp.Payload.Data, "PinMatrixRequest")
 
@@ -499,7 +531,7 @@ func TestWalletSetPinCode(t *testing.T) {
 		Pin: newStrPtr("123"),
 	}
 
-	pinAckResp, err = c.Operations.PostIntermediatePinMatrix(params, nil)
+	pinAckResp, err = c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.Nil(t, pinAckResp)
 	require.Equal(t, err.Error(), "PIN mismatch")
 }
@@ -522,7 +554,7 @@ func TestWalletTransactionSign(t *testing.T) {
 		OutputAddresses: []string{"K9TzLrgqz7uXn3QJHGxmzdRByAzH33J2ot"},
 	}
 
-	resp, err := c.Operations.PostTransactionSign(params, nil)
+	resp, err := c.Operations.PostTransactionSign(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Len(t, resp.Payload.Data.Signatures, 1)
 
@@ -535,7 +567,7 @@ func TestWalletTransactionSign(t *testing.T) {
 		Signature: newStrPtr(resp.Payload.Data.Signatures[0]),
 	}
 
-	verifResp, err := c.Operations.PostCheckMessageSignature(verifParams, nil)
+	verifResp, err := c.Operations.PostCheckMessageSignature(verifParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
 	require.Equal(t, verifResp.Payload.Data, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw")
 }
@@ -547,7 +579,8 @@ func TestWalletWipe(t *testing.T) {
 
 	c := newWalletClient()
 
-	resp, err := c.Operations.DeleteWipe(nil, nil)
+	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
+
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, "Device wiped")
 }
@@ -565,29 +598,31 @@ func TestWalletConnected(t *testing.T) {
 }
 
 func bootstrap(t *testing.T, deviceType deviceWallet.DeviceType) {
-	var c *client.HardwareWalletDaemon
-	switch deviceType {
-	case deviceWallet.DeviceTypeUSB:
-		c = newWalletClient()
-	case deviceWallet.DeviceTypeEmulator:
-		c = newEmulatorClient()
-	default:
-		t.Fatalf("invalid device type %v", deviceType)
+	if enabled() {
+		var c *client.HardwareWalletDaemon
+		switch deviceType {
+		case deviceWallet.DeviceTypeUSB:
+			c = newWalletClient()
+		case deviceWallet.DeviceTypeEmulator:
+			c = newEmulatorClient()
+		default:
+			t.Fatalf("invalid device type %v", deviceType)
+		}
+
+		// wipe existing data
+		resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
+		require.NoError(t, err)
+		require.Equal(t, resp.Payload.Data, "Device wiped")
+
+		// set new mnemonic
+		mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
+		mnemonicParams := operations.NewPostSetMnemonicParams()
+		mnemonicParams.SetMnemonic(mnemonic)
+
+		mnemonicResp, err := c.Operations.PostSetMnemonic(mnemonicParams, addCSRFHeader(t, c))
+		require.NoError(t, err)
+		require.Equal(t, mnemonicResp.Payload.Data, mnemonic)
 	}
-
-	// wipe existing data
-	resp, err := c.Operations.DeleteWipe(nil, nil)
-	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
-
-	// set new mnemonic
-	mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
-	mnemonicParams := operations.NewPostSetMnemonicParams()
-	mnemonicParams.SetMnemonic(mnemonic)
-
-	mnemonicResp, err := c.Operations.PostSetMnemonic(mnemonicParams, nil)
-	require.NoError(t, err)
-	require.Equal(t, mnemonicResp.Payload.Data, mnemonic)
 }
 
 func newStrPtr(s string) *string {

@@ -14,6 +14,8 @@ VERBOSE=""
 RUN_TESTS=""
 FAILFAST=""
 NAME=""
+USE_CSRF=""
+ENABLE_CSRF=""
 
 usage () {
   echo "Usage: $SCRIPT"
@@ -24,6 +26,7 @@ usage () {
   echo "-u <boolean> -- Update testdata"
   echo "-v <boolean> -- Run test with -v flag"
   echo "-f <boolean> -- Run test with -failfast flag"
+  echo "-c <boolean> -- Pass this argument if the node has CSRF enabled"
   exit 1
 }
 
@@ -38,7 +41,7 @@ case $args in
     u ) UPDATE="--update";;
     v ) VERBOSE="-v";;
     f ) FAILFAST="-failfast";;
-    c ) USE_CSRF="1";;
+    c ) ENABLE_CSRF="-enable-csrf"; USE_CSRF="1";;
   esac
 done
 
@@ -73,6 +76,7 @@ echo "starting daemon node in background with http listener on $HOST"
             -data-dir="$DATA_DIR" \
             -test.run "^TestRunMain$" \
             -test.coverprofile="${COVERAGEFILE}" \
+            $ENABLE_CSRF \
             &
 
 DAEMON_PID=$!
@@ -81,7 +85,7 @@ echo "daemon pid=$DAEMON_PID"
 
 set +e
 
-HW_DAEMON_INTEGRATION_TESTS=1 HW_DAEMON_INTEGRATION_TEST_MODE=$MODE \
+HW_DAEMON_INTEGRATION_TESTS=1 HW_DAEMON_INTEGRATION_TEST_MODE=$MODE USE_CSRF=$USE_CSRF \
     go test ./src/api/integration/... $FAILFAST $UPDATE -timeout=$TIMEOUT $VERBOSE $RUN_TESTS
 
 TEST_FAIL=$?
@@ -93,6 +97,5 @@ kill -s SIGINT $DAEMON_PID
 wait $DAEMON_PID
 
 rm "$BINARY"
-
 
 exit $TEST_FAIL
