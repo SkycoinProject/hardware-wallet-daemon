@@ -76,11 +76,31 @@ func TestCORS(t *testing.T) {
 		origin        string
 		hostWhitelist []string
 		valid         bool
+		isHTTPS       bool
 	}{
 		{
 			name:   "options no whitelist",
 			origin: configuredHost,
 			valid:  true,
+		},
+		{
+			name:   "options no whitelist",
+			origin: "127.0.0.1:4000",
+			valid:  true,
+		},
+
+		{
+			name:    "options no whitelist",
+			origin:  "staging.wallet.skycoin.net",
+			valid:   true,
+			isHTTPS: true,
+		},
+
+		{
+			name:    "options no whitelist",
+			origin:  "wallet.skycoin.net",
+			valid:   true,
+			isHTTPS: true,
 		},
 
 		{
@@ -89,6 +109,7 @@ func TestCORS(t *testing.T) {
 			hostWhitelist: []string{"example.com"},
 			valid:         true,
 		},
+
 		{
 			name:   "options no whitelist not whitelisted",
 			origin: "example.com",
@@ -107,7 +128,14 @@ func TestCORS(t *testing.T) {
 					req, err := http.NewRequest(http.MethodOptions, e, nil)
 					require.NoError(t, err)
 
-					req.Header.Set("Origin", fmt.Sprintf("http://%s", tc.origin))
+					var origin string
+					if tc.isHTTPS {
+						origin = fmt.Sprintf("https://%s", tc.origin)
+					} else {
+						origin = fmt.Sprintf("http://%s", tc.origin)
+					}
+
+					req.Header.Set("Origin", origin)
 					req.Header.Set("Access-Control-Request-Method", m)
 
 					handler := newServerMux(cfg, &MockGatewayer{}, &MockGatewayer{})
@@ -122,7 +150,7 @@ func TestCORS(t *testing.T) {
 					allowMethods := resp.Header.Get("Access-Control-Allow-Methods")
 
 					if tc.valid {
-						require.Equal(t, fmt.Sprintf("http://%s", tc.origin), allowOrigins)
+						require.Equal(t, origin, allowOrigins)
 						require.Equal(t, m, allowMethods)
 					} else {
 						require.Empty(t, allowOrigins)

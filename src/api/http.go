@@ -204,12 +204,13 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 		"https://staging.wallet.skycoin.net",
 		"https://wallet.skycoin.net",
 	}
+
 	for _, s := range c.hostWhitelist {
 		allowedOrigins = append(allowedOrigins, fmt.Sprintf("http://%s", s))
 	}
 
-	// allow any localhost orogin
-	lregex, err := regexp.Compile(`^https?://localhost:\d+$`)
+	// allow any localhost origin
+	lregex, err := regexp.Compile(`^https?://localhost|127.0.0.1:\d+$`)
 	if err != nil {
 		logger.Panic(err)
 	}

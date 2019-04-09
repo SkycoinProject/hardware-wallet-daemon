@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/skycoin/skycoin/src/util/iputil"
@@ -46,10 +47,27 @@ func hostCheck(host string, hostWhitelist []string, handler http.Handler) http.H
 	hostWhitelistMap[fmt.Sprintf("127.0.0.1:%d", port)] = struct{}{}
 	hostWhitelistMap[fmt.Sprintf("localhost:%d", port)] = struct{}{}
 
+	isWhiteListed := func(host string) bool {
+		if _, ok := hostWhitelistMap[host]; ok {
+			return true
+		}
+
+		// allow any localhost origin
+		lregex, err := regexp.Compile(`^https?://localhost|127.0.0.1:\d+$`)
+		if err != nil {
+			logger.Panic(err)
+		}
+
+		if lregex.MatchString(host) {
+			return true
+		}
+
+		return false
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// NOTE: The "Host" header is not in http.Request.Header, it's put in the http.Request.Host field
-		_, isWhitelisted := hostWhitelistMap[r.Host]
-		if isLocalhost && r.Host != "" && !isWhitelisted {
+		if isLocalhost && r.Host != "" && !isWhiteListed(r.Host) {
 			logger.Critical().Errorf("Detected DNS rebind attempt - configured-host=%s header-host=%s", host, r.Host)
 			resp := NewHTTPErrorResponse(http.StatusForbidden, "Invalid Host")
 			writeHTTPResponse(w, resp)
@@ -78,8 +96,29 @@ func originRefererCheck(host string, hostWhitelist []string, handler http.Handle
 	if addr, port, _ := iputil.SplitAddr(host); iputil.IsLocalhost(addr) { // nolint: errcheck
 		hostWhitelistMap[fmt.Sprintf("127.0.0.1:%d", port)] = struct{}{}
 		hostWhitelistMap[fmt.Sprintf("localhost:%d", port)] = struct{}{}
+		hostWhitelistMap["staging.wallet.skycoin.net"] = struct{}{}
+		hostWhitelistMap["wallet.skycoin.net"] = struct{}{}
+
 	} else {
 		hostWhitelistMap[host] = struct{}{}
+	}
+
+	isWhiteListed := func(host string) bool {
+		if _, ok := hostWhitelistMap[host]; ok {
+			return true
+		}
+
+		// allow any localhost origin
+		lregex, err := regexp.Compile(`^https?://localhost|127.0.0.1:\d+$`)
+		if err != nil {
+			logger.Panic(err)
+		}
+
+		if lregex.MatchString(host) {
+			return true
+		}
+
+		return false
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +140,7 @@ func originRefererCheck(host string, hostWhitelist []string, handler http.Handle
 				return
 			}
 
-			if _, isWhitelisted := hostWhitelistMap[u.Host]; !isWhitelisted {
+			if !isWhiteListed(u.Host) {
 				logger.Critical().Errorf("%s header value %s does not match host and is not whitelisted", toCheckHeader, toCheck)
 				resp := NewHTTPErrorResponse(http.StatusForbidden, "Invalid Origin or Referer")
 				writeHTTPResponse(w, resp)
