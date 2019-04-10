@@ -2,15 +2,15 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/skycoin/skycoin/src/cipher"
-	"github.com/skycoin/skycoin/src/util/droplet"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/skycoin/src/cipher"
+	"github.com/skycoin/skycoin/src/util/droplet"
+
+	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	"github.com/stretchr/testify/require"
 )
@@ -219,59 +219,53 @@ func TestSignTransaction(t *testing.T) {
 		},
 	}
 
-	for _, deviceType := range []deviceWallet.DeviceType{deviceWallet.DeviceTypeUSB, deviceWallet.DeviceTypeEmulator} {
-		for _, tc := range cases {
-			t.Run(tc.name, func(t *testing.T) {
-				endpoint := "/transaction_sign"
-				gateway := &MockGatewayer{}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			endpoint := "/transaction_sign"
+			gateway := &MockGatewayer{}
 
-				if deviceType == deviceWallet.DeviceTypeEmulator {
-					endpoint = "/emulator" + endpoint
-				}
-
-				if tc.err != "" {
-					var body TransactionSignRequest
-					err := json.Unmarshal([]byte(tc.httpBody), &body)
+			if tc.err != "" {
+				var body TransactionSignRequest
+				err := json.Unmarshal([]byte(tc.httpBody), &body)
+				if err == nil {
+					ins, outs, err := body.TransactionParams()
 					if err == nil {
-						ins, outs, err := body.TransactionParams()
-						if err == nil {
-							gateway.On("TransactionSign", ins, outs).Return(tc.gatewaySignTransactionResult, nil)
-						}
+						gateway.On("TransactionSign", ins, outs).Return(tc.gatewaySignTransactionResult, nil)
 					}
 				}
+			}
 
-				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
-				require.NoError(t, err)
+			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
+			require.NoError(t, err)
 
-				contentType := tc.contentType
-				if contentType == "" {
-					contentType = ContentTypeJSON
+			contentType := tc.contentType
+			if contentType == "" {
+				contentType = ContentTypeJSON
+			}
+
+			req.Header.Set("Content-Type", contentType)
+
+			rr := httptest.NewRecorder()
+			handler := newServerMux(defaultMuxConfig(), gateway)
+			handler.ServeHTTP(rr, req)
+
+			status := rr.Code
+			require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
+
+			var rsp HTTPResponse
+			err = json.NewDecoder(rr.Body).Decode(&rsp)
+			require.NoError(t, err)
+
+			require.Equal(t, tc.httpResponse.Error, rsp.Error)
+
+			if rsp.Data == nil {
+				require.Nil(t, tc.httpResponse.Data)
+				if tc.err != "" {
+					require.Equal(t, tc.err, rsp.Error.Message)
 				}
-
-				req.Header.Set("Content-Type", contentType)
-
-				rr := httptest.NewRecorder()
-				handler := newServerMux(defaultMuxConfig(), gateway, gateway)
-				handler.ServeHTTP(rr, req)
-
-				status := rr.Code
-				require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
-
-				var rsp HTTPResponse
-				err = json.NewDecoder(rr.Body).Decode(&rsp)
-				require.NoError(t, err)
-
-				require.Equal(t, tc.httpResponse.Error, rsp.Error)
-
-				if rsp.Data == nil {
-					require.Nil(t, tc.httpResponse.Data)
-					if tc.err != "" {
-						require.Equal(t, tc.err, rsp.Error.Message)
-					}
-				} else {
-					require.NotNil(t, tc.httpResponse.Data)
-				}
-			})
-		}
+			} else {
+				require.NotNil(t, tc.httpResponse.Data)
+			}
+		})
 	}
 }

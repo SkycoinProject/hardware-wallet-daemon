@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	"github.com/stretchr/testify/require"
@@ -92,49 +91,43 @@ func TestSignMessage(t *testing.T) {
 		},
 	}
 
-	for _, deviceType := range []deviceWallet.DeviceType{deviceWallet.DeviceTypeUSB, deviceWallet.DeviceTypeEmulator} {
-		for _, tc := range cases {
-			t.Run(tc.name, func(t *testing.T) {
-				endpoint := "/sign_message"
-				gateway := &MockGatewayer{}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			endpoint := "/sign_message"
+			gateway := &MockGatewayer{}
 
-				if deviceType == deviceWallet.DeviceTypeEmulator {
-					endpoint = "/emulator" + endpoint
-				}
+			var body SignMessageRequest
+			err := json.Unmarshal([]byte(tc.httpBody), &body)
+			if err == nil {
+				gateway.On("SignMessage", body.AddressN, body.Message).Return(tc.gatewaySignMessageResult, nil)
+			}
 
-				var body SignMessageRequest
-				err := json.Unmarshal([]byte(tc.httpBody), &body)
-				if err == nil {
-					gateway.On("SignMessage", body.AddressN, body.Message).Return(tc.gatewaySignMessageResult, nil)
-				}
+			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
+			require.NoError(t, err)
 
-				req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
-				require.NoError(t, err)
+			contentType := tc.contentType
+			if contentType == "" {
+				contentType = ContentTypeJSON
+			}
 
-				contentType := tc.contentType
-				if contentType == "" {
-					contentType = ContentTypeJSON
-				}
+			req.Header.Set("Content-Type", contentType)
 
-				req.Header.Set("Content-Type", contentType)
+			rr := httptest.NewRecorder()
+			handler := newServerMux(defaultMuxConfig(), gateway)
+			handler.ServeHTTP(rr, req)
 
-				rr := httptest.NewRecorder()
-				handler := newServerMux(defaultMuxConfig(), gateway, gateway)
-				handler.ServeHTTP(rr, req)
+			status := rr.Code
+			require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
 
-				status := rr.Code
-				require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
+			var rsp HTTPResponse
+			err = json.NewDecoder(rr.Body).Decode(&rsp)
+			require.NoError(t, err)
 
-				var rsp HTTPResponse
-				err = json.NewDecoder(rr.Body).Decode(&rsp)
-				require.NoError(t, err)
+			require.Equal(t, tc.httpResponse.Error, rsp.Error)
 
-				require.Equal(t, tc.httpResponse.Error, rsp.Error)
-
-				if rsp.Data == nil {
-					require.Nil(t, tc.httpResponse.Data)
-				}
-			})
-		}
+			if rsp.Data == nil {
+				require.Nil(t, tc.httpResponse.Data)
+			}
+		})
 	}
 }

@@ -63,7 +63,7 @@ func TestCSRFWrapper(t *testing.T) {
 
 					cfg := defaultMuxConfig()
 					cfg.enableCSRF = true
-					handler := newServerMux(cfg, gateway, gateway)
+					handler := newServerMux(cfg, gateway)
 
 					handler.ServeHTTP(rr, req)
 
@@ -95,7 +95,7 @@ func TestCSRFWrapperConcurrent(t *testing.T) {
 
 	cfg := defaultMuxConfig()
 	cfg.enableCSRF = true
-	handler := newServerMux(cfg, gateway, gateway)
+	handler := newServerMux(cfg, gateway)
 
 	var wg sync.WaitGroup
 

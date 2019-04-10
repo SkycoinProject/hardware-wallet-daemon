@@ -562,9 +562,9 @@ func TestWalletSetPinCode(t *testing.T) {
 }
 
 func TestWalletTransactionSign(t *testing.T) {
-	// if !doWallet(t) {
-	// 	return
-	// }
+	if !doWallet(t) {
+		return
+	}
 
 	bootstrap(t, deviceWallet.DeviceTypeUSB)
 
