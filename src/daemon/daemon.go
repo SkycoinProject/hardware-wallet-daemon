@@ -38,7 +38,7 @@ func (d *Daemon) Run() error {
 
 	logLevel, err := logging.LevelFromString(d.config.LogLevel)
 	if err != nil {
-		err = fmt.Errorf("Invalid -log-level: %v", err)
+		err = fmt.Errorf("invalid -log-level: %v", err)
 		d.logger.Error(err)
 		return err
 	}
@@ -95,9 +95,7 @@ func (d *Daemon) Run() error {
 	// Catch SIGUSR1 (prints runtime stack to stdout)
 	go apputil.CatchDebug()
 
-	apiServer, err = d.createServer(host, api.NewGateway(
-		deviceWallet.NewDevice(deviceWallet.DeviceTypeUSB),
-		deviceWallet.NewDevice(deviceWallet.DeviceTypeEmulator)))
+	apiServer, err = d.createServer(host, api.NewGateway(deviceWallet.NewDevice(d.config.daemonMode)))
 	if err != nil {
 		d.logger.Error(err)
 		retErr = err
@@ -181,6 +179,7 @@ func (d *Daemon) createServer(host string, gateway *api.Gateway) (*api.Server, e
 		ReadTimeout:        d.config.HTTPReadTimeout,
 		WriteTimeout:       d.config.HTTPWriteTimeout,
 		IdleTimeout:        d.config.HTTPIdleTimeout,
+		Mode:               d.config.daemonMode,
 	}
 
 	var s *api.Server

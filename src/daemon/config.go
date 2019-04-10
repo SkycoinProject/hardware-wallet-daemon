@@ -4,8 +4,11 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"os"
 	"strings"
 	"time"
+
+	devicewallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 
 	"github.com/skycoin/skycoin/src/util/file"
 )
@@ -53,6 +56,10 @@ type Config struct {
 
 	// Data directory holds app data -- defaults to ~/.skycoin
 	DataDirectory string
+
+	// DaemonMode decides with what api is enabled, either wallet or emulator
+	DaemonMode string
+	daemonMode devicewallet.DeviceType
 }
 
 // NewConfig returns a new config instance
@@ -83,6 +90,9 @@ func NewConfig(port int, datadir string) Config {
 		HTTPProf:     false,
 		HTTPProfHost: "localhost:6060",
 
+		// Run daemon in wallet mode by default
+		DaemonMode: devicewallet.DeviceTypeUSB.String(),
+
 		DataDirectory: datadir,
 	}
 }
@@ -90,6 +100,7 @@ func NewConfig(port int, datadir string) Config {
 func (c *Config) postProcess() error {
 	if help {
 		flag.Usage()
+		os.Exit(0)
 	}
 
 	var err error
@@ -102,6 +113,11 @@ func (c *Config) postProcess() error {
 			return errors.New("host whitelist should be empty when header check is disabled")
 		}
 		c.hostWhitelist = strings.Split(c.HostWhitelist, ",")
+	}
+
+	c.daemonMode = devicewallet.DeviceTypeFromString(c.DaemonMode)
+	if c.daemonMode == devicewallet.DeviceTypeInvalid {
+		return errors.New("invalid device type")
 	}
 
 	return nil
@@ -126,6 +142,8 @@ func (c *Config) RegisterFlags() {
 	flag.StringVar(&c.HTTPProfHost, "http-prof-host", c.HTTPProfHost, "hostname to bind the HTTP profiling interface to")
 
 	flag.StringVar(&c.DataDirectory, "data-dir", c.DataDirectory, "directory to store app data (defaults to ~/.skycoin)")
+
+	flag.StringVar(&c.DaemonMode, "daemon-mode", c.DaemonMode, "Choices are: USB or EMULATOR")
 }
 
 func panicIfError(err error, msg string, args ...interface{}) { // nolint: unparam

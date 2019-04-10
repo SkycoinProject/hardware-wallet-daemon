@@ -6,17 +6,15 @@ import (
 
 //go:generate mockery -name Gatewayer -case underscore -inpkg -testonly
 
-// Gateway bundles both USB and Emulator device into a single object
+// Gateway is the api gateway
 type Gateway struct {
-	USBDevice      *deviceWallet.Device
-	EmulatorDevice *deviceWallet.Device
+	Device *deviceWallet.Device
 }
 
 // NewGateway creates a Gateway
-func NewGateway(usb, emu *deviceWallet.Device) *Gateway {
+func NewGateway(device *deviceWallet.Device) *Gateway {
 	return &Gateway{
-		usb,
-		emu,
+		device,
 	}
 }
 

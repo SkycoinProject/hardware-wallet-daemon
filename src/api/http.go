@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/NYTimes/gziphandler"
@@ -52,6 +51,7 @@ type muxConfig struct {
 	enableCSRF         bool
 	disableHeaderCheck bool
 	hostWhitelist      []string
+	mode               deviceWallet.DeviceType
 }
 
 // Server exposes an HTTP API
@@ -69,6 +69,7 @@ type Config struct {
 	ReadTimeout        time.Duration
 	WriteTimeout       time.Duration
 	IdleTimeout        time.Duration
+	Mode               deviceWallet.DeviceType
 }
 
 // HTTPResponse represents the http response struct
@@ -170,9 +171,10 @@ func create(host string, c Config, gateway *Gateway) *Server {
 		enableCSRF:         c.EnableCSRF,
 		disableHeaderCheck: c.DisableHeaderCheck,
 		hostWhitelist:      c.HostWhitelist,
+		mode:               c.Mode,
 	}
 
-	srvMux := newServerMux(mc, gateway.USBDevice, gateway.EmulatorDevice)
+	srvMux := newServerMux(mc, gateway.Device)
 
 	srv := &http.Server{
 		Handler:      srvMux,
@@ -205,7 +207,7 @@ func Create(host string, c Config, gateway *Gateway) (*Server, error) {
 	return s, nil
 }
 
-func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.ServeMux {
+func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	allowedOrigins := []string{
@@ -279,56 +281,31 @@ func newServerMux(c muxConfig, usbGateway, emulatorGateway Gatewayer) *http.Serv
 	}
 	csrfHandlerV1("/csrf", getCSRFToken(c.enableCSRF)) // csrf is always available, regardless of the API set
 
-	// hw wallet endpoints
-	webHandlerV1("/generate_addresses", generateAddresses(usbGateway))
-	webHandlerV1("/apply_settings", applySettings(usbGateway))
-	webHandlerV1("/backup", backup(usbGateway))
-	webHandlerV1("/cancel", cancel(usbGateway))
-	webHandlerV1("/check_message_signature", checkMessageSignature(usbGateway))
-	webHandlerV1("/features", features(usbGateway))
-	webHandlerV1("/firmware_update", firmwareUpdate(usbGateway))
-	webHandlerV1("/generate_mnemonic", generateMnemonic(usbGateway))
-	webHandlerV1("/recovery", recovery(usbGateway))
-	webHandlerV1("/set_mnemonic", setMnemonic(usbGateway))
-	webHandlerV1("/set_pin_code", setPinCode(usbGateway))
-	webHandlerV1("/sign_message", signMessage(usbGateway))
-	webHandlerV1("/transaction_sign", transactionSign(usbGateway))
-	webHandlerV1("/wipe", wipe(usbGateway))
-	webHandlerV1("/connected", connected(usbGateway))
+	// hw daemon endpoints
+	webHandlerV1("/generate_addresses", generateAddresses(gateway))
+	webHandlerV1("/apply_settings", applySettings(gateway))
+	webHandlerV1("/backup", backup(gateway))
+	webHandlerV1("/cancel", cancel(gateway))
+	webHandlerV1("/check_message_signature", checkMessageSignature(gateway))
+	webHandlerV1("/features", features(gateway))
+	// enable firmware update endpoint only for hw wallet
+	if c.mode == deviceWallet.DeviceTypeUSB {
+		webHandlerV1("/firmware_update", firmwareUpdate(gateway))
+	}
+	webHandlerV1("/generate_mnemonic", generateMnemonic(gateway))
+	webHandlerV1("/recovery", recovery(gateway))
+	webHandlerV1("/set_mnemonic", setMnemonic(gateway))
+	webHandlerV1("/set_pin_code", setPinCode(gateway))
+	webHandlerV1("/sign_message", signMessage(gateway))
+	webHandlerV1("/transaction_sign", transactionSign(gateway))
+	webHandlerV1("/wipe", wipe(gateway))
+	webHandlerV1("/connected", connected(gateway))
 
-	webHandlerV1("/intermediate/pin_matrix", pinMatrixRequestHandler(usbGateway))
-	webHandlerV1("/intermediate/passphrase", passphraseRequestHandler(usbGateway))
-	webHandlerV1("/intermediate/word", wordRequestHandler(usbGateway))
-
-	// emulator endpoints
-	webHandlerV1("/emulator/generate_addresses", generateAddresses(emulatorGateway))
-	webHandlerV1("/emulator/apply_settings", applySettings(emulatorGateway))
-	webHandlerV1("/emulator/backup", backup(emulatorGateway))
-	webHandlerV1("/emulator/cancel", cancel(emulatorGateway))
-	webHandlerV1("/emulator/checkMessage_signature", checkMessageSignature(emulatorGateway))
-	webHandlerV1("/emulator/features", features(emulatorGateway))
-	webHandlerV1("/emulator/generate_mnemonic", generateMnemonic(emulatorGateway))
-	webHandlerV1("/emulator/recovery", recovery(emulatorGateway))
-	webHandlerV1("/emulator/set_mnemonic", setMnemonic(emulatorGateway))
-	webHandlerV1("/emulator/set_pin_code", setPinCode(emulatorGateway))
-	webHandlerV1("/emulator/sign_message", signMessage(emulatorGateway))
-	webHandlerV1("/emulator/transaction_sign", transactionSign(emulatorGateway))
-	webHandlerV1("/emulator/wipe", wipe(emulatorGateway))
-	webHandlerV1("/emulator/connected", connected(emulatorGateway))
-
-	webHandlerV1("/emulator/intermediate/pin_matrix", pinMatrixRequestHandler(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/passphrase", passphraseRequestHandler(emulatorGateway))
-	webHandlerV1("/emulator/intermediate/word", wordRequestHandler(emulatorGateway))
+	webHandlerV1("/intermediate/pin_matrix", pinMatrixRequestHandler(gateway))
+	webHandlerV1("/intermediate/passphrase", passphraseRequestHandler(gateway))
+	webHandlerV1("/intermediate/word", wordRequestHandler(gateway))
 
 	return mux
-}
-
-func parseBoolFlag(v string) (bool, error) {
-	if v == "" {
-		return false, nil
-	}
-
-	return strconv.ParseBool(v)
 }
 
 // HandleFirmwareResponseMessages handles response messages from the firmware

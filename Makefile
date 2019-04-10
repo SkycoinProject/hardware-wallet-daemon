@@ -11,6 +11,12 @@ build: ## daemon build release
 run: ## Run hardware wallet daemon
 	./run.sh ${ARGS}
 
+run-usb: ## Run daemon in usb mode
+	./run.sh -daemon-mode USB
+
+run-emulator: ## Run daemon in emulator mode
+	./run.sh -daemon-mode EMULATOR
+
 run-help: ## Show daemon help
 	./run.sh -help
 

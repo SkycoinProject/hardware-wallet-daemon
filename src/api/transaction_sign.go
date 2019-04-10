@@ -3,12 +3,13 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gogo/protobuf/proto"
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
-	"github.com/skycoin/skycoin/src/cipher"
-	"github.com/skycoin/skycoin/src/util/droplet"
 	"net/http"
 	"strconv"
+
+	"github.com/gogo/protobuf/proto"
+	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	"github.com/skycoin/skycoin/src/cipher"
+	"github.com/skycoin/skycoin/src/util/droplet"
 )
 
 // TODO(therealssj): add more validation

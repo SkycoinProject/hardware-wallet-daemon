@@ -14,6 +14,7 @@ It uses the go bindings provided by the hardware wallet go [library](https://git
 - [Installation](#installation)
 	- [Go 1.10+ Installation and Setup](#go-110-installation-and-setup)
 	- [Run Daemon from the command line](#run-daemon-from-the-command-line)
+		- [Modes](#modes)
 	- [Show Daemon options](#show-daemon-options)
 - [API Documentation](#api-documentation)
 	- [REST API](#rest-api)
@@ -45,9 +46,23 @@ Hardware Daemon supports go1.10+.
 [Golang 1.10+ Installation/Setup](https://github.com/skycoin/skycoin/blob/develop/INSTALLATION.md)
 
 ## Run Daemon from the command line
+### Modes
+The API has two modes:
+1. **USB**: Communicate with the hardware wallet.
+2. **EMULATOR**: Communicate with the emulator.
+
+You can use the `-daemon-mode` flag to enable the required mode or use the `make` commands.
+
+Example(USB Mode):
 ```sh
 $ cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
-$ make run
+$ make run-usb
+```
+
+Example(Emulator Mode):
+```sh
+$ cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
+$ make run-emulator
 ```
 
 ### Show Daemon options
@@ -58,6 +73,7 @@ $ make run-help
 ```
 
 ## API Documentation
+
 
 ### REST API
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	devicewallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,6 +39,7 @@ binary data
 		status       int
 		data         string
 		header       string
+		emulator     bool
 		httpResponse HTTPResponse
 	}{
 		{
@@ -45,6 +47,14 @@ binary data
 			method:       http.MethodGet,
 			status:       http.StatusMethodNotAllowed,
 			httpResponse: NewHTTPErrorResponse(http.StatusMethodNotAllowed, ""),
+		},
+
+		{
+			name:         "404 - Not Found",
+			method:       http.MethodGet,
+			status:       http.StatusNotFound,
+			httpResponse: NewHTTPErrorResponse(http.StatusNotFound, ""),
+			emulator:     true,
 		},
 
 		{
@@ -71,22 +81,33 @@ binary data
 			}
 
 			rr := httptest.NewRecorder()
-			handler := newServerMux(defaultMuxConfig(), gateway, gateway)
+
+			config := defaultMuxConfig()
+			if tc.emulator {
+				config.mode = devicewallet.DeviceTypeEmulator
+			}
+
+			handler := newServerMux(config, gateway)
 			handler.ServeHTTP(rr, req)
 
 			status := rr.Code
 			require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
 
-			var rsp ReceivedHTTPResponse
-			err = json.NewDecoder(rr.Body).Decode(&rsp)
-			require.NoError(t, err)
+			if !tc.emulator {
+				var rsp ReceivedHTTPResponse
+				err = json.NewDecoder(rr.Body).Decode(&rsp)
+				require.NoError(t, err)
 
-			require.Equal(t, tc.httpResponse.Error, rsp.Error)
+				require.Equal(t, tc.httpResponse.Error, rsp.Error)
 
-			if rsp.Data == nil {
-				require.Nil(t, tc.httpResponse.Data)
+				if rsp.Data == nil {
+					require.Nil(t, tc.httpResponse.Data)
+				} else {
+					require.NotNil(t, tc.httpResponse.Data)
+				}
 			} else {
-				require.NotNil(t, tc.httpResponse.Data)
+				// check that it returns 404
+				require.Equal(t, tc.httpResponse.Error.Code, rr.Code)
 			}
 		})
 	}

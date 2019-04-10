@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	devicewallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,6 +16,7 @@ func defaultMuxConfig() muxConfig {
 	return muxConfig{
 		host:       configuredHost,
 		enableCSRF: false,
+		mode:       devicewallet.DeviceTypeUSB,
 	}
 }
 
@@ -147,7 +149,7 @@ func TestCORS(t *testing.T) {
 					req.Header.Set("Origin", origin)
 					req.Header.Set("Access-Control-Request-Method", m)
 
-					handler := newServerMux(cfg, &MockGatewayer{}, &MockGatewayer{})
+					handler := newServerMux(cfg, &MockGatewayer{})
 
 					rr := httptest.NewRecorder()
 					handler.ServeHTTP(rr, req)
