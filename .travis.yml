@@ -59,7 +59,6 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
     make -C ./tmp/hardware-wallet run-emulator & true ;
     fi
-  - make test
 after_script:
   - kill -s KILL $(pgrep emulator)
 notifications:
