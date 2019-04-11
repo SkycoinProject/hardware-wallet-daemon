@@ -51,7 +51,7 @@ func hostCheck(host string, hostWhitelist []string, handler http.Handler) http.H
 			return true
 		}
 
-		if corsRegex.MatchString(host) {
+		if corsRegex.MatchString("http://" + host) {
 			return true
 		}
 

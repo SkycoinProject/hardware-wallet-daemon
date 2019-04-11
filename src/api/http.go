@@ -40,7 +40,7 @@ var corsRegex *regexp.Regexp
 
 func init() {
 	var err error
-	corsRegex, err = regexp.Compile(`^https?://localhost|127\.0\.0\.1:\d+$`)
+	corsRegex, err = regexp.Compile(`(^https?:\/\/)?^?(localhost|127\.0\.0\.1):\d+$`)
 	if err != nil {
 		logger.Panic(err)
 	}

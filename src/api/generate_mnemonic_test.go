@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 	"github.com/stretchr/testify/require"
 )
