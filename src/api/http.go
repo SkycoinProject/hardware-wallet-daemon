@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"regexp"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/rs/cors"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
-	messages "github.com/skycoin/hardware-wallet-protob/go"
+	"github.com/skycoin/hardware-wallet-protob/go"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
 )
@@ -38,12 +39,22 @@ var (
 // corsRegex matches all localhost origin headers
 var corsRegex *regexp.Regexp
 
+// autoPressEmulatorButtons is used to automatically press emulator buttons
+// Used in integration testing
+var autoPressEmulatorButtons bool
+
 func init() {
 	var err error
 	corsRegex, err = regexp.Compile(`(^https?:\/\/)?^?(localhost|127\.0\.0\.1):\d+$`)
 	if err != nil {
 		logger.Panic(err)
 	}
+
+	apb := os.Getenv("AUTO_PRESS_BUTTONS")
+	if apb == "1" {
+		autoPressEmulatorButtons = true
+	}
+
 }
 
 type muxConfig struct {
@@ -273,6 +284,10 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 
 	webHandlerV1 := func(endpoint string, handler http.Handler) {
 		webHandler("/api/"+apiVersion1+endpoint, handler)
+	}
+
+	if autoPressEmulatorButtons && c.mode != deviceWallet.DeviceTypeEmulator {
+		logger.Panic("auto press buttons enabled but device mode is not emulator")
 	}
 
 	// get the current CSRF token

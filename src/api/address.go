@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 )
 
 // GenerateAddressesRequest is request data for /api/v1/generate_addresses
@@ -59,6 +61,17 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 		// simple warning for logs
 		if req.AddressN+req.StartIndex > 8 {
 			logger.Warnf("wallet generating high index addresses: start_index: %d; address_n: %d", req.StartIndex, req.AddressN)
+		}
+
+		// for integration tests
+		if autoPressEmulatorButtons {
+			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			if err != nil {
+				logger.Error("generateAddress failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
 		}
 
 		msg, err := gateway.AddressGen(req.AddressN, req.StartIndex, req.ConfirmAddress)

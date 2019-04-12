@@ -25,7 +25,7 @@ test: ## Run tests for hardware wallet daemon
 	go test -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
 integration-test-emulator: ## Run emulator integration tests
-	./ci-scripts/integration-test.sh -m emulator -n emulator-integration
+	./ci-scripts/integration-test.sh -a -m emulator -n emulator-integration
 
 integration-test-wallet: ## Run wallet integration tests
 	./ci-scripts/integration-test.sh -m wallet -n wallet-integration

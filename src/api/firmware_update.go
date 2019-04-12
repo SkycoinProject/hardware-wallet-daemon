@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"io/ioutil"
 	"net/http"
+
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 )
 
 const (
@@ -43,6 +45,17 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 			resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, err.Error())
 			writeHTTPResponse(w, resp)
 			return
+		}
+
+		// for integration tests
+		if autoPressEmulatorButtons {
+			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			if err != nil {
+				logger.Error("generateAddress failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
 		}
 
 		err = gateway.FirmwareUpload(fileBytes, sha256.Sum256(fileBytes[0x100:]))
