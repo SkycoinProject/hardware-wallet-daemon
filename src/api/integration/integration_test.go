@@ -160,8 +160,8 @@ func TestEmulatorCheckMessageSignature(t *testing.T) {
 	params := operations.NewPostCheckMessageSignatureParams()
 	params.CheckMessageSignatureRequest = &models.CheckMessageSignatureRequest{
 		Address:   newStrPtr("2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"),
-		Message:   newStrPtr("Hello World!"),
-		Signature: newStrPtr("GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQTvMjokd3A4upPz4wyeAyKJEtRdRDGUvUgoGASpsTTUeMn"),
+		Message:   newStrPtr("Hello World"),
+		Signature: newStrPtr("6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300"),
 	}
 
 	resp, err := daemonClient.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, daemonClient))
