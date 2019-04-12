@@ -37,3 +37,7 @@
   name = "github.com/skycoin/skycoin"
   version = "0.25.0"
 
+[[constraint]]
+  name = "github.com/skycoin/hardware-wallet-protob"
+  revision = "521ecbcc7aba367b8e347fcc3fce12c942c59eba"
+

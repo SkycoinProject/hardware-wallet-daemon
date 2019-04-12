@@ -2,7 +2,7 @@ package api
 
 import (
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 
 	"net/http"
 )

@@ -451,6 +451,9 @@ definitions:
       use_passphrase:
         type: boolean
         example: false
+      language:
+        type: string
+        example: english
 
   CheckMessageSignatureRequest:
     type: object

@@ -9,6 +9,7 @@ import (
 type ApplySettingsRequest struct {
 	Label         string `json:"label"`
 	UsePassphrase bool   `json:"use_passphrase"`
+	Language      string `json:"language"`
 }
 
 // applySettings apply device settings
@@ -37,7 +38,7 @@ func applySettings(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		msg, err := gateway.ApplySettings(req.UsePassphrase, req.Label)
+		msg, err := gateway.ApplySettings(req.UsePassphrase, req.Label, req.Language)
 		if err != nil {
 			logger.Error("applySettings failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

@@ -59,6 +59,12 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
     make -C ./tmp/hardware-wallet run-emulator & true ;
     fi
+  # Run self-tests
+  - make lint
+  - ps aux | grep emulator
+  - make test
+  - make integration-test-emulator
+  - make integration-test-emulator-enable-csrf
 after_script:
   - kill -s KILL $(pgrep emulator)
 notifications:

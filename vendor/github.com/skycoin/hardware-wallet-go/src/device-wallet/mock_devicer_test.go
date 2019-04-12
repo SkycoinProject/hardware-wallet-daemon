@@ -2,7 +2,7 @@
 
 package devicewallet
 
-import messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+import messages "github.com/skycoin/hardware-wallet-protob/go"
 import mock "github.com/stretchr/testify/mock"
 import wire "github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 

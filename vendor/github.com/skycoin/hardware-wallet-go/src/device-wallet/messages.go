@@ -7,7 +7,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/skycoin/skycoin/src/cipher"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 )
 
 // MessageCancel prepare Cancel request
@@ -91,11 +91,41 @@ func MessageAddressGen(addressN, startIndex int, confirmAddress bool) ([][64]byt
 	return chunks, nil
 }
 
+// MessageDeviceGetRawEntropy prepare GetEntropy request
+func MessageDeviceGetRawEntropy(entropyBytes uint32) ([][64]byte, error) {
+	getEntropy := &messages.GetRawEntropy{
+		Size_: &entropyBytes,
+	}
+
+	data, err := proto.Marshal(getEntropy)
+	if err != nil {
+		return [][64]byte{}, err
+	}
+
+	chunks := makeSkyWalletMessage(data, messages.MessageType_MessageType_GetRawEntropy)
+	return chunks, nil
+}
+
+// MessageDeviceGetMixedEntropy prepare GetMixedEntropy request
+func MessageDeviceGetMixedEntropy(entropyBytes uint32) ([][64]byte, error) {
+	getEntropy := &messages.GetMixedEntropy{
+		Size_: &entropyBytes,
+	}
+
+	data, err := proto.Marshal(getEntropy)
+	if err != nil {
+		return [][64]byte{}, err
+	}
+
+	chunks := makeSkyWalletMessage(data, messages.MessageType_MessageType_GetMixedEntropy)
+	return chunks, nil
+}
+
 // MessageApplySettings prepare MessageApplySettings request
-func MessageApplySettings(usePassphrase bool, label string) ([][64]byte, error) {
+func MessageApplySettings(usePassphrase bool, label string, language string) ([][64]byte, error) {
 	applySettings := &messages.ApplySettings{
 		Label:         proto.String(label),
-		Language:      proto.String(""),
+		Language:      proto.String(language),
 		UsePassphrase: proto.Bool(usePassphrase),
 	}
 	log.Println(applySettings)

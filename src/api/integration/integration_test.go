@@ -415,7 +415,7 @@ func TestWalletBackup(t *testing.T) {
 
 	resp, err := c.Operations.PostBackup(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, "Device backed up!", resp.Payload.Data )
+	require.Equal(t, "Device backed up!", resp.Payload.Data)
 }
 
 func TestWalletCheckMessageSignature(t *testing.T) {
@@ -616,7 +616,7 @@ func TestWalletWipe(t *testing.T) {
 	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", resp.Payload.Data )
+	require.Equal(t, "Device wiped", resp.Payload.Data)
 }
 
 func TestWalletConnected(t *testing.T) {

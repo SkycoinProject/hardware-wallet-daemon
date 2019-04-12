@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// SetMnemonicRequest is request data for /api/v1/set_mnemonic
 type SetMnemonicRequest struct {
 	Mnemonic string `json:"mnemonic"`
 }

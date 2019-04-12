@@ -9,7 +9,6 @@
 - [Usage](#usage)
   - [Download source code](#download-source-code)
   - [Dependancies management](#dependancies-management)
-  - [Generate protobuf files](#generate-protobuf-files)
   - [Run](#run)
 - [Development guidelines](#development-guidelines)
   - [Versioning policies](#versioning-policies)
@@ -45,13 +44,6 @@ Download dependencies using command:
 
 ```bash
 $ make dep
-```
-
-### Generate protobuf files
-
-#### Init proto submboule
-```bash
-$ make init
 ```
 
 ### Run

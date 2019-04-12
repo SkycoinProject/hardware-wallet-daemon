@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gogo/protobuf/proto"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/skycoin/skycoin/src/cipher"
 	"github.com/skycoin/skycoin/src/util/droplet"
 )

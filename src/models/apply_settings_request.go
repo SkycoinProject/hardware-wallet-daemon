@@ -18,6 +18,9 @@ type ApplySettingsRequest struct {
 	// label
 	Label string `json:"label,omitempty"`
 
+	// language
+	Language string `json:"language,omitempty"`
+
 	// use passphrase
 	UsePassphrase bool `json:"use_passphrase,omitempty"`
 }

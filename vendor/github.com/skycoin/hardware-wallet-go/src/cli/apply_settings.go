@@ -7,8 +7,9 @@ import (
 
 	gcli "github.com/urfave/cli"
 
+	messages "github.com/skycoin/hardware-wallet-protob/go"
+
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 )
 
 func applySettingsCmd() gcli.Command {
@@ -31,11 +32,17 @@ func applySettingsCmd() gcli.Command {
 				Usage:  "Device type to send instructions to, hardware wallet (USB) or emulator.",
 				EnvVar: "DEVICE_TYPE",
 			},
+			gcli.StringFlag{
+				Name:  "language",
+				Usage: "Configure a device language",
+				Value: "",
+			},
 		},
 		OnUsageError: onCommandUsageError(name),
 		Action: func(c *gcli.Context) {
 			passphrase := c.Bool("usePassphrase")
 			label := c.String("label")
+			language := c.String("language")
 
 			device := deviceWallet.NewDevice(deviceWallet.DeviceTypeFromString(c.String("deviceType")))
 			if device == nil {
@@ -43,7 +50,7 @@ func applySettingsCmd() gcli.Command {
 			}
 
 			var msg wire.Message
-			msg, err := device.ApplySettings(passphrase, label)
+			msg, err := device.ApplySettings(passphrase, label, language)
 			if err != nil {
 				log.Error(err)
 				return

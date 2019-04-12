@@ -12,7 +12,6 @@ env:
     - XARGS="-screen 0 1024x768x24"
 before_install:
   - source ./ci-scripts/install-$TRAVIS_OS_NAME.sh
-  - sh "./src/device-wallet/messages/ci-scripts/install-$TRAVIS_OS_NAME.sh"
 install:
   - make proto
   - if [[ ! -d $GOPATH/src/github.com/skycoin/hardware-wallet-go ]]; then mkdir -p $GOPATH/src/github.com/skycoin; ln -s $TRAVIS_BUILD_DIR $GOPATH/src/github.com/skycoin/hardware-wallet-go; fi
@@ -31,10 +30,7 @@ before_script:
   # Install hardware wallet for running tests against emulator
   - mkdir -p tmp/hardware-wallet
   - git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git tmp/hardware-wallet
-  - git -C tmp/hardware-wallet checkout develop
-  - git -C tmp/hardware-wallet submodule init
-  - git -C tmp/hardware-wallet submodule update
-  - git -C tmp/hardware-wallet submodule update --remote
+  - git -C tmp/hardware-wallet submodule update --init
   # Install OS-specific test and build dependencies for hardware-wallet
   - ( cd ./tmp/hardware-wallet && sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh" )
   # Define env vars for Linux builds
@@ -66,7 +62,8 @@ script:
   - ps aux | grep emulator
   - make test
   # Test that dependencies can be updated
-  - make clean && make dep
+  - make clean
+  - make dep
 after_script:
   - kill -s KILL $(pgrep emulator)
 notifications:

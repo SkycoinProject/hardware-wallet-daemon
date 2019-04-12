@@ -12,8 +12,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/rs/cors"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
 )
