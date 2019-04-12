@@ -152,7 +152,7 @@ func TestEmulatorApplySettings(t *testing.T) {
 
 	resp, err := c.Operations.PostApplySettings(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Settings applied")
+	require.Equal(t, "Settings applied", resp.Payload.Data)
 }
 
 func TestEmulatorBackup(t *testing.T) {
@@ -169,7 +169,7 @@ func TestEmulatorBackup(t *testing.T) {
 
 	resp, err := c.Operations.PostBackup(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device backed up!")
+	require.Equal(t, "Device backed up!", resp.Payload.Data)
 }
 
 func TestEmulatorCheckMessageSignature(t *testing.T) {
@@ -187,7 +187,7 @@ func TestEmulatorCheckMessageSignature(t *testing.T) {
 
 	resp, err := c.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Verification success")
+	require.Equal(t, "Verification success", resp.Payload.Data)
 }
 
 func TestEmulatorFeatures(t *testing.T) {
@@ -222,7 +222,7 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 	// wipe existing data
 	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
+	require.Equal(t, "Device wiped", resp.Payload.Data)
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
 	mnemonicParams.GenerateMnemonicRequest = &models.GenerateMnemonicRequest{
@@ -231,7 +231,7 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 
 	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, mnemonicResp.Payload.Data, "Mnemonic successfully configured")
+	require.Equal(t, "Mnemonic successfully configured", mnemonicResp.Payload.Data)
 }
 
 func TestEmulatorRecovery(t *testing.T) {
@@ -244,7 +244,7 @@ func TestEmulatorRecovery(t *testing.T) {
 	// wipe existing data
 	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
+	require.Equal(t, "Device wiped", resp.Payload.Data)
 
 	params := operations.NewPostRecoveryParams()
 	params.RecoveryRequest = &models.RecoveryRequest{
@@ -253,7 +253,7 @@ func TestEmulatorRecovery(t *testing.T) {
 
 	recoveryResp, err := c.Operations.PostRecovery(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, recoveryResp.Payload.Data, "WordRequest")
+	require.Equal(t, "WordRequest", recoveryResp.Payload.Data)
 
 	wordParams := operations.NewPostIntermediateWordParams()
 	wordParams.WordRequest = &models.WordRequest{
@@ -281,7 +281,7 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 
 	resp, err := c.Operations.PostSetMnemonic(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, mnemonic)
+	require.Equal(t, mnemonic, resp.Payload.Data)
 }
 
 func TestEmulatorSetPinCode(t *testing.T) {
@@ -293,7 +293,7 @@ func TestEmulatorSetPinCode(t *testing.T) {
 
 	resp, err := c.Operations.PostSetPinCode(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "PinMatrixRequest")
+	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
 
 	params := operations.NewPostIntermediatePinMatrixParams()
 	params.PinMatrixRequest = &models.PinMatrixRequest{
@@ -302,7 +302,7 @@ func TestEmulatorSetPinCode(t *testing.T) {
 
 	pinAckResp, err := c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, pinAckResp.Payload.Data, "PinMatrixRequest")
+	require.Equal(t, "PinMatrixRequest", pinAckResp.Payload.Data)
 
 	params = operations.NewPostIntermediatePinMatrixParams()
 	params.PinMatrixRequest = &models.PinMatrixRequest{
@@ -311,7 +311,7 @@ func TestEmulatorSetPinCode(t *testing.T) {
 
 	pinAckResp, err = c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.Nil(t, pinAckResp)
-	require.Equal(t, err.Error(), "PIN mismatch")
+	require.Equal(t, "PIN mismatch", err.Error())
 }
 
 func TestEmulatorTransactionSign(t *testing.T) {
@@ -356,7 +356,7 @@ func TestEmulatorWipe(t *testing.T) {
 
 	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
+	require.Equal(t, "Device wiped", resp.Payload.Data)
 }
 
 // ---------------------------- HW Wallet Tests ---------------------------- //
@@ -397,7 +397,7 @@ func TestWalletApplySettings(t *testing.T) {
 
 	resp, err := c.Operations.PostApplySettings(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Settings applied")
+	require.Equal(t, "Settings applied", resp.Payload.Data)
 
 }
 
@@ -415,7 +415,7 @@ func TestWalletBackup(t *testing.T) {
 
 	resp, err := c.Operations.PostBackup(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device backed up!")
+	require.Equal(t, "Device backed up!", resp.Payload.Data )
 }
 
 func TestWalletCheckMessageSignature(t *testing.T) {
@@ -434,7 +434,7 @@ func TestWalletCheckMessageSignature(t *testing.T) {
 
 	resp, err := c.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw")
+	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", resp.Payload.Data)
 }
 
 func TestWalletFeatures(t *testing.T) {
@@ -478,7 +478,7 @@ func TestWalletGenerateMnemonic(t *testing.T) {
 
 	mnemonicResp, err := c.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, mnemonicResp.Payload.Data, "Mnemonic successfully configured")
+	require.Equal(t, "Mnemonic successfully configured", mnemonicResp.Payload.Data)
 }
 
 func TestWalletRecovery(t *testing.T) {
@@ -528,7 +528,7 @@ func TestWalletSetMnemonic(t *testing.T) {
 
 	resp, err := c.Operations.PostSetMnemonic(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, mnemonic)
+	require.Equal(t, mnemonic, resp.Payload.Data)
 }
 
 func TestWalletSetPinCode(t *testing.T) {
@@ -540,7 +540,7 @@ func TestWalletSetPinCode(t *testing.T) {
 
 	resp, err := c.Operations.PostSetPinCode(nil, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "PinMatrixRequest")
+	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
 
 	params := operations.NewPostIntermediatePinMatrixParams()
 	params.PinMatrixRequest = &models.PinMatrixRequest{
@@ -549,7 +549,7 @@ func TestWalletSetPinCode(t *testing.T) {
 
 	pinAckResp, err := c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, pinAckResp.Payload.Data, "PinMatrixRequest")
+	require.Equal(t, "PinMatrixRequest", pinAckResp.Payload.Data)
 
 	params = operations.NewPostIntermediatePinMatrixParams()
 	params.PinMatrixRequest = &models.PinMatrixRequest{
@@ -558,7 +558,7 @@ func TestWalletSetPinCode(t *testing.T) {
 
 	pinAckResp, err = c.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, c))
 	require.Nil(t, pinAckResp)
-	require.Equal(t, err.Error(), "PIN mismatch")
+	require.Equal(t, "PIN mismatch", err.Error())
 }
 
 func TestWalletTransactionSign(t *testing.T) {
@@ -603,7 +603,7 @@ func TestWalletTransactionSign(t *testing.T) {
 
 	verifResp, err := c.Operations.PostCheckMessageSignature(verifParams, addCSRFHeader(t, c))
 	require.NoError(t, err)
-	require.Equal(t, verifResp.Payload.Data, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw")
+	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", verifResp.Payload.Data)
 }
 
 func TestWalletWipe(t *testing.T) {
@@ -616,7 +616,7 @@ func TestWalletWipe(t *testing.T) {
 	resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
+	require.Equal(t, "Device wiped", resp.Payload.Data )
 }
 
 func TestWalletConnected(t *testing.T) {
@@ -646,7 +646,7 @@ func bootstrap(t *testing.T, deviceType deviceWallet.DeviceType) {
 		// wipe existing data
 		resp, err := c.Operations.DeleteWipe(nil, addCSRFHeader(t, c))
 		require.NoError(t, err)
-		require.Equal(t, resp.Payload.Data, "Device wiped")
+		require.Equal(t, "Device wiped", resp.Payload.Data)
 
 		// set mnemonic
 		mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
@@ -657,7 +657,7 @@ func bootstrap(t *testing.T, deviceType deviceWallet.DeviceType) {
 
 		mnemonicResp, err := c.Operations.PostSetMnemonic(mnemonicParams, addCSRFHeader(t, c))
 		require.NoError(t, err)
-		require.Equal(t, mnemonicResp.Payload.Data, mnemonic)
+		require.Equal(t, mnemonic, mnemonicResp.Payload.Data)
 	}
 }
 

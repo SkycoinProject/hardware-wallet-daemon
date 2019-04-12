@@ -310,102 +310,115 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 
 // HandleFirmwareResponseMessages handles response messages from the firmware
 func HandleFirmwareResponseMessages(w http.ResponseWriter, r *http.Request, gateway Gatewayer, msg wire.Message) {
-	switch msg.Kind {
-	case uint16(messages.MessageType_MessageType_PinMatrixRequest):
-		writeHTTPResponse(w, HTTPResponse{
-			Data: "PinMatrixRequest",
-		})
-	case uint16(messages.MessageType_MessageType_PassphraseRequest):
-		writeHTTPResponse(w, HTTPResponse{
-			Data: "PassPhraseRequest",
-		})
-	case uint16(messages.MessageType_MessageType_WordRequest):
-		writeHTTPResponse(w, HTTPResponse{
-			Data: "WordRequest",
-		})
-	case uint16(messages.MessageType_MessageType_ButtonRequest):
-		msg, err := gateway.ButtonAck()
-		if err != nil {
-			logger.Error(err.Error())
-			resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
+	for {
+		switch msg.Kind {
+		case uint16(messages.MessageType_MessageType_PinMatrixRequest):
+			writeHTTPResponse(w, HTTPResponse{
+				Data: "PinMatrixRequest",
+			})
+			return
+		case uint16(messages.MessageType_MessageType_PassphraseRequest):
+			writeHTTPResponse(w, HTTPResponse{
+				Data: "PassPhraseRequest",
+			})
+			return
+		case uint16(messages.MessageType_MessageType_WordRequest):
+			writeHTTPResponse(w, HTTPResponse{
+				Data: "WordRequest",
+			})
+			return
+		case uint16(messages.MessageType_MessageType_ButtonRequest):
+			var err error
+			msg, err = gateway.ButtonAck()
+			if err != nil {
+				logger.Error(err.Error())
+				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
+				writeHTTPResponse(w, resp)
+			}
+		case uint16(messages.MessageType_MessageType_Failure):
+			failureMsg, err := deviceWallet.DecodeFailMsg(msg)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			resp := NewHTTPErrorResponse(http.StatusConflict, failureMsg)
 			writeHTTPResponse(w, resp)
 			return
-		}
+		case uint16(messages.MessageType_MessageType_Success):
+			successMsg, err := deviceWallet.DecodeSuccessMsg(msg)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
 
-		HandleFirmwareResponseMessages(w, r, gateway, msg)
-	case uint16(messages.MessageType_MessageType_Failure):
-		failureMsg, err := deviceWallet.DecodeFailMsg(msg)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
+			writeHTTPResponse(w, HTTPResponse{
+				Data: successMsg,
+			})
 			return
-		}
-		resp := NewHTTPErrorResponse(http.StatusConflict, failureMsg)
-		writeHTTPResponse(w, resp)
-		return
-	case uint16(messages.MessageType_MessageType_Success):
-		successMsg, err := deviceWallet.DecodeSuccessMsg(msg)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
 
-		writeHTTPResponse(w, HTTPResponse{
-			Data: successMsg,
-		})
-	// AddressGen Response
-	case uint16(messages.MessageType_MessageType_ResponseSkycoinAddress):
-		addresses, err := deviceWallet.DecodeResponseSkycoinAddress(msg)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+		// AddressGen Response
+		case uint16(messages.MessageType_MessageType_ResponseSkycoinAddress):
+			addresses, err := deviceWallet.DecodeResponseSkycoinAddress(msg)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			writeHTTPResponse(w, HTTPResponse{
+				Data: addresses,
+			})
+			return
+
+		// Features Response
+		case uint16(messages.MessageType_MessageType_Features):
+			features := &messages.Features{}
+			err := proto.Unmarshal(msg.Data, features)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			writeHTTPResponse(w, HTTPResponse{
+				Data: features,
+			})
+			return
+
+		// SignMessage Response
+		case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
+			signature, err := deviceWallet.DecodeResponseSkycoinSignMessage(msg)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			writeHTTPResponse(w, HTTPResponse{
+				Data: signature,
+			})
+			return
+
+		// TransactionSign Response
+		case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
+			signatures, err := deviceWallet.DecodeResponseTransactionSign(msg)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			writeHTTPResponse(w, HTTPResponse{
+				Data: &signatures,
+			})
+			return
+		default:
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, fmt.Sprintf("recevied unexpected response message type: %s", messages.MessageType(msg.Kind)))
 			writeHTTPResponse(w, resp)
 			return
 		}
-
-		writeHTTPResponse(w, HTTPResponse{
-			Data: addresses,
-		})
-	// Features Response
-	case uint16(messages.MessageType_MessageType_Features):
-		features := &messages.Features{}
-		err := proto.Unmarshal(msg.Data, features)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
-
-		writeHTTPResponse(w, HTTPResponse{
-			Data: features,
-		})
-	// SignMessage Response
-	case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
-		signature, err := deviceWallet.DecodeResponseSkycoinSignMessage(msg)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
-
-		writeHTTPResponse(w, HTTPResponse{
-			Data: signature,
-		})
-	// TransactionSign Response
-	case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
-		signatures, err := deviceWallet.DecodeResponseTransactionSign(msg)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
-
-		writeHTTPResponse(w, HTTPResponse{
-			Data: &signatures,
-		})
-	default:
-		resp := NewHTTPErrorResponse(http.StatusInternalServerError, fmt.Sprintf("recevied unexpected response message type: %s", messages.MessageType(msg.Kind)))
-		writeHTTPResponse(w, resp)
 	}
 }
 
