@@ -30,10 +30,10 @@ integration-test-emulator: ## Run emulator integration tests
 integration-test-wallet: ## Run wallet integration tests
 	./ci-scripts/integration-test.sh -m USB -n wallet-integration
 
-integration-test-wallet-enable-csrf: ## Run wallet integration tests with CSRF enabled
+integration-test-emulator-enable-csrf: ## Run wallet integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -a -m EMULATOR -c -n emulator-integration-enable-csrf
 
-integration-test-emulator-enable-csrf: ## Run emulator integration tests with CSRF enabled
+integration-test-wallet-enable-csrf: ## Run emulator integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -m USB -c -n wallet-integration-enable-csrf
 
 check: test \
