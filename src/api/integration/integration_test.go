@@ -166,7 +166,7 @@ func TestEmulatorCheckMessageSignature(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Verification success", resp.Payload.Data)
+	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", resp.Payload.Data)
 }
 
 func TestEmulatorFeatures(t *testing.T) {
