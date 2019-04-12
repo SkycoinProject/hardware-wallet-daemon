@@ -11,7 +11,8 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
+
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/usb"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 )
@@ -269,4 +270,17 @@ func DecodeResponseSkycoinSignMessage(msg wire.Message) (string, error) {
 		return responseSkycoinSignMessage.GetSignedMessage(), nil
 	}
 	return "", fmt.Errorf("calling DecodeResponseeSkycoinSignMessage with wrong message type: %s", messages.MessageType(msg.Kind))
+}
+
+// DecodeResponseEntropyMessage convert byte data into entropy message, meant to be used after GetEntropy
+func DecodeResponseEntropyMessage(msg wire.Message) (*messages.Entropy, error) {
+	if msg.Kind == uint16(messages.MessageType_MessageType_Entropy) {
+		responseEntropyMessage := &messages.Entropy{}
+		err := proto.Unmarshal(msg.Data, responseEntropyMessage)
+		if err != nil {
+			return nil, err
+		}
+		return responseEntropyMessage, nil
+	}
+	return nil, fmt.Errorf("calling DecodeResponseEntropyMessage with wrong message type: %s", messages.MessageType(msg.Kind))
 }

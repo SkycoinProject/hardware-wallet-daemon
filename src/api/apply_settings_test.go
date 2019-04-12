@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -60,6 +60,7 @@ func TestApplySettings(t *testing.T) {
 			httpBody: toJSON(t, &ApplySettingsRequest{
 				UsePassphrase: true,
 				Label:         "foo",
+				Language:      "english",
 			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
@@ -75,6 +76,7 @@ func TestApplySettings(t *testing.T) {
 			httpBody: toJSON(t, &ApplySettingsRequest{
 				UsePassphrase: true,
 				Label:         "foo",
+				Language:      "english",
 			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
@@ -94,7 +96,7 @@ func TestApplySettings(t *testing.T) {
 			var body ApplySettingsRequest
 			err := json.Unmarshal([]byte(tc.httpBody), &body)
 			if err == nil {
-				gateway.On("ApplySettings", body.UsePassphrase, body.Label).Return(tc.gatewayApplySettingsResult, nil)
+				gateway.On("ApplySettings", body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
 			}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))

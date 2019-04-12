@@ -28,7 +28,6 @@
 [prune]
   go-tests = true
   unused-packages = true
-
   [[prune.project]]
     name = "github.com/skycoin/hardware-wallet-go"
      go-tests = false
@@ -53,3 +52,4 @@
 [[constraint]]
   branch = "master"
   name = "github.com/andreyvit/diff"
+

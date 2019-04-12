@@ -10,8 +10,8 @@ import (
 	"github.com/skycoin/skycoin/src/cipher"
 	"github.com/skycoin/skycoin/src/util/droplet"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/stretchr/testify/require"
 )
 

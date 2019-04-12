@@ -128,9 +128,9 @@ func TestCORS(t *testing.T) {
 		},
 
 		{
-			name:   "options no whitelist not whitelisted",
-			origin: "example.com",
-			valid:  false,
+			name:    "options no whitelist not whitelisted",
+			origin:  "example.com",
+			valid:   false,
 			isHTTPS: true,
 		},
 

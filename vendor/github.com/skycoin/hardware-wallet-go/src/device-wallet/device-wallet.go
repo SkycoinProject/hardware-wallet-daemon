@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"time"
 
 	"github.com/skycoin/skycoin/src/util/logging"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
+
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
 )
 
@@ -38,7 +40,7 @@ const (
 // Devicer provides api for the hw wallet functions
 type Devicer interface {
 	AddressGen(addressN, startIndex int, confirmAddress bool) (wire.Message, error)
-	ApplySettings(usePassphrase bool, label string) (wire.Message, error)
+	ApplySettings(usePassphrase bool, label string, language string) (wire.Message, error)
 	Backup() (wire.Message, error)
 	Cancel() (wire.Message, error)
 	CheckMessageSignature(message, signature, address string) (wire.Message, error)
@@ -110,6 +112,7 @@ func (d *Device) Connect() error {
 	// close any existing connections
 	if d.dev != nil {
 		d.dev.Close()
+		d.dev = nil
 	}
 
 	dev, err := d.Driver.GetDevice()
@@ -119,6 +122,14 @@ func (d *Device) Connect() error {
 
 	d.dev = dev
 	return nil
+}
+
+// Disconnect the device
+func (d *Device) Disconnect() error {
+	if !d.Connected() {
+		return errors.New("device is not connected")
+	}
+	return d.dev.Close()
 }
 
 // AddressGen Ask the device to generate an address
@@ -136,14 +147,174 @@ func (d *Device) AddressGen(addressN, startIndex int, confirmAddress bool) (wire
 	return d.Driver.SendToDevice(d.dev, chunks)
 }
 
+// SaveDeviceEntropyInFile Ask the device to generate entropy and save it in a file
+// if `outFile` is the "-" string, the output file is considered stdout
+func (d *Device) SaveDeviceEntropyInFile(outFile string, entropyBytes uint32, getEntropyMsgBuilder func(entropyBytes uint32) ([][64]byte, error)) error {
+	usingStdout := false
+	if outFile == "-" {
+		usingStdout = true
+	}
+	if !usingStdout {
+		log.Infoln("Saving entropy to", outFile)
+	}
+	var receivedEntropyBytes uint32
+	var processBytes func(buf []byte) error
+	var err error
+	var processGetEntropyResponse func(msg wire.Message) (*messages.Entropy, error)
+	processGetEntropyResponse = func(msg wire.Message) (*messages.Entropy, error) {
+		if err != nil || msg.Kind != uint16(messages.MessageType_MessageType_Entropy) {
+			if err != nil {
+				return &messages.Entropy{}, err
+			}
+			if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
+				// Send ButtonAck
+				chunks, err := MessageButtonAck()
+				if err != nil {
+					return &messages.Entropy{}, err
+				}
+				if err = sendToDeviceNoAnswer(d.dev, chunks); err != nil {
+					return &messages.Entropy{}, err
+				}
+				// simulate button press
+				if d.simulateButtonPress {
+					if err := d.SimulateButtonPress(); err != nil {
+						return &messages.Entropy{}, err
+					}
+				}
+				msg = wire.Message{}
+				if _, err = msg.ReadFrom(d.dev); err != nil {
+					return &messages.Entropy{}, err
+				}
+				return processGetEntropyResponse(msg)
+			}
+			var msgStr string
+			msgStr, err = DecodeFailMsg(msg)
+			if err != nil {
+				log.Errorf("Error decoding device response as fails msg %s", err)
+				return &messages.Entropy{}, err
+			}
+			err = errors.New(msgStr)
+			log.Errorf("Error getting entropy from device %s", err)
+			return &messages.Entropy{}, err
+		}
+		entropy, err := DecodeResponseEntropyMessage(msg)
+		if err != nil {
+			log.Errorf("Error decoding device response %s", err)
+			return &messages.Entropy{}, err
+		}
+		return entropy, nil
+	}
+	getEntropy := func(bytes uint32) (*messages.Entropy, error) {
+		chunks, err := getEntropyMsgBuilder(bytes)
+		if err != nil {
+			return &messages.Entropy{}, err
+		}
+		resp, err := d.Driver.SendToDevice(d.dev, chunks)
+		if err != nil {
+			return &messages.Entropy{}, err
+		}
+		return processGetEntropyResponse(resp)
+	}
+	checkProducedFile := func() error {
+		if !usingStdout {
+			fileInfo, err := os.Stat(outFile)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+			if fileInfo.Size() != int64(entropyBytes) {
+				return fmt.Errorf(
+					"no engout bytes saved in the file %s\n current: %d\nrequired: %d",
+					outFile, fileInfo.Size(), entropyBytes)
+			}
+		}
+		return nil
+	}
+	if usingStdout {
+		processBytes = func(buf []byte) error {
+			fmt.Print(buf)
+			return nil
+		}
+	} else {
+		pb := Progbar{total: int(entropyBytes)}
+		defer func() {
+			if checkProducedFile() == nil {
+				pb.PrintComplete()
+			}
+		}()
+		if _, err := os.Stat(outFile); err == nil {
+			// nolint: gosec
+			if err = os.Chmod(outFile, 0777); err != nil {
+				log.Errorf("error with %s %s", outFile, err)
+			}
+		}
+		file, err := os.Create(outFile)
+		if err != nil {
+			log.Errorf("error creating output file %s", err)
+			return err
+		}
+		defer func() {
+			if err := os.Chmod(outFile, 0444); err != nil {
+				log.Error(err)
+			}
+		}()
+		defer file.Close()
+		processBytes = func(buf []byte) error {
+			var wroteBytes = 0
+			for wroteBytes < len(buf) {
+				var res int
+				if res, err = file.Write(buf[wroteBytes:]); err != nil {
+					return err
+				}
+				wroteBytes += res
+			}
+			if wroteBytes != len(buf) {
+				return errors.New("invalid bytes amount wrote")
+			}
+			pb.PrintProg(int(receivedEntropyBytes))
+			return nil
+		}
+	}
+	if err := d.Connect(); err != nil {
+		return err
+	}
+	defer func() {
+		if err := d.Disconnect(); err != nil {
+			log.Error(err)
+		}
+	}()
+	entropy, err := getEntropy(entropyBytes)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	receivedEntropyBytes = uint32(len(entropy.GetEntropy()))
+	if err := processBytes(entropy.GetEntropy()); err != nil {
+		log.Errorf("error writing file %s.\n %s", outFile, err.Error())
+		return err
+	}
+	for receivedEntropyBytes < entropyBytes {
+		entropy, err := getEntropy(entropyBytes - receivedEntropyBytes)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		receivedEntropyBytes += uint32(len(entropy.GetEntropy()))
+		if err := processBytes(entropy.GetEntropy()); err != nil {
+			log.Errorf("error writing file %s.\n %s", outFile, err.Error())
+			return err
+		}
+	}
+	return checkProducedFile()
+}
+
 // ApplySettings send ApplySettings request to the device
-func (d *Device) ApplySettings(usePassphrase bool, label string) (wire.Message, error) {
+func (d *Device) ApplySettings(usePassphrase bool, label string, language string) (wire.Message, error) {
 	if err := d.Connect(); err != nil {
 		return wire.Message{}, err
 	}
 	defer d.dev.Close()
-
-	chunks, err := MessageApplySettings(usePassphrase, label)
+	chunks, err := MessageApplySettings(usePassphrase, label, language)
 	if err != nil {
 		return wire.Message{}, err
 	}
@@ -259,28 +430,22 @@ func (d *Device) ChangePin() (wire.Message, error) {
 
 // Connected check if a device is connected
 func (d *Device) Connected() bool {
-	dev, err := d.Driver.GetDevice()
-	if dev == nil {
+	if d.dev == nil {
 		return false
 	}
-	defer dev.Close()
-	if err != nil {
-		return false
-	}
-
 	chunks, err := MessageConnected()
 	if err != nil {
 		log.Error(err)
 		return false
 	}
 	for _, element := range chunks {
-		_, err = dev.Write(element[:])
+		_, err = d.dev.Write(element[:])
 		if err != nil {
 			return false
 		}
 	}
 	var msg wire.Message
-	_, err = msg.ReadFrom(dev)
+	_, err = msg.ReadFrom(d.dev)
 	if err != nil {
 		return false
 	}
@@ -338,8 +503,30 @@ func (d *Device) FirmwareUpload(payload []byte, hash [32]byte) error {
 	}
 
 	switch uploadmsg.Kind {
-	case uint16(messages.MessageType_MessageType_Success):
-		log.Printf("Success %d! FirmwareUpload %s\n", uploadmsg.Kind, uploadmsg.Data)
+	case uint16(messages.MessageType_MessageType_ButtonRequest):
+		log.Println("Please confirm in the device if fingerprints match")
+		// Send ButtonAck
+		chunks, err = MessageButtonAck()
+		if err != nil {
+			return err
+		}
+		resp, err := d.Driver.SendToDevice(d.dev, chunks)
+		if err != nil {
+			return err
+		}
+		switch resp.Kind {
+		case uint16(messages.MessageType_MessageType_Success):
+			return nil
+		case uint16(messages.MessageType_MessageType_Failure):
+			var msgStr string
+			if msgStr, err = DecodeFailMsg(resp); err != nil {
+				return err
+			}
+			return errors.New(msgStr)
+		default:
+			return errors.New("unknown response")
+		}
+		return nil
 	case uint16(messages.MessageType_MessageType_Failure):
 		msg, err := DecodeFailMsg(erasemsg)
 		if err != nil {
@@ -350,13 +537,6 @@ func (d *Device) FirmwareUpload(payload []byte, hash [32]byte) error {
 	default:
 		return fmt.Errorf("received unexpected message type: %s", messages.MessageType(erasemsg.Kind))
 	}
-
-	// Send ButtonAck
-	chunks, err = MessageButtonAck()
-	if err != nil {
-		return err
-	}
-	return d.Driver.SendToDeviceNoAnswer(d.dev, chunks)
 }
 
 // GetFeatures send Features message to the device

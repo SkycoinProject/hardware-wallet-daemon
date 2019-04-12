@@ -2,7 +2,7 @@ package api
 
 import (
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 
 	"net/http"
 )
@@ -15,6 +15,17 @@ func cancel(gateway Gatewayer) http.HandlerFunc {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")
 			writeHTTPResponse(w, resp)
 			return
+		}
+
+		// for integration tests
+		if autoPressEmulatorButtons {
+			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			if err != nil {
+				logger.Error("generateAddress failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
 		}
 
 		msg, err := gateway.Cancel()

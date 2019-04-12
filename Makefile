@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: run lint format generate-client
+.PHONY: run lint format generate-client install-linters
 .PHONY: test integration-test-emulator integration-test-wallet
 .PHONY: clean-coverage update-golden-files merge-coverage
 .PHONY: mocks
@@ -25,16 +25,16 @@ test: ## Run tests for hardware wallet daemon
 	go test -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
 integration-test-emulator: ## Run emulator integration tests
-	./ci-scripts/integration-test.sh -m emulator -n emulator-integration
+	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
 
 integration-test-wallet: ## Run wallet integration tests
-	./ci-scripts/integration-test.sh -m wallet -n wallet-integration
+	./ci-scripts/integration-test.sh -m USB -n wallet-integration
 
-integration-test-wallet-enable-csrf: ## Run wallet integration tests with CSRF enabled
-	./ci-scripts/integration-test.sh -m emulator -c -n emulator-integration-enable-csrf
+integration-test-emulator-enable-csrf: ## Run wallet integration tests with CSRF enabled
+	./ci-scripts/integration-test.sh -a -m EMULATOR -c -n emulator-integration-enable-csrf
 
-integration-test-emulator-enable-csrf: ## Run emulator integration tests with CSRF enabled
-	./ci-scripts/integration-test.sh -m wallet -c -n wallet-integration-enable-csrf
+integration-test-wallet-enable-csrf: ## Run emulator integration tests with CSRF enabled
+	./ci-scripts/integration-test.sh -m USB -c -n wallet-integration-enable-csrf
 
 check: test \
     integration-test-emulator \
@@ -63,6 +63,13 @@ merge-coverage: ## Merge coverage files and create HTML coverage output. gocovme
 	go tool cover -html coverage/all-coverage.merged.out -o coverage/all-coverage.html
 	@echo "Total coverage HTML file generated at coverage/all-coverage.html"
 	@echo "Open coverage/all-coverage.html in your browser to view"
+
+
+install-linters: ## Install linters
+	go get -u github.com/FiloSottile/vendorcheck
+	# For some reason this install method is not recommended, see https://github.com/golangci/golangci-lint#install
+	# However, they suggest `curl ... | bash` which we should not do
+	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
 format: ## Formats the code. Must have goimports installed (use make install-linters).
 	goimports -w -local github.com/skycoin/hardware-wallet-daemon ./cmd

@@ -16,21 +16,23 @@ FAILFAST=""
 NAME=""
 USE_CSRF=""
 ENABLE_CSRF=""
+AUTO_PRESS_BUTTONS=""
 
 usage () {
   echo "Usage: $SCRIPT"
   echo "Optional command line arguments"
-  echo "-m <string>  -- Testmode to run, emulator or wallet;"
+  echo "-m <string>  -- Testmode to run, EMULATOR or USB;"
   echo "-r <string>  -- Run test with -run flag"
   echo "-n <string>  -- Specific name for this test, affects coverage output files"
   echo "-u <boolean> -- Update testdata"
   echo "-v <boolean> -- Run test with -v flag"
   echo "-f <boolean> -- Run test with -failfast flag"
   echo "-c <boolean> -- Pass this argument if the node has CSRF enabled"
+  echo "-a <boolean> -- Auto press buttons in emulator mode"
   exit 1
 }
 
-while getopts "h?m:r:n:uvfc" args; do
+while getopts "h?m:r:n:uvfca" args; do
 case $args in
     h|\?)
         usage;
@@ -42,6 +44,7 @@ case $args in
     v ) VERBOSE="-v";;
     f ) FAILFAST="-failfast";;
     c ) ENABLE_CSRF="-enable-csrf"; USE_CSRF="1";;
+    a ) AUTO_PRESS_BUTTONS="1";;
   esac
 done
 
@@ -57,7 +60,6 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 CMDPKG=$(go list ./cmd/daemon)
 COVERPKG=$(dirname $(dirname ${CMDPKG}))
 GOLDFLAGS="-X ${CMDPKG}.Commit=${COMMIT} -X ${CMDPKG}.Branch=${BRANCH}"
-
 set -euxo pipefail
 
 DATA_DIR=$(mktemp -d -t daemon-data-dir.XXXXXX)
@@ -72,10 +74,11 @@ mkdir -p coverage/
 # Run daemon
 echo "starting daemon node in background with http listener on $HOST"
 
-./"$BINARY" -web-interface-port=$PORT \
+AUTO_PRESS_BUTTONS=$AUTO_PRESS_BUTTONS ./"$BINARY" -web-interface-port=$PORT \
             -data-dir="$DATA_DIR" \
             -test.run "^TestRunMain$" \
             -test.coverprofile="${COVERAGEFILE}" \
+            -daemon-mode $MODE \
             $ENABLE_CSRF \
             &
 

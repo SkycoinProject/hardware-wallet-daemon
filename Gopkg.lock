@@ -254,17 +254,27 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9459f74bfe2b9d96dc9fbf7869a7314b3119a456ad5b1049a8323f6b0e1e494e"
+  digest = "1:13b418034c73680deca26cba6616020067d5cad5c5a19135e4ec301d7f14b165"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/device-wallet",
-    "src/device-wallet/messages/go",
     "src/device-wallet/usb",
     "src/device-wallet/usb/usbhid",
     "src/device-wallet/wire",
   ]
   pruneopts = ""
-  revision = "4c8487be020bc5d296fcd2a5650a8e0b32329422"
+  revision = "2005503ec26b8ebce4d1edac4bb5c0683e4fcf80"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ec7e836da96f6206b40ed8afb39c936364ee1a983284db0007999f32f1bfece6"
+  name = "github.com/skycoin/hardware-wallet-protob"
+  packages = [
+    "go",
+    "go/google/protobuf",
+  ]
+  pruneopts = "UT"
+  revision = "521ecbcc7aba367b8e347fcc3fce12c942c59eba"
 
 [[projects]]
   digest = "1:60a450854b4edf4cf42decf7646756e04e255eff8b0de67711292edc2ba7eca7"
@@ -312,7 +322,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "38d8ce5564a5b71b2e3a00553993f1b9a7ae852f"
+  revision = "88737f569e3a9c7ab309cdc09a07fe7fc87233c3"
 
 [[projects]]
   branch = "master"
@@ -324,14 +334,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:503f66aac79cb9135d73679c7fa3e95a6fad82a3da399c505ea282b50ff03723"
+  digest = "1:ae913c44e70b411817f8d4d352dc10e595d6b970ba23f2f1e668c95901f8a46a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4b34438f7a67ee5f45cc6132e2bad873a20324e9"
+  revision = "b44545bcd369ef9ff9bebcfebf5f3370ef9b1932"
 
 [[projects]]
   digest = "1:0c56024909189aee3364b7f21a95a27459f718aa7c199a5c111c36cfffd9eaef"
@@ -381,8 +391,8 @@
     "github.com/gogo/protobuf/proto",
     "github.com/rs/cors",
     "github.com/skycoin/hardware-wallet-go/src/device-wallet",
-    "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go",
     "github.com/skycoin/hardware-wallet-go/src/device-wallet/wire",
+    "github.com/skycoin/hardware-wallet-protob/go",
     "github.com/skycoin/skycoin/src/cipher",
     "github.com/skycoin/skycoin/src/util/apputil",
     "github.com/skycoin/skycoin/src/util/droplet",

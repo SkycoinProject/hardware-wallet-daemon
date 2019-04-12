@@ -15,7 +15,7 @@
   packages = ["proto"]
   pruneopts = "UT"
   revision = "ba06b47c162d49f2af050fb4c75bcbc86a159d5c"
-  version = "v1.2.0"
+  version = "v1.2.1"
 
 [[projects]]
   digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
@@ -58,12 +58,22 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:e4c72127d910a96daf869a44f3dd563b86dbe6931a172863a0e99c5ff04b59e4"
+  digest = "1:fd61cf4ae1953d55df708acb6b91492d538f49c305b364a014049914495db426"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4"
-  version = "v1.4.0"
+  revision = "8bdbc7bcc01dcbb8ec23dc8a28e332258d25251f"
+  version = "v1.4.1"
+
+[[projects]]
+  digest = "1:ec7e836da96f6206b40ed8afb39c936364ee1a983284db0007999f32f1bfece6"
+  name = "github.com/skycoin/hardware-wallet-protob"
+  packages = [
+    "go",
+    "go/google/protobuf",
+  ]
+  pruneopts = "UT"
+  revision = "521ecbcc7aba367b8e347fcc3fce12c942c59eba"
 
 [[projects]]
   digest = "1:cda151c59579fb3fe777cc9334e328cb72bd11088ea473ec0af5dc6b87540d1f"
@@ -89,7 +99,7 @@
   version = "v0.1.1"
 
 [[projects]]
-  digest = "1:ffae6a0390594c05dc5ba534c385229e883508f17f6da257624913fd9aaa4d21"
+  digest = "1:288e2ba4192b77ec619875ab54d82e2179ca8978e8baa690dcb4343a4a1f4da7"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
@@ -98,8 +108,8 @@
     "suite",
   ]
   pruneopts = "UT"
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
@@ -111,22 +121,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:058e9504b9a79bfe86092974d05bb3298d2aa0c312d266d43148de289a5065d9"
+  digest = "1:bbe51412d9915d64ffaa96b51d409e070665efc5194fcf145c4a27d4133107a4"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "a1f597ede03a7bef967a422b5b3a5bd08805a01e"
+  revision = "88737f569e3a9c7ab309cdc09a07fe7fc87233c3"
 
 [[projects]]
   branch = "master"
-  digest = "1:ed708ad22c955df62e7eaba9ddd9edd3afc7818a4a72d9680bf797ac6c5ae3a8"
+  digest = "1:ae913c44e70b411817f8d4d352dc10e595d6b970ba23f2f1e668c95901f8a46a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "a2f829d7f35f2ed1c3520c553a6226495455cae0"
+  revision = "b44545bcd369ef9ff9bebcfebf5f3370ef9b1932"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -134,6 +144,7 @@
   input-imports = [
     "github.com/davecgh/go-spew/spew",
     "github.com/gogo/protobuf/proto",
+    "github.com/skycoin/hardware-wallet-protob/go",
     "github.com/skycoin/skycoin/src/cipher",
     "github.com/skycoin/skycoin/src/util/logging",
     "github.com/stretchr/testify/mock",

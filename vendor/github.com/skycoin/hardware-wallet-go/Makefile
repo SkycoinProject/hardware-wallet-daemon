@@ -6,18 +6,13 @@
 
 all: build
 
-build: ## Build project
+build: proto ## Build project
 	cd cmd/cli && ./install.sh
 
-init: ## initiaize submodule
-	git submodule init
-	git submodule update
-	make proto
-
 dep: proto ## Ensure package dependencies are up to date
-	dep ensure
+	dep ensure -v
 	# Ensure sources for protoc-gen-go and protobuf/proto are in sync
-	dep ensure -add github.com/gogo/protobuf/protoc-gen-gofast ## setup dependencies
+	dep ensure -v -add github.com/gogo/protobuf/protoc-gen-gofast ## setup dependencies
 
 mocks: ## Create all mock files for unit tests
 	echo "Generating mock files"
@@ -31,13 +26,6 @@ test_integration: ## Run integration tests
 	go test -count=1 -v github.com/skycoin/hardware-wallet-go/src/device-wallet/integration
 
 test: test_unit test_integration ## Run all tests
-
-proto: ## Generate protocol buffer classes for communicating with hardware wallet
-	make -C src/device-wallet/messages build-go GO_IMPORT=github.com/skycoin/hardware-wallet-go/src/device-wallet/messages
-
-clean: ## Delete temporary build files
-	make -C src/device-wallet/messages clean-go
-	rm -rf vendor/github.com/google
 
 install-linters: ## Install linters
 	go get -u github.com/FiloSottile/vendorcheck

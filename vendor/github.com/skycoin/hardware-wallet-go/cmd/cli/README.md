@@ -4,23 +4,44 @@ Skycoin Hardware wallet command line interface
 
 <!-- MarkdownTOC autolink="true" bracket="round" levels="1,2,3" -->
 
-- [Usage](#usage)
+- [CLI Documentation](#cli-documentation)
+  - [Install](#install)
+  - [Usage](#usage)
     - [Apply settings](#apply-settings)
+      - [Examples](#examples-apply-settings)
+        - [Text output](#text-output-apply settings)
     - [Update firmware](#update-firmware)
     - [Ask device to generate addresses](#ask-device-to-generate-addresses)
+      - [Examples](#examples-ask-device-to-generate-addresses)
+        - [Text output](#text-output-ask-device-to-generate-addresses)
     - [Configure device mnemonic](#configure-device-mnemonic)
+      - [Examples](#examples-configure-device-mnemonic)
+        - [Text output](#text-output-configure-device-mnemonic)
     - [Ask device to generate mnemonic](#generate-mnemonic)
+      - [Examples](#examples-ask-device to generate mnemonic)
+        - [Text output](#text-output-ask-device-to-generate-mnemonic)
     - [Configure device PIN code](#configure-device-pin-code)
-    - [Get firmware version](#get-version)
+      - [Examples](#examples-configure-device-pin-code)
+        - [Text output](#text-output-configure-device-pin-code)
     - [Ask device to sign message](#ask-device-to-sign-message)
+      - [Examples](#examples-ask-device-to-sign-message)
+        - [Text output](#text-output-ask-device-to-sign-message)
     - [Ask device to check signature](#ask-device-to-check-signature)
+      - [Examples](#examples-ask-device-to-check-signature)
+        - [Text output](#text-output-ask-device-to-check-signature)
+      - [Note](#note)
     - [Wipe device](#wipe-device)
+      - [Examples](#examples-wipe-device)
+        - [Text output](#text-output-wipe-device)
     - [Ask the device to perform the seed backup procedure](#backup-device)
+      - [Examples](#examples-ask-the-device-to-perform-the-seed-backup-procedure)
+        - [Text output](#text-output-ask-the-device-to-perform-the-seed-backup-procedure)
     - [Ask the device to perform the seed recovery procedure](#recovery-device)
+      - [Examples](#examples-ask-the-device-to-perform-the-seed-recovery-procedure)
+        - [Text output](#text-output-ask-the-device-to-perform-the-seed-recovery-procedure)
     - [Ask the device Features](#device-features)
     - [Ask the device to cancel the ongoing procedure](#device-cancel)
     - [Ask the device to sign a transaction using the provided information](#transaction-sign)
-- [Note](#note)
 
 <!-- /MarkdownTOC -->
 
@@ -74,20 +95,26 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
+All commands accept `--deviceType` option. Supported values are `USB` and `EMULATOR`.
+
 ### Apply settings
 
-Configure device with settings such as: using passphrase
+Configure device with settings such as: using passphrase, configuring label, setting device language
 
+
+```
+OPTIONS:
+        --usePassphrase bool              Use this option if you want to activate passphrase on device
+        --language      string            Configure device language
+        --label         string            Configure label to identify the device
+```
+
+#### Examples
+##### Text output
 
 ```bash
 $ skycoin-hw-cli applySettings --usePassphrase
 ```
-
-```
-OPTIONS:
-        --usePassphrase bool            Use this option if you want to activate passphrase on device
-```
-
 <details>
  <summary>View Output</summary>
 
@@ -101,6 +128,20 @@ Success with code:  Settings applied
 ```
 </details>
 
+Configure device with settings such as: change language
+
+
+```bash
+$ skycoin-hw-cli applySettings --language en
+```
+<details>
+ <summary>View Output</summary>
+
+```
+[2019-03-24T17:02:36-04:00] INFO [device-wallet]: language:"en" label:"" use_passphrase:false 
+Success with code:  Settings applied
+```
+</details>
 
 ### Update firmware
 
@@ -300,7 +341,7 @@ Success 2! address that issued the signature is:
 ```
 </details>
 
-## Note
+#### Note
 
 The `[option]` in subcommand must be set before the rest of the values, otherwise the `option` won't
 be parsed. For example:

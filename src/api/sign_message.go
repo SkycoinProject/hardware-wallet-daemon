@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
 )
 
 // SignMessageRequest is request data for /api/v1/sign_message
@@ -51,6 +53,17 @@ func signMessage(gateway Gatewayer) http.HandlerFunc {
 			resp := NewHTTPErrorResponse(http.StatusBadRequest, "message is required")
 			writeHTTPResponse(w, resp)
 			return
+		}
+
+		// for integration tests
+		if autoPressEmulatorButtons {
+			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			if err != nil {
+				logger.Error("generateAddress failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
 		}
 
 		msg, err := gateway.SignMessage(req.AddressN, req.Message)

@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	messages "github.com/skycoin/hardware-wallet-go/src/device-wallet/messages/go"
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/stretchr/testify/require"
 )
 
