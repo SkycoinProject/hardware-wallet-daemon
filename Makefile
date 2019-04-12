@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: run lint format generate-client
+.PHONY: run lint format generate-client install-linters
 .PHONY: test integration-test-emulator integration-test-wallet
 .PHONY: clean-coverage update-golden-files merge-coverage
 .PHONY: mocks
@@ -63,6 +63,13 @@ merge-coverage: ## Merge coverage files and create HTML coverage output. gocovme
 	go tool cover -html coverage/all-coverage.merged.out -o coverage/all-coverage.html
 	@echo "Total coverage HTML file generated at coverage/all-coverage.html"
 	@echo "Open coverage/all-coverage.html in your browser to view"
+
+
+install-linters: ## Install linters
+	go get -u github.com/FiloSottile/vendorcheck
+	# For some reason this install method is not recommended, see https://github.com/golangci/golangci-lint#install
+	# However, they suggest `curl ... | bash` which we should not do
+	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
 format: ## Formats the code. Must have goimports installed (use make install-linters).
 	goimports -w -local github.com/skycoin/hardware-wallet-daemon ./cmd
