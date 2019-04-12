@@ -21,7 +21,7 @@ AUTO_PRESS_BUTTONS=""
 usage () {
   echo "Usage: $SCRIPT"
   echo "Optional command line arguments"
-  echo "-m <string>  -- Testmode to run, emulator or wallet;"
+  echo "-m <string>  -- Testmode to run, EMULATOR or USB;"
   echo "-r <string>  -- Run test with -run flag"
   echo "-n <string>  -- Specific name for this test, affects coverage output files"
   echo "-u <boolean> -- Update testdata"
@@ -60,7 +60,6 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 CMDPKG=$(go list ./cmd/daemon)
 COVERPKG=$(dirname $(dirname ${CMDPKG}))
 GOLDFLAGS="-X ${CMDPKG}.Commit=${COMMIT} -X ${CMDPKG}.Branch=${BRANCH}"
-
 set -euxo pipefail
 
 DATA_DIR=$(mktemp -d -t daemon-data-dir.XXXXXX)
@@ -75,10 +74,11 @@ mkdir -p coverage/
 # Run daemon
 echo "starting daemon node in background with http listener on $HOST"
 
-./"$BINARY" -web-interface-port=$PORT \
+AUTO_PRESS_BUTTONS=$AUTO_PRESS_BUTTONS ./"$BINARY" -web-interface-port=$PORT \
             -data-dir="$DATA_DIR" \
             -test.run "^TestRunMain$" \
             -test.coverprofile="${COVERAGEFILE}" \
+            -daemon-mode $MODE \
             $ENABLE_CSRF \
             &
 
@@ -88,7 +88,7 @@ echo "daemon pid=$DAEMON_PID"
 
 set +e
 
-HW_DAEMON_INTEGRATION_TESTS=1 HW_DAEMON_INTEGRATION_TEST_MODE=$MODE USE_CSRF=$USE_CSRF AUTO_PRESS_BUTTONS=$AUTO_PRESS_BUTTONS \
+HW_DAEMON_INTEGRATION_TESTS=1 HW_DAEMON_INTEGRATION_TEST_MODE=$MODE USE_CSRF=$USE_CSRF \
     go test ./src/api/integration/... $FAILFAST $UPDATE -timeout=$TIMEOUT $VERBOSE $RUN_TESTS
 
 TEST_FAIL=$?

@@ -25,10 +25,10 @@ test: ## Run tests for hardware wallet daemon
 	go test -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
 integration-test-emulator: ## Run emulator integration tests
-	./ci-scripts/integration-test.sh -a -m emulator -n emulator-integration
+	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
 
 integration-test-wallet: ## Run wallet integration tests
-	./ci-scripts/integration-test.sh -m wallet -n wallet-integration
+	./ci-scripts/integration-test.sh -m USB -n wallet-integration
 
 integration-test-wallet-enable-csrf: ## Run wallet integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -m emulator -c -n emulator-integration-enable-csrf

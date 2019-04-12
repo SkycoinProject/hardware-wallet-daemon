@@ -27,8 +27,8 @@ import (
 )
 
 const (
-	testModeEmulator = "emulator"
-	testModeWallet   = "wallet"
+	testModeEmulator = "EMULATOR"
+	testModeUSB      = "USB"
 
 	testFixturesDir = "testdata"
 )
@@ -72,7 +72,7 @@ func mode(t *testing.T) string {
 	switch mode {
 	case "":
 		mode = testModeEmulator
-	case testModeWallet, testModeEmulator:
+	case testModeUSB, testModeEmulator:
 	default:
 		t.Fatalf("Invalid test mode %s, must be emulator or wallet", mode)
 	}
@@ -84,7 +84,7 @@ func enabled() bool {
 }
 
 func doWallet(t *testing.T) bool {
-	if enabled() && mode(t) == testModeWallet {
+	if enabled() && mode(t) == testModeUSB {
 		return true
 	}
 
