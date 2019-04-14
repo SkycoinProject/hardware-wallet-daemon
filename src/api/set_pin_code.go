@@ -10,6 +10,16 @@ import (
 // Method: POST
 func setPinCode(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// allow only one request at a time
+		closeFunc, err := serialize(gateway)
+		if err != nil {
+			logger.Error("serialize failed: %s", err.Error())
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+		defer closeFunc()
+
 		if r.Method != http.MethodPost {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")
 			writeHTTPResponse(w, resp)
@@ -35,6 +45,6 @@ func setPinCode(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		HandleFirmwareResponseMessages(w, r, gateway, msg)
+		HandleFirmwareResponseMessages(w, gateway, msg)
 	}
 }

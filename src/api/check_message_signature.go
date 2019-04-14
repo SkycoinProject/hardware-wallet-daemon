@@ -21,6 +21,16 @@ type CheckMessageSignatureRequest struct {
 // Args: JSON Body
 func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// allow only one request at a time
+		closeFunc, err := serialize(gateway)
+		if err != nil {
+			logger.Error("serialize failed: %s", err.Error())
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+		defer closeFunc()
+
 		if r.Method != http.MethodPost {
 			resp := NewHTTPErrorResponse(http.StatusMethodNotAllowed, "")
 			writeHTTPResponse(w, resp)
@@ -47,7 +57,7 @@ func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		_, err := cipher.DecodeBase58Address(req.Address)
+		_, err = cipher.DecodeBase58Address(req.Address)
 		if err != nil {
 			resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, err.Error())
 			writeHTTPResponse(w, resp)
@@ -85,6 +95,6 @@ func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		HandleFirmwareResponseMessages(w, r, gateway, msg)
+		HandleFirmwareResponseMessages(w, gateway, msg)
 	}
 }
