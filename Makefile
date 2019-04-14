@@ -24,6 +24,10 @@ test: ## Run tests for hardware wallet daemon
 	@mkdir -p coverage/
 	go test -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
+test-race: ## Run tests for hardware wallet daemon with race flag
+	@mkdir -p coverage/
+	go test -race -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
+
 integration-test-emulator: ## Run emulator integration tests
 	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
 
