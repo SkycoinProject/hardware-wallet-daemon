@@ -181,7 +181,7 @@ paths:
       parameters:
         - in: body
           name: RecoveryRequest
-          description: RecoveryRequest is request data for /api/v1/check_message_signature
+          description: RecoveryRequest is request data for /api/v1/recovery
           schema:
             $ref: '#/definitions/RecoveryRequest'
       responses:
@@ -246,11 +246,19 @@ paths:
       security:
         - csrfAuth: []
 
-  /set_pin_code:
+  /configure_pin_code:
     post:
       description: Configure a pin code on the device.
+      consumes:
+        - application/x-www-form-urlencoded
       produces:
         - application/json
+      parameters:
+        - in: formData
+          name: remove_pin
+          type: boolean
+          description: remove current pin code. needs to be called without remove_pin again to set a new one
+          required: false
       responses:
         200:
           description: success
@@ -273,7 +281,7 @@ paths:
       parameters:
         - in: body
           name: SignMessageRequest
-          description: SignMessageRequest is request data for /api/signMessage
+          description: SignMessageRequest is request data for /api/v1/sign_message
           schema:
             $ref: '#/definitions/SignMessageRequest'
       responses:

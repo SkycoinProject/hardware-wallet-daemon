@@ -64,7 +64,7 @@ for the post sign message operation typically these are written to a http.Reques
 type PostSignMessageParams struct {
 
 	/*SignMessageRequest
-	  SignMessageRequest is request data for /api/signMessage
+	  SignMessageRequest is request data for /api/v1/sign_message
 
 	*/
 	SignMessageRequest *models.SignMessageRequest

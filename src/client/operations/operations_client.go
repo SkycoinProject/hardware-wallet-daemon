@@ -227,6 +227,35 @@ func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignaturePara
 }
 
 /*
+PostConfigurePinCode Configure a pin code on the device.
+*/
+func (a *Client) PostConfigurePinCode(params *PostConfigurePinCodeParams, authInfo runtime.ClientAuthInfoWriter) (*PostConfigurePinCodeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostConfigurePinCodeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostConfigurePinCode",
+		Method:             "POST",
+		PathPattern:        "/configure_pin_code",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostConfigurePinCodeReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostConfigurePinCodeOK), nil
+
+}
+
+/*
 PostGenerateAddresses Generate addresses for the hardware wallet seed.
 */
 func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateAddressesOK, error) {
@@ -426,35 +455,6 @@ func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams, authInfo runtime
 		return nil, err
 	}
 	return result.(*PostSetMnemonicOK), nil
-
-}
-
-/*
-PostSetPinCode Configure a pin code on the device.
-*/
-func (a *Client) PostSetPinCode(params *PostSetPinCodeParams, authInfo runtime.ClientAuthInfoWriter) (*PostSetPinCodeOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostSetPinCodeParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostSetPinCode",
-		Method:             "POST",
-		PathPattern:        "/set_pin_code",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostSetPinCodeReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostSetPinCodeOK), nil
 
 }
 

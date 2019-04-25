@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"runtime"
 	"time"
 
 	"github.com/NYTimes/gziphandler"
@@ -53,7 +54,7 @@ func init() {
 	ongoingOperation = make(chan struct{}, 1)
 
 	apb := os.Getenv("AUTO_PRESS_BUTTONS")
-	if apb == "1" {
+	if apb == "1" && runtime.GOOS == "linux" {
 		autoPressEmulatorButtons = true
 	}
 }
@@ -255,7 +256,7 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	webHandlerV1("/generate_mnemonic", generateMnemonic(gateway))
 	webHandlerV1("/recovery", recovery(gateway))
 	webHandlerV1("/set_mnemonic", setMnemonic(gateway))
-	webHandlerV1("/set_pin_code", setPinCode(gateway))
+	webHandlerV1("/configure_pin_code", configurePinCode(gateway))
 	webHandlerV1("/sign_message", signMessage(gateway))
 	webHandlerV1("/transaction_sign", transactionSign(gateway))
 	webHandlerV1("/wipe", wipe(gateway))

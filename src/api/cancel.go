@@ -31,7 +31,7 @@ func cancel(gateway Gatewayer) http.HandlerFunc {
 		if autoPressEmulatorButtons {
 			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
 			if err != nil {
-				logger.Error("generateAddress failed: %s", err.Error())
+				logger.Error("cancel failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
 				return
