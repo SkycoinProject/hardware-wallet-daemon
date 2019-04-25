@@ -352,6 +352,26 @@ $  curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code \
    -d 'remove_pin=true'
 ```
 
+Response Flow:
+- User is shown a button confirmation request on hardware wallet to confirm start of pin remove process.
+- The daemon returns intermediate pinmatrix request once to the frontend.
+- Response on success
+
+```json
+{
+    "data": "PIN removed"
+}
+```
+- Response on failure
+```json
+{
+    "error": {
+        "message": "PIN invalid",
+        "code": 409
+    }
+}
+```
+
 ### Sign Message
 Sign a message using the secret key at given index.
 
