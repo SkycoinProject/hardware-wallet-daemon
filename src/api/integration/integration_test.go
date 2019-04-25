@@ -567,7 +567,7 @@ func TestWalletConnected(t *testing.T) {
 		return
 	}
 
-	resp, err := daemonClient.Operations.GetConnected(nil, nil)
+	resp, err := daemonClient.Operations.GetAvailable(nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, resp.Payload.Data, true)
 }

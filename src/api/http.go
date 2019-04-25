@@ -250,6 +250,7 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	// enable firmware update endpoint only for hw wallet
 	if c.mode == deviceWallet.DeviceTypeUSB {
 		webHandlerV1("/firmware_update", firmwareUpdate(gateway))
+		webHandlerV1("/available", available(gateway))
 	}
 	webHandlerV1("/generate_mnemonic", generateMnemonic(gateway))
 	webHandlerV1("/recovery", recovery(gateway))
@@ -258,7 +259,6 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	webHandlerV1("/sign_message", signMessage(gateway))
 	webHandlerV1("/transaction_sign", transactionSign(gateway))
 	webHandlerV1("/wipe", wipe(gateway))
-	webHandlerV1("/connected", connected(gateway))
 
 	webHandlerV1("/intermediate/pin_matrix", pinMatrixRequestHandler(gateway))
 	webHandlerV1("/intermediate/passphrase", passphraseRequestHandler(gateway))

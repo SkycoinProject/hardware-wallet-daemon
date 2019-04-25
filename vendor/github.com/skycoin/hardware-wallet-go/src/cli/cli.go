@@ -88,6 +88,7 @@ func NewApp() (*App, error) {
 		signMessageCmd(),
 		checkMessageSignatureCmd(),
 		setPinCode(),
+		removePinCode(),
 		wipeCmd(),
 		backupCmd(),
 		recoveryCmd(),
@@ -96,6 +97,7 @@ func NewApp() (*App, error) {
 		sandbox(),
 		getRawEntropyCmd(),
 		getMixedEntropyCmd(),
+		getUsbDetails(),
 	}
 
 	app.Name = "skycoin-hw-cli"

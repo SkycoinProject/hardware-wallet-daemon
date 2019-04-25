@@ -56,3 +56,8 @@ func (suite *devicerSuit) TestGenerateMnemonic() {
 	mock.AssertExpectationsForObjects(suite.T(), driverMock)
 	spew.Dump(msg)
 }
+
+func (suite *devicerSuit) TestInterfacesImplemented() {
+	var _ Devicer = (*Device)(nil)
+	var _ DeviceDriver = (*Driver)(nil)
+}

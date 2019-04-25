@@ -1,18 +1,16 @@
 .DEFAULT_GOAL := help
 .PHONY: all build
 .PHONY: test_unit test_integration test
-.PHONY: dep vendor_proto proto mocks
+.PHONY: dep mocks
 .PHONY: clean lint check format
 
 all: build
 
-build: proto ## Build project
+build:
 	cd cmd/cli && ./install.sh
 
-dep: proto ## Ensure package dependencies are up to date
+dep: ## Ensure package dependencies are up to date
 	dep ensure -v
-	# Ensure sources for protoc-gen-go and protobuf/proto are in sync
-	dep ensure -v -add github.com/gogo/protobuf/protoc-gen-gofast ## setup dependencies
 
 mocks: ## Create all mock files for unit tests
 	echo "Generating mock files"

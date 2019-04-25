@@ -54,23 +54,23 @@ func (a *Client) DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAut
 }
 
 /*
-GetConnected check whether device is connected or not.
+GetAvailable check whether a skywallet is connected to the machine.
 */
-func (a *Client) GetConnected(params *GetConnectedParams, authInfo runtime.ClientAuthInfoWriter) (*GetConnectedOK, error) {
+func (a *Client) GetAvailable(params *GetAvailableParams, authInfo runtime.ClientAuthInfoWriter) (*GetAvailableOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetConnectedParams()
+		params = NewGetAvailableParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetConnected",
+		ID:                 "GetAvailable",
 		Method:             "GET",
-		PathPattern:        "/connected",
+		PathPattern:        "/available",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetConnectedReader{formats: a.formats},
+		Reader:             &GetAvailableReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -78,7 +78,7 @@ func (a *Client) GetConnected(params *GetConnectedParams, authInfo runtime.Clien
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetConnectedOK), nil
+	return result.(*GetAvailableOK), nil
 
 }
 

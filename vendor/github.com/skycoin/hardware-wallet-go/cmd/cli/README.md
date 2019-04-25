@@ -42,6 +42,12 @@ Skycoin Hardware wallet command line interface
     - [Ask the device Features](#device-features)
     - [Ask the device to cancel the ongoing procedure](#device-cancel)
     - [Ask the device to sign a transaction using the provided information](#transaction-sign)
+    - [Ask the device to get internal raw entropy](#get-raw-entropy)
+       - [Examples](#examples-ask-the-device-to-get-internal-raw-entropy)
+        - [Text output](#text-output-ask-the-device-to-get-internal-raw-entropy)
+    - [Ask the device to get internal mixed entropy](#get-mixed-entropy)
+      - [Examples](#examples-ask-the-device-to-get-internal-mixed-entropy)
+        - [Text output](#text-output-ask-the-device-to-get-internal-mixed-entropy)
 
 <!-- /MarkdownTOC -->
 
@@ -70,25 +76,26 @@ VERSION:
    1.7.0
 
 COMMANDS:
-
-     applySettings            Apply settings.
-     setMnemonic              Configure the device with a mnemonic.
-     features                 Ask the device Features.
-     generateMnemonic         Ask the device to generate a mnemonic and configure itself with it.
-     addressGen               Generate skycoin addresses using the firmware
-     firmwareUpdate           Update device's firmware.
-     signMessage              Ask the device to sign a message using the secret key at given index.
-     checkMessageSignature    Check a message signature matches the given address.
-     setPinCode               Configure a PIN code on a device.
-     wipe                     Ask the device to wipe clean all the configuration it contains.
-     backup                   Ask the device to perform the seed backup procedure.
-     recovery                 Ask the device to perform the seed recovery procedure.
-     cancel                   Ask the device to cancel the ongoing procedure.
+     applySettings          Apply settings.
+     setMnemonic            Configure the device with a mnemonic.
+     features               Ask the device Features.
+     generateMnemonic       Ask the device to generate a mnemonic and configure itself with it.
+     addressGen             Generate skycoin addresses using the firmware
+     firmwareUpdate         Update device's firmware.
+     signMessage            Ask the device to sign a message using the secret key at given index.
+     checkMessageSignature  Check a message signature matches the given address.
+     setPinCode             Configure a PIN code on a device.
+     removePinCode          Remove a PIN code on a device.
+     wipe                   Ask the device to wipe clean all the configuration it contains.
+     backup                 Ask the device to perform the seed backup procedure.
+     recovery               Ask the device to perform the seed recovery procedure.
+     cancel                 Ask the device to cancel the ongoing procedure.
      transactionSign        Ask the device to sign a transaction using the provided information.
-     sandbox                  Sandbox.
-     help, h                  Shows a list of commands or help for one command
-
-
+     sandbox                Sandbox.
+     getRawEntropy          Get device raw internal entropy and write it down to a file
+     getMixedEntropy        Get device internal mixed entropy and write it down to a file
+     getUsbDetails          Ask host usb about details for the hardware wallet
+     help, h                Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --help, -h     show help
@@ -96,6 +103,11 @@ GLOBAL OPTIONS:
 ```
 
 All commands accept `--deviceType` option. Supported values are `USB` and `EMULATOR`.
+
+### Internal entropy
+
+There are two kinds of internal entropy, [`getRawEntropy`](#get-raw-entropy) and `getMixedEntropy`(#get-mixed-entropy). The difference between this two are that raw entropy comes from a random buffer function that uses a peripheral device under the hood, in the other hand the mixed entropy comes from a salted entropy source as described in [this FAQ](https://github.com/skycoin/hardware-wallet/blob/develop/FAQ.md#random-source).
+
 
 ### Apply settings
 
@@ -495,8 +507,14 @@ FwPatch: 0
 FwVendor: 
 FwVendorKeys: 
 UnfinishedBackup: false
+FirmwareFeatures: 0
 ```
 </details>
+
+- `FirmwareFeatures` is interpreted as a bits slice as follows
+  * bit `0` (i.e. mask `0x1`) is active if user confirmation required prior to returning internal entropy
+  * bit `1` (i.e. mask `0x2`) set if support for sending internal entropy back to the peer is enabled in firmware.
+  * bit `2` (i.e. mask `0x4`) set if device is the emulator.
 
 ### Device cancel
 
@@ -540,3 +558,60 @@ $ skycoin-hw-cli transactionSign --inputHash a885343cc57aedaab56ad88d860f2bd4362
 [zC8GAQGQBfwk7vtTxVoRG7iMperHNuyYPs] [1000000] [1] []
 ```
 </details>
+
+### Get raw entropy
+
+Ask the device to get internally generated [raw entropy](#internal-entropy).
+
+```
+OPTIONS:
+        --entropyBytes value  Total number of how many bytes of raw entropy to read. (default: 1048576)
+        --outFile value       File path to write out the raw entropy buffers, a "-" set the file to stdout. (default: "-")
+        --deviceType value    Device type to send instructions to, hardware wallet (USB) or emulator. [$DEVICE_TYPE]
+```
+
+#### Examples
+##### Text output
+```bash
+$ skycoin-hw-cli getRawEntropy --outFile - --entropyBytes 33
+```
+
+<details>
+ <summary>View Output</summary>
+
+```
+INFO [skycoin-hw-cli]: Getting raw entropy from device
+[23 239 184 152 31 15 62 85 216 241 180 64 251 108 122 204 241 116 35 96 112 154 122 162 53 243 178 209 28 43 99 174 79]
+```
+</details>
+
+A real example about how to use this feature can be checked at the [TRNG validation](https://github.com/skycoin/hardware-wallet/tree/8edc2a28027875f464b68348c44fb188efb4dfbb#validate-the-trng) (please get noticed that the firmware should be build with this feature enabled trough `ENABLE_GETENTROPY`). The tool is use specifically [from here](https://github.com/skycoin/hardware-wallet/blob/8edc2a28027875f464b68348c44fb188efb4dfbb/trng-test/Makefile#L7-L8).
+
+### Get mixed entropy
+
+Ask the device to get internally generated [mixed entropy](#internal-entropy).
+
+```
+OPTIONS:
+        --entropyBytes value  Total number of how many bytes of mixed entropy to read. (default: 1048576)
+        --outFile value       File path to write out the mixed entropy buffers, a "-" set the file to stdout. (default: "-")
+        --deviceType value    Device type to send instructions to, hardware wallet (USB) or emulator. [$DEVICE_TYPE]
+```
+
+#### Examples
+##### Text output
+
+```bash
+$ skycoin-hw-cli getMixedEntropy --outFile - --entropyBytes 33
+```
+
+<details>
+ <summary>View Output</summary>
+
+```
+INFO [skycoin-hw-cli]: Getting mixed entropy from device
+[78 81 147 249 42 193 246 64 113 249 212 43 216 233 38 198 9 31 24 178 19 109 62 110 195 44 176 147 158 146 80 215 191]
+```
+</details>
+
+A real example about how to use this feature can be checked at the [TRNG validation](https://github.com/skycoin/hardware-wallet/tree/8edc2a28027875f464b68348c44fb188efb4dfbb#validate-the-trng) (please get noticed that the firmware should be build with this feature enabled trough `ENABLE_GETENTROPY`). The tool is use specifically [from here](https://github.com/skycoin/hardware-wallet/blob/8edc2a28027875f464b68348c44fb188efb4dfbb/trng-test/Makefile#L7-L8).

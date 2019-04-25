@@ -60,7 +60,7 @@ var endpointsMethods = map[string][]string{
 	"/api/v1/wipe": []string{
 		http.MethodDelete,
 	},
-	"/api/v1/connected": []string{
+	"/api/v1/available": []string{
 		http.MethodGet,
 	},
 }

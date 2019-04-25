@@ -19,9 +19,9 @@ func applySettingsCmd() gcli.Command {
 		Usage:       "Apply settings.",
 		Description: "",
 		Flags: []gcli.Flag{
-			gcli.BoolFlag{
+			gcli.StringFlag{
 				Name:  "usePassphrase",
-				Usage: "Configure a passphrase",
+				Usage: "Configure a passphrase (true or false)",
 			},
 			gcli.StringFlag{
 				Name:  "label",
@@ -40,7 +40,7 @@ func applySettingsCmd() gcli.Command {
 		},
 		OnUsageError: onCommandUsageError(name),
 		Action: func(c *gcli.Context) {
-			passphrase := c.Bool("usePassphrase")
+			passphrase := c.String("usePassphrase")
 			label := c.String("label")
 			language := c.String("language")
 
@@ -50,7 +50,19 @@ func applySettingsCmd() gcli.Command {
 			}
 
 			var msg wire.Message
-			msg, err := device.ApplySettings(passphrase, label, language)
+			usePassphrase := new(bool)
+			switch passphrase {
+			case "true":
+				*usePassphrase = true
+			case "false":
+				*usePassphrase = false
+			case "":
+				usePassphrase = nil
+			default:
+				log.Errorln("Valid values for usePassphrase are true or false")
+				return
+			}
+			msg, err := device.ApplySettings(usePassphrase, label, language)
 			if err != nil {
 				log.Error(err)
 				return

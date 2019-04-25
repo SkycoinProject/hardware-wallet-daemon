@@ -96,7 +96,7 @@ func TestApplySettings(t *testing.T) {
 			var body ApplySettingsRequest
 			err := json.Unmarshal([]byte(tc.httpBody), &body)
 			if err == nil {
-				gateway.On("ApplySettings", body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
+				gateway.On("ApplySettings", &body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
 			}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))

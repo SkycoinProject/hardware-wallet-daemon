@@ -40,7 +40,7 @@ func sandbox() gcli.Command {
 
 			var pinEnc string
 			var msg wire.Message
-			msg, err = device.ChangePin()
+			msg, err = device.ChangePin(nil)
 			if err != nil {
 				log.Error(err)
 				return
@@ -58,7 +58,7 @@ func sandbox() gcli.Command {
 
 			// come on one-more time
 			// testing what happen when we try to change an existing pin code
-			msg, err = device.ChangePin()
+			msg, err = device.ChangePin(nil)
 			if err != nil {
 				log.Error(err)
 				return

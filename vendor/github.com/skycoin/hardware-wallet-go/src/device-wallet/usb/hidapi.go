@@ -22,10 +22,10 @@ func InitHIDAPI() (*HIDAPI, error) {
 	return &HIDAPI{}, nil
 }
 
-func (b *HIDAPI) Enumerate() ([]Info, error) {
+func (b *HIDAPI) Enumerate(vendorID uint16, productID uint16) ([]Info, error) {
 	var infos []Info
 
-	for _, dev := range usbhid.HidEnumerate(0, 0) { // enumerate all devices
+	for _, dev := range usbhid.HidEnumerate(vendorID, productID) { // enumerate all devices matching the given vendor and product
 		if b.match(&dev) {
 			infos = append(infos, Info{
 				Path:      b.identify(&dev),

@@ -40,7 +40,7 @@ func (b *WebUSB) Close() {
 	usbhid.Exit(b.usb)
 }
 
-func (b *WebUSB) Enumerate() ([]Info, error) {
+func (b *WebUSB) Enumerate(vendorID uint16, productID uint16) ([]Info, error) {
 	list, err := usbhid.Get_Device_List(b.usb)
 	if err != nil {
 		return nil, err
@@ -62,12 +62,29 @@ func (b *WebUSB) Enumerate() ([]Info, error) {
 			path := b.identify(dev)
 			inset := paths[path]
 			if !inset {
-				infos = append(infos, Info{
-					Path:      path,
-					VendorID:  int(dd.IdVendor),
-					ProductID: int(dd.IdProduct),
-				})
-				paths[path] = true
+				appendInfo := func() {
+					infos = append(infos, Info{
+						Path:      path,
+						VendorID:  int(dd.IdVendor),
+						ProductID: int(dd.IdProduct),
+					})
+					paths[path] = true
+				}
+				if vendorID != 0 && productID != 0 {
+					if dd.IdVendor == vendorID && dd.IdProduct == productID {
+						appendInfo()
+					}
+				} else if vendorID != 0 {
+					if dd.IdVendor == vendorID {
+						appendInfo()
+					}
+				} else if productID != 0 {
+					if dd.IdProduct == productID {
+						appendInfo()
+					}
+				} else {
+					appendInfo()
+				}
 			}
 		}
 	}

@@ -28,10 +28,6 @@
   go-tests = true
   unused-packages = true
 
-[[constraint]]
-  name = "github.com/gogo/protobuf"
-  version = "1.2.0"
-
 
 [[constraint]]
   name = "github.com/skycoin/skycoin"
@@ -39,5 +35,8 @@
 
 [[constraint]]
   name = "github.com/skycoin/hardware-wallet-protob"
-  revision = "521ecbcc7aba367b8e347fcc3fce12c942c59eba"
+  revision = "65ae99e4109dc0383567d7454788bee3f52e1c38"
 
+[[constraint]]
+  name = "github.com/gogo/protobuf"
+  version = "1.2.1"

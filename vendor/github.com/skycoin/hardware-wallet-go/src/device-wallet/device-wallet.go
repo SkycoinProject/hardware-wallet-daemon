@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/skycoin/hardware-wallet-go/src/device-wallet/usb"
+
 	"github.com/skycoin/skycoin/src/util/logging"
 
 	messages "github.com/skycoin/hardware-wallet-protob/go"
@@ -40,12 +42,13 @@ const (
 // Devicer provides api for the hw wallet functions
 type Devicer interface {
 	AddressGen(addressN, startIndex int, confirmAddress bool) (wire.Message, error)
-	ApplySettings(usePassphrase bool, label string, language string) (wire.Message, error)
+	ApplySettings(usePassphrase *bool, label string, language string) (wire.Message, error)
 	Backup() (wire.Message, error)
 	Cancel() (wire.Message, error)
 	CheckMessageSignature(message, signature, address string) (wire.Message, error)
-	ChangePin() (wire.Message, error)
+	ChangePin(removePin *bool) (wire.Message, error)
 	Connected() bool
+	Available() bool
 	FirmwareUpload(payload []byte, hash [32]byte) error
 	GetFeatures() (wire.Message, error)
 	GenerateMnemonic(wordCount uint32, usePassphrase bool) (wire.Message, error)
@@ -130,6 +133,23 @@ func (d *Device) Disconnect() error {
 		return errors.New("device is not connected")
 	}
 	return d.dev.Close()
+}
+
+// GetUsbInfo returns information from the attached usb
+func (d *Device) GetUsbInfo() ([]usb.Info, error) {
+	if d.Driver.DeviceType() == DeviceTypeUSB {
+		if err := d.Connect(); err != nil {
+			return nil, err
+		}
+		if err := d.Disconnect(); err != nil {
+			return nil, err
+		}
+	}
+	devInfos, err := d.Driver.GetDeviceInfos()
+	if err != nil {
+		return nil, err
+	}
+	return devInfos, nil
 }
 
 // AddressGen Ask the device to generate an address
@@ -309,7 +329,7 @@ func (d *Device) SaveDeviceEntropyInFile(outFile string, entropyBytes uint32, ge
 }
 
 // ApplySettings send ApplySettings request to the device
-func (d *Device) ApplySettings(usePassphrase bool, label string, language string) (wire.Message, error) {
+func (d *Device) ApplySettings(usePassphrase *bool, label string, language string) (wire.Message, error) {
 	if err := d.Connect(); err != nil {
 		return wire.Message{}, err
 	}
@@ -402,12 +422,12 @@ func (d *Device) CheckMessageSignature(message, signature, address string) (wire
 // To set the PIN "12345", the positions are:
 // top, bottom-right, top-left, right, top-right
 // so you must send "83769".
-func (d *Device) ChangePin() (wire.Message, error) {
+func (d *Device) ChangePin(removePin *bool) (wire.Message, error) {
 	if err := d.Connect(); err != nil {
 		return wire.Message{}, err
 	}
 	defer d.dev.Close()
-	chunks, err := MessageChangePin()
+	chunks, err := MessageChangePin(removePin)
 	if err != nil {
 		return wire.Message{}, err
 	}
@@ -428,7 +448,7 @@ func (d *Device) ChangePin() (wire.Message, error) {
 	return msg, nil
 }
 
-// Connected check if a device is connected
+// Connected checks if we can communicate with a connected skycoin wallet
 func (d *Device) Connected() bool {
 	if d.dev == nil {
 		return false
@@ -450,6 +470,21 @@ func (d *Device) Connected() bool {
 		return false
 	}
 	return msg.Kind == uint16(messages.MessageType_MessageType_Success)
+}
+
+// Available checks if a skycoin wallet is connected to the system
+func (d *Device) Available() bool {
+	infos, _, err := getUsbInfo()
+	if err != nil {
+		log.Error(err)
+		return false
+	}
+
+	if len(infos) <= 0 {
+		return false
+	}
+
+	return true
 }
 
 // FirmwareUpload Updates device's firmware
