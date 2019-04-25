@@ -40,6 +40,14 @@ const (
 	DeviceTypeInvalid
 )
 
+const (
+	// SkycoinVendorID from https://github.com/skycoin/hardware-wallet/blob/50000f674c56c0cc18eec30d55978b73ed279b2e/tiny-firmware/bootloader/usb.c#L57
+	SkycoinVendorID = 0x313A
+
+	// SkycoinHwProductID from https://github.com/skycoin/hardware-wallet/blob/50000f674c56c0cc18eec30d55978b73ed279b2e/tiny-firmware/bootloader/usb.c#L58
+	SkycoinHwProductID = 0x0001
+)
+
 //go:generate mockery -name DeviceDriver -case underscore -inpkg -testonly
 
 // DeviceDriver is the api for hardware wallet communication
@@ -47,6 +55,7 @@ type DeviceDriver interface {
 	SendToDevice(dev io.ReadWriteCloser, chunks [][64]byte) (wire.Message, error)
 	SendToDeviceNoAnswer(dev io.ReadWriteCloser, chunks [][64]byte) error
 	GetDevice() (io.ReadWriteCloser, error)
+	GetDeviceInfos() ([]usb.Info, error)
 	DeviceType() DeviceType
 }
 
@@ -87,6 +96,18 @@ func (drv *Driver) GetDevice() (io.ReadWriteCloser, error) {
 	return dev, err
 }
 
+// GetDeviceInfos returns information from the attached usb
+func (drv *Driver) GetDeviceInfos() ([]usb.Info, error) {
+	if drv.DeviceType() == DeviceTypeUSB {
+		infos, _, err := getUsbInfo()
+		if err != nil {
+			return nil, err
+		}
+		return infos, nil
+	}
+	return nil, errors.New("reading device info make sense for physical devices only")
+}
+
 func sendToDeviceNoAnswer(dev io.ReadWriteCloser, chunks [][64]byte) error {
 	for _, element := range chunks {
 		_, err := dev.Write(element[:])
@@ -116,20 +137,7 @@ func getEmulatorDevice() (net.Conn, error) {
 
 // getUsbDevice returns a usb device connection instance
 func getUsbDevice() (usb.Device, error) {
-	w, err := usb.InitWebUSB()
-	if err != nil {
-		log.Printf("webusb: %s", err)
-		return nil, err
-	}
-	h, err := usb.InitHIDAPI()
-	if err != nil {
-		log.Printf("hidapi: %s", err)
-		return nil, err
-	}
-	b := usb.Init(w, h)
-
-	var infos []usb.Info
-	infos, err = b.Enumerate()
+	infos, b, err := getUsbInfo()
 	if len(infos) <= 0 {
 		return nil, err
 	}
@@ -145,6 +153,28 @@ func getUsbDevice() (usb.Device, error) {
 		}
 	}
 	return nil, err
+}
+
+// getUsbInfo returns usb connections info and the usb interface initialized
+func getUsbInfo() ([]usb.Info, *usb.USB, error) {
+	w, err := usb.InitWebUSB()
+	if err != nil {
+		log.Printf("webusb: %s", err)
+		return nil, nil, err
+	}
+	h, err := usb.InitHIDAPI()
+	if err != nil {
+		log.Printf("hidapi: %s", err)
+		return nil, nil, err
+	}
+	b := usb.Init(w, h)
+
+	var infos []usb.Info
+	infos, err = b.Enumerate(SkycoinVendorID, SkycoinHwProductID)
+	if len(infos) <= 0 {
+		return nil, nil, err
+	}
+	return infos, b, nil
 }
 
 func binaryWrite(message io.Writer, data interface{}) {

@@ -23,7 +23,7 @@ The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v
         - [Sign Message](#sign-message)
         - [Transaction Sign](#transaction-sign)
         - [Wipe](#wipe)
-        - [Connected](#connected)
+        - [Available](#available)
     
 
 <!-- /MarkdownTOC -->
@@ -425,17 +425,17 @@ Response:
 }
 ```
 
-### Connected
-Connected tells whether the device is currently connected or not.
+### Available
+Available tells whether a device is currently connected to the machine or not.
 
 ```
-URI: /api/v1/connected
+URI: /api/v1/available
 Method: GET
 ```
 
 Example:
 ```sh
-$ curl -X GET http://127.0.0.1:9510/api/v1/conected
+$ curl -X GET http://127.0.0.1:9510/api/v1/available
 ```
 
 Response:

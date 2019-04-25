@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/gogo/protobuf/proto"
 	gcli "github.com/urfave/cli"
@@ -46,7 +48,11 @@ func featuresCmd() gcli.Command {
 					return
 				}
 
-				fmt.Println(features)
+				enc := json.NewEncoder(os.Stdout)
+				if err = enc.Encode(features); err != nil {
+					log.Errorln(err)
+					return
+				}
 			// TODO: figure out if this method can even return success or failure msg.
 			case uint16(messages.MessageType_MessageType_Failure), uint16(messages.MessageType_MessageType_Success):
 				msgData, err := deviceWallet.DecodeSuccessOrFailMsg(msg)

@@ -330,9 +330,9 @@ paths:
       security:
         - csrfAuth: []
 
-  /connected:
+  /available:
     get:
-      description: check whether device is connected or not.
+      description: check whether a skywallet is connected to the machine.
       produces:
         - application/json
       responses:

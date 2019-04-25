@@ -34,24 +34,38 @@ func (_m *MockGatewayer) AddressGen(addressN int, startIndex int, confirmAddress
 }
 
 // ApplySettings provides a mock function with given fields: usePassphrase, label, language
-func (_m *MockGatewayer) ApplySettings(usePassphrase bool, label string, language string) (wire.Message, error) {
+func (_m *MockGatewayer) ApplySettings(usePassphrase *bool, label string, language string) (wire.Message, error) {
 	ret := _m.Called(usePassphrase, label, language)
 
 	var r0 wire.Message
-	if rf, ok := ret.Get(0).(func(bool, string, string) wire.Message); ok {
+	if rf, ok := ret.Get(0).(func(*bool, string, string) wire.Message); ok {
 		r0 = rf(usePassphrase, label, language)
 	} else {
 		r0 = ret.Get(0).(wire.Message)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(bool, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(*bool, string, string) error); ok {
 		r1 = rf(usePassphrase, label, language)
 	} else {
 		r1 = ret.Error(1)
 	}
 
 	return r0, r1
+}
+
+// Available provides a mock function with given fields:
+func (_m *MockGatewayer) Available() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
 }
 
 // Backup provides a mock function with given fields:
@@ -117,20 +131,20 @@ func (_m *MockGatewayer) Cancel() (wire.Message, error) {
 	return r0, r1
 }
 
-// ChangePin provides a mock function with given fields:
-func (_m *MockGatewayer) ChangePin() (wire.Message, error) {
-	ret := _m.Called()
+// ChangePin provides a mock function with given fields: removePin
+func (_m *MockGatewayer) ChangePin(removePin *bool) (wire.Message, error) {
+	ret := _m.Called(removePin)
 
 	var r0 wire.Message
-	if rf, ok := ret.Get(0).(func() wire.Message); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(*bool) wire.Message); ok {
+		r0 = rf(removePin)
 	} else {
 		r0 = ret.Get(0).(wire.Message)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(*bool) error); ok {
+		r1 = rf(removePin)
 	} else {
 		r1 = ret.Error(1)
 	}

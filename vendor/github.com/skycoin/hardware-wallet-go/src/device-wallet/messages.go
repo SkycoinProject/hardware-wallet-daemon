@@ -122,11 +122,13 @@ func MessageDeviceGetMixedEntropy(entropyBytes uint32) ([][64]byte, error) {
 }
 
 // MessageApplySettings prepare MessageApplySettings request
-func MessageApplySettings(usePassphrase bool, label string, language string) ([][64]byte, error) {
+func MessageApplySettings(usePassphrase *bool, label string, language string) ([][64]byte, error) {
 	applySettings := &messages.ApplySettings{
-		Label:         proto.String(label),
-		Language:      proto.String(language),
-		UsePassphrase: proto.Bool(usePassphrase),
+		Label:    proto.String(label),
+		Language: proto.String(language),
+	}
+	if usePassphrase != nil {
+		applySettings.UsePassphrase = proto.Bool(*usePassphrase)
 	}
 	log.Println(applySettings)
 	data, err := proto.Marshal(applySettings)
@@ -150,8 +152,11 @@ func MessageBackup() ([][64]byte, error) {
 }
 
 // MessageChangePin prepare MessageChangePin request
-func MessageChangePin() ([][64]byte, error) {
+func MessageChangePin(remove *bool) ([][64]byte, error) {
 	changePin := &messages.ChangePin{}
+	if remove != nil {
+		changePin.Remove = proto.Bool(*remove)
+	}
 	data, err := proto.Marshal(changePin)
 	if err != nil {
 		return [][64]byte{}, err

@@ -32,25 +32,39 @@ func (_m *MockDevicer) AddressGen(addressN int, startIndex int, confirmAddress b
 	return r0, r1
 }
 
-// ApplySettings provides a mock function with given fields: usePassphrase, label
-func (_m *MockDevicer) ApplySettings(usePassphrase bool, label string) (wire.Message, error) {
-	ret := _m.Called(usePassphrase, label)
+// ApplySettings provides a mock function with given fields: usePassphrase, label, language
+func (_m *MockDevicer) ApplySettings(usePassphrase *bool, label string, language string) (wire.Message, error) {
+	ret := _m.Called(usePassphrase, label, language)
 
 	var r0 wire.Message
-	if rf, ok := ret.Get(0).(func(bool, string) wire.Message); ok {
-		r0 = rf(usePassphrase, label)
+	if rf, ok := ret.Get(0).(func(*bool, string, string) wire.Message); ok {
+		r0 = rf(usePassphrase, label, language)
 	} else {
 		r0 = ret.Get(0).(wire.Message)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(bool, string) error); ok {
-		r1 = rf(usePassphrase, label)
+	if rf, ok := ret.Get(1).(func(*bool, string, string) error); ok {
+		r1 = rf(usePassphrase, label, language)
 	} else {
 		r1 = ret.Error(1)
 	}
 
 	return r0, r1
+}
+
+// Available provides a mock function with given fields:
+func (_m *MockDevicer) Available() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
 }
 
 // Backup provides a mock function with given fields:
@@ -116,20 +130,20 @@ func (_m *MockDevicer) Cancel() (wire.Message, error) {
 	return r0, r1
 }
 
-// ChangePin provides a mock function with given fields:
-func (_m *MockDevicer) ChangePin() (wire.Message, error) {
-	ret := _m.Called()
+// ChangePin provides a mock function with given fields: removePin
+func (_m *MockDevicer) ChangePin(removePin *bool) (wire.Message, error) {
+	ret := _m.Called(removePin)
 
 	var r0 wire.Message
-	if rf, ok := ret.Get(0).(func() wire.Message); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(*bool) wire.Message); ok {
+		r0 = rf(removePin)
 	} else {
 		r0 = ret.Get(0).(wire.Message)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(*bool) error); ok {
+		r1 = rf(removePin)
 	} else {
 		r1 = ret.Error(1)
 	}

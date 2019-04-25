@@ -61,7 +61,7 @@ func applySettings(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.ApplySettings(req.UsePassphrase, req.Label, req.Language)
+		msg, err := gateway.ApplySettings(&req.UsePassphrase, req.Label, req.Language)
 
 		if err != nil {
 			logger.Error("applySettings failed: %s", err.Error())

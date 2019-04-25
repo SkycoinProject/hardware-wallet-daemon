@@ -30,7 +30,11 @@ type Device interface {
 }
 
 type Bus interface {
-	Enumerate() ([]Info, error)
+	// Enumerate returns a list of all the devices accessible in the the system
+	// - If the vendor id is set to 0 then any vendor matches.
+	// - If the product id is set to 0 then any product matches.
+	// - If the vendor and product id are both 0, all devices are returned.
+	Enumerate(vendorID uint16, productID uint16) ([]Info, error)
 	Connect(path string) (Device, error)
 	Has(path string) bool
 }
@@ -45,11 +49,11 @@ func Init(buses ...Bus) *USB {
 	}
 }
 
-func (b *USB) Enumerate() ([]Info, error) {
+func (b *USB) Enumerate(vendorID uint16, productID uint16) ([]Info, error) {
 	var infos []Info
 
 	for _, b := range b.buses {
-		l, err := b.Enumerate()
+		l, err := b.Enumerate(vendorID, productID)
 		if err != nil {
 			return nil, err
 		}

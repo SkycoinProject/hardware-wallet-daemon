@@ -212,3 +212,7 @@ func newStrPtr(s string) *string {
 func newUint32Ptr(n uint32) *uint32 {
 	return &n
 }
+
+func newBoolPtr(b bool) *bool {
+	return &b
+}

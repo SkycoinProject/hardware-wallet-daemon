@@ -87,7 +87,7 @@ func checkPort(ping chan []byte, w io.Writer) (bool, error) {
 	}
 }
 
-func (u *UDP) Enumerate() ([]Info, error) {
+func (u *UDP) Enumerate(vendorID uint16, productID uint16) ([]Info, error) {
 	var infos []Info
 
 	for _, port := range u.ports {

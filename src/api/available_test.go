@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestConnected(t *testing.T) {
+func TestAvailable(t *testing.T) {
 	cases := []struct {
 		name                   string
 		method                 string
 		status                 int
+		gatewayAvailableResult bool
 		httpResponse           HTTPResponse
-		gatewayConnectedResult bool
 	}{
 		{
 			name:         "405",
@@ -25,32 +25,22 @@ func TestConnected(t *testing.T) {
 		},
 
 		{
-			name:                   "200 - OK",
+			name:                   "200",
 			method:                 http.MethodGet,
 			status:                 http.StatusOK,
-			gatewayConnectedResult: true,
+			gatewayAvailableResult: true,
 			httpResponse: HTTPResponse{
 				Data: true,
-			},
-		},
-
-		{
-			name:                   "200 - OK",
-			method:                 http.MethodGet,
-			status:                 http.StatusOK,
-			gatewayConnectedResult: false,
-			httpResponse: HTTPResponse{
-				Data: false,
 			},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			endpoint := "/connected"
+			endpoint := "/available"
 			gateway := &MockGatewayer{}
 
-			gateway.On("Connected").Return(tc.gatewayConnectedResult)
+			gateway.On("Available").Return(tc.gatewayAvailableResult, nil)
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
 			require.NoError(t, err)
@@ -72,12 +62,11 @@ func TestConnected(t *testing.T) {
 				require.Nil(t, tc.httpResponse.Data)
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
-
 				var resp bool
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(bool), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}
