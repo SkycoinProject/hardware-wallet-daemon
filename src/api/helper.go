@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gogo/protobuf/proto"
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
@@ -203,6 +204,14 @@ func serialize(gateway Gatewayer) (func(), error) {
 			<-ongoingOperation
 		}, nil
 	}
+}
+
+func parseBoolFlag(v string) (bool, error) {
+	if v == "" {
+		return false, nil
+	}
+
+	return strconv.ParseBool(v)
 }
 
 func newStrPtr(s string) *string {

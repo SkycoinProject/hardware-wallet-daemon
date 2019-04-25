@@ -64,7 +64,7 @@ for the post recovery operation typically these are written to a http.Request
 type PostRecoveryParams struct {
 
 	/*RecoveryRequest
-	  RecoveryRequest is request data for /api/v1/check_message_signature
+	  RecoveryRequest is request data for /api/v1/recovery
 
 	*/
 	RecoveryRequest *models.RecoveryRequest

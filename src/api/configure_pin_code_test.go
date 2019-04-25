@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
@@ -11,7 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSetPinCode(t *testing.T) {
+func TestConfigurePinCode(t *testing.T) {
+	type httpBody struct {
+		removePin string
+	}
+
 	failureMsg := messages.Failure{
 		Code:    messages.FailureType_Failure_NotInitialized.Enum(),
 		Message: newStrPtr("failure msg"),
@@ -21,18 +26,20 @@ func TestSetPinCode(t *testing.T) {
 	require.NoError(t, err)
 
 	successMsg := messages.Success{
-		Message: newStrPtr("setpincode success msg"),
+		Message: newStrPtr("configure pin code success msg"),
 	}
 
 	successMsgBytes, err := successMsg.Marshal()
 	require.NoError(t, err)
 
 	cases := []struct {
-		name                    string
-		method                  string
-		status                  int
-		gatewaySetPinCodeResult wire.Message
-		httpResponse            HTTPResponse
+		name                          string
+		method                        string
+		status                        int
+		httpBody                      *httpBody
+		removePin                     bool
+		gatewayConfigurePinCodeResult wire.Message
+		httpResponse                  HTTPResponse
 	}{
 		{
 			name:         "405",
@@ -42,10 +49,35 @@ func TestSetPinCode(t *testing.T) {
 		},
 
 		{
+			name:         "400 - invalid remove_pin",
+			method:       http.MethodPost,
+			status:       http.StatusBadRequest,
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for remove_pin"),
+			httpBody: &httpBody{
+				removePin: "foo",
+			},
+		},
+
+		{
 			name:   "409 - Failure msg",
 			method: http.MethodPost,
 			status: http.StatusConflict,
-			gatewaySetPinCodeResult: wire.Message{
+			gatewayConfigurePinCodeResult: wire.Message{
+				Kind: uint16(messages.MessageType_MessageType_Failure),
+				Data: failureMsgBytes,
+			},
+			httpResponse: NewHTTPErrorResponse(http.StatusConflict, "failure msg"),
+		},
+
+		{
+			name:   "409 - Failure msg with remove pin",
+			method: http.MethodPost,
+			status: http.StatusConflict,
+			httpBody: &httpBody{
+				removePin: "true",
+			},
+			removePin: true,
+			gatewayConfigurePinCodeResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
 			},
@@ -56,22 +88,50 @@ func TestSetPinCode(t *testing.T) {
 			name:   "200 - OK",
 			method: http.MethodPost,
 			status: http.StatusOK,
-			gatewaySetPinCodeResult: wire.Message{
+			gatewayConfigurePinCodeResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "setpincode success msg",
+				Data: "configure pin code success msg",
+			},
+		},
+
+		{
+			name:   "200 - OK with remove pin",
+			method: http.MethodPost,
+			status: http.StatusOK,
+			httpBody: &httpBody{
+				removePin: "true",
+			},
+			removePin: true,
+			gatewayConfigurePinCodeResult: wire.Message{
+				Kind: uint16(messages.MessageType_MessageType_Success),
+				Data: successMsgBytes,
+			},
+			httpResponse: HTTPResponse{
+				Data: "configure pin code success msg",
 			},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			endpoint := "/set_pin_code"
+			endpoint := "/configure_pin_code"
 			gateway := &MockGatewayer{}
 
-			gateway.On("ChangePin", newBoolPtr(false)).Return(tc.gatewaySetPinCodeResult, nil)
+			v := url.Values{}
+			if tc.httpBody != nil {
+				if tc.httpBody.removePin != "" {
+					v.Add("remove_pin", tc.httpBody.removePin)
+				}
+
+				if len(v) > 0 {
+					endpoint += "?" + v.Encode()
+				}
+			}
+
+			gateway.On("ChangePin", newBoolPtr(tc.removePin)).Return(tc.gatewayConfigurePinCodeResult, nil)
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
 			require.NoError(t, err)

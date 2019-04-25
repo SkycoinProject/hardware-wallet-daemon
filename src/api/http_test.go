@@ -48,7 +48,7 @@ var endpointsMethods = map[string][]string{
 	"/api/v1/set_mnemonic": []string{
 		http.MethodPost,
 	},
-	"/api/v1/set_pin_code": []string{
+	"/api/v1/configure_pin_code": []string{
 		http.MethodPost,
 	},
 	"/api/v1/sign_message": []string{

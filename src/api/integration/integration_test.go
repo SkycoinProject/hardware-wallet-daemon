@@ -255,12 +255,12 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 	require.Equal(t, mnemonic, resp.Payload.Data)
 }
 
-func TestEmulatorSetPinCode(t *testing.T) {
+func TestEmulatorConfigurePinCode(t *testing.T) {
 	if !doEmulator(t) {
 		return
 	}
 
-	resp, err := daemonClient.Operations.PostSetPinCode(nil, addCSRFHeader(t, daemonClient))
+	resp, err := daemonClient.Operations.PostConfigurePinCode(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
 	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
 
@@ -480,12 +480,12 @@ func TestWalletSetMnemonic(t *testing.T) {
 	require.Equal(t, mnemonic, resp.Payload.Data)
 }
 
-func TestWalletSetPinCode(t *testing.T) {
+func TestWalletConfigurePinCode(t *testing.T) {
 	if !doWallet(t) {
 		return
 	}
 
-	resp, err := daemonClient.Operations.PostSetPinCode(nil, addCSRFHeader(t, daemonClient))
+	resp, err := daemonClient.Operations.PostConfigurePinCode(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
 	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
 
