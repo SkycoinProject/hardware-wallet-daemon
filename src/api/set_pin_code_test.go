@@ -71,7 +71,7 @@ func TestSetPinCode(t *testing.T) {
 			endpoint := "/set_pin_code"
 			gateway := &MockGatewayer{}
 
-			gateway.On("ChangePin").Return(tc.gatewaySetPinCodeResult, nil)
+			gateway.On("ChangePin", newBoolPtr(false)).Return(tc.gatewaySetPinCodeResult, nil)
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
 			require.NoError(t, err)
