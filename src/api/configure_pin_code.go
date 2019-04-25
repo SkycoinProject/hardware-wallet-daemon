@@ -8,6 +8,8 @@ import (
 
 // URI: /api/v1/configure_pin_code
 // Method: POST
+// Args:
+// - remove_pin: (optional) Used to remove current pin
 func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// allow only one request at a time

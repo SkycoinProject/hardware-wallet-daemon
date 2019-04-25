@@ -19,7 +19,7 @@ The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v
         - [Recover Wallet](#recover-old-wallet)
         - [Generate Mnemonic](#generate-mnemonic)
         - [Set Mnemonic](#set-mnemonic)
-        - [Set Pin Code](#set-pin-code)
+        - [Configure Pin Code](#configure-pin-code)
         - [Sign Message](#sign-message)
         - [Transaction Sign](#transaction-sign)
         - [Wipe](#wipe)
@@ -132,7 +132,7 @@ Method: PUT
 ```
 
 Example:
-```sh
+```bash
 $ curl -X PUT http://127.0.0.1:9510/api/v1/cancel
 ```
 
@@ -159,7 +159,7 @@ Args: {"message": "<message>", "signature": "<signature>", "address": "<address>
 - `address`: Address that issued the signature.
 
 Example:
-```sh
+```bash
 curl -X POST http://127.0.0.1:9510/api/v1/check_message_signature \
 -H 'Content-Type: application/json' \
 -d '{"message": "Hello World", "signature": "6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300", "address": "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"}'
@@ -174,7 +174,7 @@ Method: GET
 ```
 
 Example:
-```sh
+```bash
 $ curl http://127.0.0.1:9510/api/v1/features
 ```
 
@@ -229,7 +229,7 @@ Args: {
 ```
 
 Example:
-```sh
+```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/recovery \
   -H 'Content-Type: application/json' \
   -d '{"word_count": 12, "use_passphrase": false, "dry_run": true}'
@@ -258,7 +258,7 @@ Args: {"word_count": "<mnemonic seed length>", "use_passphrase": "<ask for passp
 ```
 
 Example:
-```sh
+```bash
 $ curl http://127.0.0.1:9510/api/v1/generate_mnemonic \
   -H 'Content-Type: application/json' \
   -d '{"word_count": 12, "use_passphrase": false}'
@@ -284,7 +284,7 @@ Args: {"mnemonic": "<bip39 mnemonic seed>"}
 ```
 
 Example:
-```sh
+```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/set_mnemonic \
   -H 'Content-Type: application/json' \
   -d '{"mnemonic": "cloud flower upset remain green metal below cup stem infant art thank"}'
@@ -309,17 +309,20 @@ Response:
 }
 ```
 
-### Set Pin Code
+### Configure Pin Code
 Configure a pin code on the device.
 
+
 ```
-URI: /api/v1/set_pin_code
+URI: /api/v1/configure_pin_code
 Method: POST
+Args:
+- remove_pin: (optional) Used to remove current pin
 ```
 
 Example:
-```sh
-$ curl -X POST http://127.0.0.1:9510/api/v1/set_pin_code
+```bash
+$ curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code
 ```
 
 Response Flow:
@@ -342,6 +345,13 @@ Response Flow:
 }
 ```
 
+Example(Remove Pin):
+```bash
+$  curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code \
+   -H 'Content-Type: application/x-www-form-urlencoded' \
+   -d 'remove_pin=true'
+```
+
 ### Sign Message
 Sign a message using the secret key at given index.
 
@@ -359,7 +369,7 @@ Args: {
 - `message`: The message that the signature claims to be signing.
 
 Example:
-```sh
+```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/sign_message \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 0, "message": "hello world"}'
@@ -399,7 +409,7 @@ Args: {
   * `hours`: Output hours.
 
 Example:
-```sh
+```bash
 $ curl http://127.0.0.1:9510/api/v1/transaction_sign \
   -H 'Content-Type: application/json' \
   -d '{"transaction_inputs":[{"index":0,"hash":"c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},{"index":1,"hash":"4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"}],"transaction_outputs":[{"address_index":null,"address":"2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG","coins":"2","hours":"2"},{"address_index":null,"address":"2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8","coins":"3","hours":"3"}]}'
@@ -414,7 +424,7 @@ Method: DELETE
 ```
 
 Example:
-```sh
+```bash
 $ curl -X DELETE http://127.0.0.1:9510/api/v1/wipe
 ```
 
@@ -434,7 +444,7 @@ Method: GET
 ```
 
 Example:
-```sh
+```bash
 $ curl -X GET http://127.0.0.1:9510/api/v1/available
 ```
 
