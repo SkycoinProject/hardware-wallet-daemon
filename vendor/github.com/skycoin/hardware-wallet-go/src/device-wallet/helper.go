@@ -162,6 +162,8 @@ func getUsbInfo() ([]usb.Info, *usb.USB, error) {
 		log.Printf("webusb: %s", err)
 		return nil, nil, err
 	}
+	defer w.Close()
+
 	h, err := usb.InitHIDAPI()
 	if err != nil {
 		log.Printf("hidapi: %s", err)
