@@ -254,7 +254,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:dd3c0b55bae3d5075632f5caed9e58da94d4dd54ee6c6ce842b9f1caea3e7de0"
+  digest = "1:7dad1860944d54642e537e5deea4026b8aa01be74a1806b493a33ecdb75790c5"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/device-wallet",
@@ -263,7 +263,7 @@
     "src/device-wallet/wire",
   ]
   pruneopts = ""
-  revision = "c89f86ab0163460e6e744091ffe3b7ab066633b6"
+  revision = "f64efd32d427c2ac3978ea191c077901855158fb"
 
 [[projects]]
   digest = "1:8a86a2a343fbaf8cc2068f8b10d99e0c1f71a11f4c7f0c4cce7034a531f05288"
@@ -304,7 +304,7 @@
   version = "v0.1.1"
 
 [[projects]]
-  digest = "1:cf4fdb98e23a565bd82473027d37512a3d5b186fba3a1895d7e8401d8ce3ffe1"
+  digest = "1:b762f96c1183763894e8dabbac5f8e8d5821754b6e2686a8c398a174b7a58ff5"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
@@ -312,8 +312,8 @@
     "require",
   ]
   pruneopts = "UT"
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -321,7 +321,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "c05e17bb3b2dca130fc919668a96b4bec9eb9442"
+  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
 
 [[projects]]
   branch = "master"
@@ -340,10 +340,10 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "9f0b1ff7b46a4014ddb5d4bdb6602a43b882cb27"
+  revision = "a129542de9ae0895210abff9c95d67a1f33cb93d"
 
 [[projects]]
-  digest = "1:d353d6b67791fda470bf6b9bfa83086ee597febeb808cfc2adec70a2bab99663"
+  digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -365,8 +365,8 @@
     "width",
   ]
   pruneopts = "UT"
-  revision = "c942b20a5d85b458c4dce1589326051d85e25d6d"
-  version = "v0.3.1"
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
