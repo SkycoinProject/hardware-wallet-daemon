@@ -50,7 +50,7 @@ func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 
 		if req.WordCount != 12 && req.WordCount != 24 {
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-				resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, err.Error())
+				resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, "word count must be 12 or 24")
 				writeHTTPResponse(w, resp)
 				return
 			}

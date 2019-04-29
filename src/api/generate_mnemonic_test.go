@@ -45,11 +45,29 @@ func TestGenerateMnemonic(t *testing.T) {
 		},
 
 		{
+			name:         "400 - EOF",
+			method:       http.MethodPost,
+			contentType:  ContentTypeJSON,
+			status:       http.StatusBadRequest,
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "EOF"),
+		},
+
+		{
 			name:         "415 - Unsupported Media Type",
 			method:       http.MethodPost,
 			contentType:  ContentTypeForm,
 			status:       http.StatusUnsupportedMediaType,
 			httpResponse: NewHTTPErrorResponse(http.StatusUnsupportedMediaType, ""),
+		},
+
+		{
+			name:   "422 - invalid word count",
+			method: http.MethodPost,
+			status: http.StatusUnprocessableEntity,
+			httpBody: toJSON(t, &GenerateMnemonicRequest{
+				WordCount: 15,
+			}),
+			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "word count must be 12 or 24"),
 		},
 
 		{
