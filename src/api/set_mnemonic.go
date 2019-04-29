@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	"github.com/skycoin/skycoin/src/cipher/go-bip39"
 )
 
 // SetMnemonicRequest is request data for /api/v1/set_mnemonic
@@ -47,7 +48,11 @@ func setMnemonic(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		// TODO(therealssj): add mnemonic check?
+		if ok := bip39.IsMnemonicValid(req.Mnemonic); !ok {
+			resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, "seed is not a valid bip39 seed")
+			writeHTTPResponse(w, resp)
+			return
+		}
 
 		// for integration tests
 		if autoPressEmulatorButtons {

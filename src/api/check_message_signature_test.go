@@ -38,6 +38,14 @@ func TestCheckMessageSignature(t *testing.T) {
 		},
 
 		{
+			name:         "400 - EOF",
+			method:       http.MethodPost,
+			contentType:  ContentTypeJSON,
+			status:       http.StatusBadRequest,
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "EOF"),
+		},
+
+		{
 			name:         "415 - Unsupported Media Type",
 			method:       http.MethodPost,
 			contentType:  ContentTypeForm,

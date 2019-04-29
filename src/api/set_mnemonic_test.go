@@ -45,6 +45,32 @@ func TestSetMnemonic(t *testing.T) {
 		},
 
 		{
+			name:         "400 - EOF",
+			method:       http.MethodPost,
+			contentType:  ContentTypeJSON,
+			status:       http.StatusBadRequest,
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "EOF"),
+		},
+
+		{
+			name:         "415 - Unsupported Media Type",
+			method:       http.MethodPost,
+			contentType:  ContentTypeForm,
+			status:       http.StatusUnsupportedMediaType,
+			httpResponse: NewHTTPErrorResponse(http.StatusUnsupportedMediaType, ""),
+		},
+
+		{
+			name:   "422 - invalid bip39 seed",
+			method: http.MethodPost,
+			status: http.StatusUnprocessableEntity,
+			httpBody: toJSON(t, &SetMnemonicRequest{
+				Mnemonic: "foo bar foo bar",
+			}),
+			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "seed is not a valid bip39 seed"),
+		},
+
+		{
 			name:   "409 - Failure msg",
 			method: http.MethodPost,
 			status: http.StatusConflict,

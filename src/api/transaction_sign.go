@@ -13,8 +13,6 @@ import (
 	"github.com/skycoin/skycoin/src/util/droplet"
 )
 
-// TODO(therealssj): add more validation
-
 // TransactionSignRequest is request data for /api/v1/transaction_sign
 type TransactionSignRequest struct {
 	TransactionInputs  []TransactionInput  `json:"transaction_inputs"`
