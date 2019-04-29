@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  daemon:
+    image: golang:1.11
+    container_name: "daemon-server"
+    restart: always
+    ports:
+      - "0.0.0.0:9510:9510"
+    volumes:
+      - .:/usr/local/go/src/github.com/skycoin/hardware-wallet-daemon
+    working_dir: /usr/local/go/src/github.com/skycoin/hardware-wallet-daemon
+    command: go run ./cmd/daemon/daemon.go -web-interface-addr='0.0.0.0'
+    privileged: true
