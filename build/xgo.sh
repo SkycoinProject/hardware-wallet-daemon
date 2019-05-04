@@ -44,7 +44,7 @@ fi
 COMMIT=`git rev-parse HEAD`
 
 
-GOPATH=~/go xgo -targets="$OSARCH" \
+xgo -targets="$OSARCH" \
     -dest="${OUTPUT_DIR}" \
     -out="$CMD" \
     "${CMDDIR}/${CMD}"
