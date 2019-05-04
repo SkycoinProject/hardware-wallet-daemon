@@ -44,7 +44,7 @@ fi
 COMMIT=`git rev-parse HEAD`
 
 
-xgo -targets="$OSARCH" \
+GOPATH=~/go xgo -targets="$OSARCH" \
     -dest="${OUTPUT_DIR}" \
     -out="$CMD" \
     "${CMDDIR}/${CMD}"
@@ -55,8 +55,7 @@ xgo -targets="$OSARCH" \
 platforms=$(echo $OSARCH | tr "," "\n")
 for plt in $platforms
 do
-    set -- "$plt"
-    IFS="/"; declare -a s=($*)
+     s=(${plt//\// })
     case "${s[0]}" in
     "windows")
         if [ "${s[1]}" = "386" ]; then
