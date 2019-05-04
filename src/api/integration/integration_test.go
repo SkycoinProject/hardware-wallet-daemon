@@ -123,7 +123,7 @@ func TestEmulatorGenerateAddresses(t *testing.T) {
 }
 
 func TestEmulatorApplySettings(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -142,7 +142,7 @@ func TestEmulatorApplySettings(t *testing.T) {
 }
 
 func TestEmulatorBackup(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -161,7 +161,7 @@ func TestEmulatorBackup(t *testing.T) {
 }
 
 func TestEmulatorCheckMessageSignature(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -202,7 +202,7 @@ func TestEmulatorFeatures(t *testing.T) {
 }
 
 func TestEmulatorGenerateMnemonic(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -226,7 +226,7 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 }
 
 func TestEmulatorRecovery(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -260,7 +260,7 @@ func TestEmulatorRecovery(t *testing.T) {
 }
 
 func TestEmulatorSetMnemonic(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -280,7 +280,7 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 }
 
 func TestEmulatorConfigurePinCode(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -312,7 +312,7 @@ func TestEmulatorConfigurePinCode(t *testing.T) {
 }
 
 func TestEmulatorTransactionSign(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -347,7 +347,7 @@ func TestEmulatorTransactionSign(t *testing.T) {
 }
 
 func TestEmulatorWipe(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -383,7 +383,7 @@ func TestWalletGeGenerateAddresses(t *testing.T) {
 }
 
 func TestWalletApplySettings(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -403,7 +403,7 @@ func TestWalletApplySettings(t *testing.T) {
 }
 
 func TestWalletBackup(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -422,7 +422,7 @@ func TestWalletBackup(t *testing.T) {
 }
 
 func TestWalletCheckMessageSignature(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -463,7 +463,7 @@ func TestWalletFeatures(t *testing.T) {
 }
 
 func TestWalletGenerateMnemonic(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -487,7 +487,7 @@ func TestWalletGenerateMnemonic(t *testing.T) {
 }
 
 func TestWalletRecovery(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -521,7 +521,7 @@ func TestWalletRecovery(t *testing.T) {
 }
 
 func TestWalletSetMnemonic(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -541,7 +541,7 @@ func TestWalletSetMnemonic(t *testing.T) {
 }
 
 func TestWalletConfigurePinCode(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -573,7 +573,7 @@ func TestWalletConfigurePinCode(t *testing.T) {
 }
 
 func TestWalletTransactionSign(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -620,7 +620,7 @@ func TestWalletTransactionSign(t *testing.T) {
 }
 
 func TestWalletWipe(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
@@ -635,7 +635,7 @@ func TestWalletWipe(t *testing.T) {
 }
 
 func TestWalletConnected(t *testing.T) {
-	if *update{
+	if *update {
 		t.SkipNow()
 	}
 
