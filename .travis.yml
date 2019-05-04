@@ -14,6 +14,9 @@ env:
   global:
     - XARGS="-screen 0 1024x768x24"
 install:
+  # Install gox
+  - go get github.com/gz-c/gox
+  # Install linters
   - make install-linters
   # Install OS-specific test and build dependencies
   - sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh"
