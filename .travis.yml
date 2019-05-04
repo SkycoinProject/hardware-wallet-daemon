@@ -4,6 +4,7 @@ go:
   - "1.11.x"
 services:
   - xvfb
+  - docker
 
 matrix:
   include:
@@ -14,8 +15,9 @@ env:
   global:
     - XARGS="-screen 0 1024x768x24"
 install:
-  # Install gox
-  - go get github.com/gz-c/gox
+  # Install xgo
+  - docker pull karalabe/xgo-latest
+  - go get github.com/karalabe/xgo
   # Install linters
   - make install-linters
   # Install OS-specific test and build dependencies
@@ -51,6 +53,7 @@ before_script:
   - echo "PATH=$PATH";
   - echo "PIP=$PIP";
 script:
+  - ./ci-scripts/build-daemon.sh;
   - make -C tmp/hardware-wallet clean
   - make -C tmp/hardware-wallet/tiny-firmware/protob install-deps-nanopb
   - make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc
@@ -70,7 +73,6 @@ script:
   - make test
   - make integration-test-emulator
   - make integration-test-emulator-enable-csrf
-  - ./ci-scripts/build-daemon.sh;
 after_script:
   - kill -s KILL $(pgrep emulator)
 

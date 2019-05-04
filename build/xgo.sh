@@ -44,18 +44,15 @@ fi
 COMMIT=`git rev-parse HEAD`
 
 
-gox -osarch="$OSARCH" \
-    -gcflags="-trimpath=${HOME}" \
-    -asmflags="-trimpath=${HOME}" \
-    -ldflags="-X main.Version=${APP_VERSION} -X main.Commit=${COMMIT}" \
-    -output="${OUTPUT_DIR}{{.Dir}}_{{.OS}}_{{.Arch}}" \
+xgo -targets="$OSARCH" \
+    -dest="${OUTPUT_DIR}" \
+    -out="$CMD" \
     "${CMDDIR}/${CMD}"
 
-# move the executable files into ${os}_${arch} folders, electron-builder will pack
+# move the executable files into ${os}_${arch} folders
 # the file into corresponding packages.
 
-platforms=$(echo $OSARCH | tr ";" "\n")
-
+platforms=$(echo $OSARCH | tr "," "\n")
 for plt in $platforms
 do
     set -- "$plt"
@@ -66,30 +63,30 @@ do
             OUT="${OUTPUT_DIR}${WIN32_OUT}"
             echo "mkdir $OUT"
             mkdir -p "$OUT"
-            mv "${OUTPUT_DIR}${CMD}_${s[0]}_${s[1]}.exe" "${OUT}/${BIN_NAME}.exe"
+            find ${OUTPUT_DIR} -name '*windows*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
         else
             OUT="${OUTPUT_DIR}${WIN64_OUT}"
             mkdir -p "${OUT}"
-            mv "${OUTPUT_DIR}${CMD}_${s[0]}_${s[1]}.exe" "${OUT}/${BIN_NAME}.exe"
+            find ${OUTPUT_DIR} -name '*windows*' -name '*386*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
         fi
         ;;
     "darwin")
         OUT="${OUTPUT_DIR}${OSX64_OUT}"
         echo "mkdir ${OUT}"
         mkdir -p "${OUT}"
-        mv "${OUTPUT_DIR}${CMD}_${s[0]}_${s[1]}" "${OUT}/${BIN_NAME}"
+        find ${OUTPUT_DIR} -name '*darwin*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
         ;;
     "linux")
         if [ "${s[1]}" = "amd64" ]; then
             OUT="${OUTPUT_DIR}${LNX64_OUT}"
             echo "mkdir ${OUT}"
             mkdir -p "${OUT}"
-            mv "${OUTPUT_DIR}${CMD}_${s[0]}_${s[1]}" "${OUT}/${BIN_NAME}"
+            find ${OUTPUT_DIR} -name '*linux*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
         elif [ "${s[1]}" = "arm" ]; then
             OUT="${OUTPUT_DIR}${LNX_ARM_OUT}"
             echo "mkdir ${OUT}"
             mkdir -p "${OUT}"
-            mv "${OUTPUT_DIR}${CMD}_${s[0]}_${s[1]}" "${OUT}/${BIN_NAME}"
+            find ${OUTPUT_DIR} -name '*linux*' -name '*arm*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
         fi
         ;;
     esac

@@ -21,7 +21,7 @@ function copy_if_exists {
         exit 1
     fi
 
-    BIN="${GOX_DMN_OUTPUT_DIR}/${1}"
+    BIN="${XGO_DMN_OUTPUT_DIR}/${1}"
     DESTDIR="$2"
     DESTSRC="$3"
 

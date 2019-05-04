@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -e -o pipefail
 
-GOX_OSARCH="$@"
+XGO_TARGETS="$@"
 
-. build-conf.sh "$GOX_OSARCH"
+. build-conf.sh "$XGO_TARGETS"
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 pushd "$SCRIPTDIR" >/dev/null
 
-./gox.sh "$GOX_OSARCH" "$GOX_DMN_OUTPUT_DIR"
+./xgo.sh "$XGO_TARGETS" "$XGO_DMN_OUTPUT_DIR"
 
 echo "==========================="
 echo "Packaging daemon release"
-./package-daemon-release.sh "$GOX_OSARCH"
+./package-daemon-release.sh "$XGO_TARGETS"
 
 echo "------------------------------"
 echo "Compressing daemon release"
-./compress-daemon-release.sh "$GOX_OSARCH"
+./compress-daemon-release.sh "$XGO_TARGETS"
 
 popd >/dev/null
