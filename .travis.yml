@@ -79,14 +79,3 @@ after_script:
 notifications:
   # https://github.com/kvld/travisci-telegram TravisCI Telegram Bot integration
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
-
-deploy:
-  provider: releases
-  api_key:
-    secure: XhcygsUScJdV+tW0+JS7FyRBdHm0Bf0j3ejFpzrO12tNFt3V5TBryZPrCeDQkhaA/7D2vBbjeBqH6PqBIlx59TUF8ulgPUzvUhemAeafKGVeVp72tc2gukDZ6nk3pkOSRPg48653EDZy7tcXLWJ0c1u/64IqPYqeCfv7P+xtTT3EXtpClV/hMAYGSCEnAk3nghYjavmMYA5wYCFpMsAHOqoq03OpMIVeUHR7MgbgqWfgEMLKnlaTNWL3B4XeH6xpI44KXx0MPyBxk3Tl3q1BAIZYQmhXKRh81y58bCPzqX9rS0EZ+zpXBOJbQ8bFGTyZZVZQ/BE2QqE/vxgQDDfLhJp8V+mOekcjp/OTB2J6gVvI6ne2YDs2hoeELoN3pbRtWVD9Q1EPHOI2NpEiORhI+ycSjTKLipt5tzw/+uw4KOZre30mrNqlbwznck/SNyFcKAGLD169cS6d/D4BVWV94dYE4ux+5e0fEDl/EKFVF/uWlbufGpoI9WdQq+WEYDW8bvsREehZs3QiSvKCyBhLDWqI4JV2BMjakqWKKwNSOB3RNdMRP6kB50QrI92H8cvFLrO2llTXNmJRFnoJMxpqxlCjMD6BtQXmz08yQfhBM1bd820VJ7Ns5nIlAplEbLYmpCxTJRrtLFstKFmRVJTQoVY3Pc3WTaW24gjrf85el3o=
-  file_glob: true
-  file: build/release/*
-  draft: true
-  on:
-    repo: skycoin/hardware-wallet-daemon
-    branch: 40-release

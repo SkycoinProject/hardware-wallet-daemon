@@ -62,30 +62,30 @@ do
             OUT="${OUTPUT_DIR}${WIN32_OUT}"
             echo "mkdir $OUT"
             mkdir -p "$OUT"
-            find ${OUTPUT_DIR} -name '*windows*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
+            find ${OUTPUT_DIR} -name '*daemon-windows*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
         else
             OUT="${OUTPUT_DIR}${WIN64_OUT}"
             mkdir -p "${OUT}"
-            find ${OUTPUT_DIR} -name '*windows*' -name '*386*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
+            find ${OUTPUT_DIR} -name '*daemon-windows*' -name '*386*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
         fi
         ;;
     "darwin")
         OUT="${OUTPUT_DIR}${OSX64_OUT}"
         echo "mkdir ${OUT}"
         mkdir -p "${OUT}"
-        find ${OUTPUT_DIR} -name '*darwin*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
+        find ${OUTPUT_DIR} -name '*daemon-darwin*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
         ;;
     "linux")
         if [ "${s[1]}" = "amd64" ]; then
             OUT="${OUTPUT_DIR}${LNX64_OUT}"
             echo "mkdir ${OUT}"
             mkdir -p "${OUT}"
-            find ${OUTPUT_DIR} -name '*linux*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
+            find ${OUTPUT_DIR} -name '*daemon-inux*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
         elif [ "${s[1]}" = "arm" ]; then
             OUT="${OUTPUT_DIR}${LNX_ARM_OUT}"
             echo "mkdir ${OUT}"
             mkdir -p "${OUT}"
-            find ${OUTPUT_DIR} -name '*linux*' -name '*arm*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
+            find ${OUTPUT_DIR} -name '*daemon-linux*' -name '*arm*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
         fi
         ;;
     esac
