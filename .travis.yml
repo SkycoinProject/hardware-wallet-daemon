@@ -67,7 +67,7 @@ script:
   - make test
   - make integration-test-emulator
   - make integration-test-emulator-enable-csrf
-  - make release
+  - ./ci-scripts/build-daemon.sh;
 after_script:
   - kill -s KILL $(pgrep emulator)
 
