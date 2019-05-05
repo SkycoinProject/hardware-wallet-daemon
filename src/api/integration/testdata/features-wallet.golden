@@ -1,0 +1,18 @@
+{
+	"data": {
+		"bootloader_hash": "foo",
+		"device_id": "foo",
+		"fw_major": null,
+		"fw_minor": null,
+		"fw_patch": null,
+		"initialized": true,
+		"label": "foo",
+		"model": "1",
+		"needs_backup": true,
+		"passphrase_cached": false,
+		"passphrase_protection": false,
+		"pin_cached": false,
+		"pin_protection": false,
+		"vendor": "Skycoin Foundation"
+	}
+}

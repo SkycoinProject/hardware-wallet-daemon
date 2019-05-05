@@ -58,7 +58,7 @@ clean-coverage: ## Remove coverage output files
 	rm -rf ./coverage/
 
 update-golden-files: ## Run integration tests in update mode
-	./ci-scripts/integration-test.sh -u -m wallet -n emulator-integration >/dev/null 2>&1 || true
+	./ci-scripts/integration-test.sh -u -m ${DEVICE_TYPE} -n update-golden-files
 
 merge-coverage: ## Merge coverage files and create HTML coverage output. gocovmerge is required, install with `go get github.com/wadey/gocovmerge`
 	@echo "To install gocovmerge do:"

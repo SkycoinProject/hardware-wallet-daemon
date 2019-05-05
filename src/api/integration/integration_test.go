@@ -119,10 +119,14 @@ func TestEmulatorGenerateAddresses(t *testing.T) {
 	require.NoError(t, err)
 
 	var expected models.GenerateAddressesResponse
-	checkGoldenFile(t, "generate-addresses.golden", TestData{*resp.Payload, &expected})
+	checkGoldenFile(t, "generate-addresses-emulator.golden", TestData{*resp.Payload, &expected})
 }
 
 func TestEmulatorApplySettings(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -138,6 +142,10 @@ func TestEmulatorApplySettings(t *testing.T) {
 }
 
 func TestEmulatorBackup(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -153,6 +161,10 @@ func TestEmulatorBackup(t *testing.T) {
 }
 
 func TestEmulatorCheckMessageSignature(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -186,10 +198,14 @@ func TestEmulatorFeatures(t *testing.T) {
 	resp.Payload.Data.Label = "foo"
 	resp.Payload.Data.BootloaderHash = "foo"
 
-	checkGoldenFile(t, "features.golden", TestData{*resp.Payload, &expected})
+	checkGoldenFile(t, "features-emulator.golden", TestData{*resp.Payload, &expected})
 }
 
 func TestEmulatorGenerateMnemonic(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -210,6 +226,10 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 }
 
 func TestEmulatorRecovery(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -240,6 +260,10 @@ func TestEmulatorRecovery(t *testing.T) {
 }
 
 func TestEmulatorSetMnemonic(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -256,6 +280,10 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 }
 
 func TestEmulatorConfigurePinCode(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -284,6 +312,10 @@ func TestEmulatorConfigurePinCode(t *testing.T) {
 }
 
 func TestEmulatorTransactionSign(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -315,6 +347,10 @@ func TestEmulatorTransactionSign(t *testing.T) {
 }
 
 func TestEmulatorWipe(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doEmulator(t) {
 		return
 	}
@@ -343,10 +379,14 @@ func TestWalletGeGenerateAddresses(t *testing.T) {
 	require.NoError(t, err)
 
 	var expected models.GenerateAddressesResponse
-	checkGoldenFile(t, "generate-addresses.golden", TestData{*resp.Payload, &expected})
+	checkGoldenFile(t, "generate-addresses-wallet.golden", TestData{*resp.Payload, &expected})
 }
 
 func TestWalletApplySettings(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -363,6 +403,10 @@ func TestWalletApplySettings(t *testing.T) {
 }
 
 func TestWalletBackup(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -378,6 +422,10 @@ func TestWalletBackup(t *testing.T) {
 }
 
 func TestWalletCheckMessageSignature(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -411,10 +459,14 @@ func TestWalletFeatures(t *testing.T) {
 	resp.Payload.Data.Label = "foo"
 	resp.Payload.Data.BootloaderHash = "foo"
 
-	checkGoldenFile(t, "features.golden", TestData{*resp.Payload, &expected})
+	checkGoldenFile(t, "features-wallet.golden", TestData{*resp.Payload, &expected})
 }
 
 func TestWalletGenerateMnemonic(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -435,6 +487,10 @@ func TestWalletGenerateMnemonic(t *testing.T) {
 }
 
 func TestWalletRecovery(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -465,6 +521,10 @@ func TestWalletRecovery(t *testing.T) {
 }
 
 func TestWalletSetMnemonic(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -481,6 +541,10 @@ func TestWalletSetMnemonic(t *testing.T) {
 }
 
 func TestWalletConfigurePinCode(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -509,6 +573,10 @@ func TestWalletConfigurePinCode(t *testing.T) {
 }
 
 func TestWalletTransactionSign(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -552,6 +620,10 @@ func TestWalletTransactionSign(t *testing.T) {
 }
 
 func TestWalletWipe(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}
@@ -563,6 +635,10 @@ func TestWalletWipe(t *testing.T) {
 }
 
 func TestWalletConnected(t *testing.T) {
+	if *update {
+		t.SkipNow()
+	}
+
 	if !doWallet(t) {
 		return
 	}

@@ -17,4 +17,6 @@ coverage.html
 coverage/
 *.coverage.out
 
-release
+build/.xgo_output
+build/.daemon_output
+build/release

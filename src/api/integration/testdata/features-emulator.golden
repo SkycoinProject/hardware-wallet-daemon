@@ -2,9 +2,9 @@
 	"data": {
 		"bootloader_hash": "foo",
 		"device_id": "foo",
-		"fw_major": 1,
-		"fw_minor": 7,
-		"fw_patch": 0,
+		"fw_major": null,
+		"fw_minor": null,
+		"fw_patch": null,
 		"initialized": true,
 		"label": "foo",
 		"model": "1",

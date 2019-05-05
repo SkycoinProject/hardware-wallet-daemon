@@ -4,6 +4,7 @@ go:
   - "1.11.x"
 services:
   - xvfb
+  - docker
 
 matrix:
   include:
@@ -14,6 +15,10 @@ env:
   global:
     - XARGS="-screen 0 1024x768x24"
 install:
+  # Install xgo
+  - docker pull karalabe/xgo-latest
+  - go get github.com/karalabe/xgo
+  # Install linters
   - make install-linters
   # Install OS-specific test and build dependencies
   - sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh"
@@ -48,6 +53,7 @@ before_script:
   - echo "PATH=$PATH";
   - echo "PIP=$PIP";
 script:
+  - ./ci-scripts/build-daemon.sh;
   - make -C tmp/hardware-wallet clean
   - make -C tmp/hardware-wallet/tiny-firmware/protob install-deps-nanopb
   - make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc
@@ -69,6 +75,7 @@ script:
   - make integration-test-emulator-enable-csrf
 after_script:
   - kill -s KILL $(pgrep emulator)
+
 notifications:
   # https://github.com/kvld/travisci-telegram TravisCI Telegram Bot integration
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
