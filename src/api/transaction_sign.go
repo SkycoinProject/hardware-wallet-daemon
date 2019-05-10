@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gogo/protobuf/proto"
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/skycoin/skycoin/src/cipher"
 	"github.com/skycoin/skycoin/src/util/droplet"
@@ -88,7 +88,7 @@ func transactionSign(gateway Gatewayer) http.HandlerFunc {
 
 		// for integration tests
 		if autoPressEmulatorButtons {
-			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			err := gateway.SetAutoPressButton(true, skyWallet.ButtonRight)
 			if err != nil {
 				logger.Error("transactionSign failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

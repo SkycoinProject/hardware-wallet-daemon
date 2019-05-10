@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 // ApplySettingsRequest is request data for /api/v1/apply_settings
@@ -52,7 +52,7 @@ func applySettings(gateway Gatewayer) http.HandlerFunc {
 
 		// for integration tests
 		if autoPressEmulatorButtons {
-			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			err := gateway.SetAutoPressButton(true, skyWallet.ButtonRight)
 			if err != nil {
 				logger.Error("applySettings failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

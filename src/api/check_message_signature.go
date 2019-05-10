@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	"github.com/skycoin/skycoin/src/cipher"
 )
 
@@ -78,7 +78,7 @@ func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 
 		// for integration tests
 		if autoPressEmulatorButtons {
-			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			err := gateway.SetAutoPressButton(true, skyWallet.ButtonRight)
 			if err != nil {
 				logger.Error("checkMessageSignature failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

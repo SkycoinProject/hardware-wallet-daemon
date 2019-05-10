@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gogo/protobuf/proto"
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 	wh "github.com/skycoin/skycoin/src/util/http"
 )
@@ -98,7 +98,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 				writeHTTPResponse(w, resp)
 			}
 		case uint16(messages.MessageType_MessageType_Failure):
-			failureMsg, err := deviceWallet.DecodeFailMsg(msg)
+			failureMsg, err := skyWallet.DecodeFailMsg(msg)
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
@@ -108,7 +108,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			writeHTTPResponse(w, resp)
 			return
 		case uint16(messages.MessageType_MessageType_Success):
-			successMsg, err := deviceWallet.DecodeSuccessMsg(msg)
+			successMsg, err := skyWallet.DecodeSuccessMsg(msg)
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
 				writeHTTPResponse(w, resp)
@@ -122,7 +122,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 
 		// AddressGen Response
 		case uint16(messages.MessageType_MessageType_ResponseSkycoinAddress):
-			addresses, err := deviceWallet.DecodeResponseSkycoinAddress(msg)
+			addresses, err := skyWallet.DecodeResponseSkycoinAddress(msg)
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
@@ -151,7 +151,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 
 		// SignMessage Response
 		case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
-			signature, err := deviceWallet.DecodeResponseSkycoinSignMessage(msg)
+			signature, err := skyWallet.DecodeResponseSkycoinSignMessage(msg)
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
@@ -165,7 +165,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 
 		// TransactionSign Response
 		case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
-			signatures, err := deviceWallet.DecodeResponseTransactionSign(msg)
+			signatures, err := skyWallet.DecodeResponseTransactionSign(msg)
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)

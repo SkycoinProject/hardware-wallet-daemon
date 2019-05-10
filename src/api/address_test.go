@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/stretchr/testify/require"
 )
@@ -143,7 +143,7 @@ func TestGenerateAddresses(t *testing.T) {
 			var body GenerateAddressesRequest
 			err := json.Unmarshal([]byte(tc.httpBody), &body)
 			if err == nil {
-				gateway.On("AddressGen", body.AddressN, body.StartIndex, body.ConfirmAddress).Return(tc.gatewayAddressGenResult, nil)
+				gateway.On("AddressGen", uint32(body.AddressN), uint32(body.StartIndex), body.ConfirmAddress).Return(tc.gatewayAddressGenResult, nil)
 			}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))

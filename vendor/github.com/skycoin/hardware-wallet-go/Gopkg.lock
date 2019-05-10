@@ -66,14 +66,14 @@
   version = "v1.4.1"
 
 [[projects]]
-  digest = "1:8a86a2a343fbaf8cc2068f8b10d99e0c1f71a11f4c7f0c4cce7034a531f05288"
+  digest = "1:e4f488f5b2bc0fa7beda333dd139febf8cfcb48251d8ffcb1ed48a27ee1dbf93"
   name = "github.com/skycoin/hardware-wallet-protob"
   packages = [
     "go",
     "go/google/protobuf",
   ]
   pruneopts = "UT"
-  revision = "65ae99e4109dc0383567d7454788bee3f52e1c38"
+  revision = "b3a2d50a55c6fb047b895bec27204e0abae38900"
 
 [[projects]]
   digest = "1:cda151c59579fb3fe777cc9334e328cb72bd11088ea473ec0af5dc6b87540d1f"

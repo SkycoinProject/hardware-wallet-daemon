@@ -5,13 +5,13 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/skycoin/hardware-wallet-go/src/device-wallet/wire"
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
 
 	gcli "github.com/urfave/cli"
 
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func transactionSignCmd() gcli.Command {

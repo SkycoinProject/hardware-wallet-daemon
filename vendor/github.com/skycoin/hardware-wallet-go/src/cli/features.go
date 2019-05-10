@@ -10,7 +10,7 @@ import (
 
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func featuresCmd() gcli.Command {
@@ -53,6 +53,12 @@ func featuresCmd() gcli.Command {
 					log.Errorln(err)
 					return
 				}
+				ff := deviceWallet.NewFirmwareFeatures(uint64(*features.FirmwareFeatures))
+				if err := ff.Unmarshal(); err != nil {
+					log.Errorln(err)
+					return
+				}
+				log.Printf("\n\nFirmware features:\n%s", ff)
 			// TODO: figure out if this method can even return success or failure msg.
 			case uint16(messages.MessageType_MessageType_Failure), uint16(messages.MessageType_MessageType_Success):
 				msgData, err := deviceWallet.DecodeSuccessOrFailMsg(msg)

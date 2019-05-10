@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	devicewallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -84,7 +84,7 @@ binary data
 
 			config := defaultMuxConfig()
 			if tc.emulator {
-				config.mode = devicewallet.DeviceTypeEmulator
+				config.mode = skyWallet.DeviceTypeEmulator
 			}
 
 			handler := newServerMux(config, gateway)

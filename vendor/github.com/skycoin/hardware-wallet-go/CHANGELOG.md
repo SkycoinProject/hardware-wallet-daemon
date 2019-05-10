@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Add BitEncodedFlags to encode/decode flags from/to a string.
 - Add remove PIN code.
 - Pretty(`json`) print features output.
 - Add a progress bar, currently used in get entropy messages only.
@@ -35,6 +36,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Change project structure to follow standard project layout.
 - Replace `hardware-wallet-protob` submodule with a dep dependency.
+- Updated usblib to fix issue on windows.
+- Rename `device-wallet` package to `skywallet`.
 
 ### Removed
 

@@ -254,26 +254,28 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7dad1860944d54642e537e5deea4026b8aa01be74a1806b493a33ecdb75790c5"
+  digest = "1:3cb082a73f545362698232c39754ab41fb783248857e2791df2f0b853805231a"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
-    "src/device-wallet",
-    "src/device-wallet/usb",
-    "src/device-wallet/usb/usbhid",
-    "src/device-wallet/wire",
+    "src/skywallet",
+    "src/skywallet/usb",
+    "src/skywallet/wire",
+    "src/usb/lowlevel/hidapi",
+    "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "f64efd32d427c2ac3978ea191c077901855158fb"
+  revision = "7effb2b0a20b41dc33041711a67c6a14103a7070"
 
 [[projects]]
-  digest = "1:8a86a2a343fbaf8cc2068f8b10d99e0c1f71a11f4c7f0c4cce7034a531f05288"
+  branch = "master"
+  digest = "1:e4f488f5b2bc0fa7beda333dd139febf8cfcb48251d8ffcb1ed48a27ee1dbf93"
   name = "github.com/skycoin/hardware-wallet-protob"
   packages = [
     "go",
     "go/google/protobuf",
   ]
   pruneopts = "UT"
-  revision = "65ae99e4109dc0383567d7454788bee3f52e1c38"
+  revision = "b3a2d50a55c6fb047b895bec27204e0abae38900"
 
 [[projects]]
   digest = "1:d9a9e5705b46e2c36e02b3b7c84b940f294f1c681ca9ad54b2fefc70307e745e"
@@ -322,7 +324,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
+  revision = "cbcb750295291b33242907a04be40e80801d0cfc"
 
 [[projects]]
   branch = "master"
@@ -330,18 +332,18 @@
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "UT"
-  revision = "4829fb13d2c62012c17688fa7f629f371014946d"
+  revision = "a4d6f7feada510cc50e69a37b484cb0fdc6b7876"
 
 [[projects]]
   branch = "master"
-  digest = "1:1a4cf0c4cbbda6ef0b6f168acc112df2a8e182945d71dc8367593a3b378db106"
+  digest = "1:646036a04e163f383d101f40e36fd3354676c7dcccc226d825200a6b9509727a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "804c0c7841b595338f049388006a3945cb3cfad1"
+  revision = "a5b02f93d862f065920dd6a40dddc66b60d0dec4"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
@@ -392,8 +394,8 @@
     "github.com/go-openapi/validate",
     "github.com/gogo/protobuf/proto",
     "github.com/rs/cors",
-    "github.com/skycoin/hardware-wallet-go/src/device-wallet",
-    "github.com/skycoin/hardware-wallet-go/src/device-wallet/wire",
+    "github.com/skycoin/hardware-wallet-go/src/skywallet",
+    "github.com/skycoin/hardware-wallet-go/src/skywallet/wire",
     "github.com/skycoin/hardware-wallet-protob/go",
     "github.com/skycoin/skycoin/src/cipher",
     "github.com/skycoin/skycoin/src/cipher/go-bip39",

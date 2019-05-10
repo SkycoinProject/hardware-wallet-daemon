@@ -11,7 +11,7 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/rs/cors"
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	wh "github.com/skycoin/skycoin/src/util/http"
 	"github.com/skycoin/skycoin/src/util/logging"
 )
@@ -64,7 +64,7 @@ type muxConfig struct {
 	enableCSRF         bool
 	disableHeaderCheck bool
 	hostWhitelist      []string
-	mode               deviceWallet.DeviceType
+	mode               skyWallet.DeviceType
 }
 
 // Server exposes an HTTP API
@@ -82,7 +82,7 @@ type Config struct {
 	ReadTimeout        time.Duration
 	WriteTimeout       time.Duration
 	IdleTimeout        time.Duration
-	Mode               deviceWallet.DeviceType
+	Mode               skyWallet.DeviceType
 }
 
 // Serve serves the web interface on the configured host
@@ -231,7 +231,7 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 		webHandler("/api/"+apiVersion1+endpoint, handler)
 	}
 
-	if autoPressEmulatorButtons && c.mode != deviceWallet.DeviceTypeEmulator {
+	if autoPressEmulatorButtons && c.mode != skyWallet.DeviceTypeEmulator {
 		logger.Panic("auto press buttons enabled but device mode is not emulator")
 	}
 
@@ -249,7 +249,7 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	webHandlerV1("/check_message_signature", checkMessageSignature(gateway))
 	webHandlerV1("/features", features(gateway))
 	// enable firmware update endpoint only for hw wallet
-	if c.mode == deviceWallet.DeviceTypeUSB {
+	if c.mode == skyWallet.DeviceTypeUSB {
 		webHandlerV1("/firmware_update", firmwareUpdate(gateway))
 		webHandlerV1("/available", available(gateway))
 	}
