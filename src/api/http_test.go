@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	devicewallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,7 +16,7 @@ func defaultMuxConfig() muxConfig {
 	return muxConfig{
 		host:       configuredHost,
 		enableCSRF: false,
-		mode:       devicewallet.DeviceTypeUSB,
+		mode:       skyWallet.DeviceTypeUSB,
 	}
 }
 

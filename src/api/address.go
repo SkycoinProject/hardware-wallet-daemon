@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 // GenerateAddressesRequest is request data for /api/v1/generate_addresses
@@ -75,7 +75,7 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 
 		// for integration tests
 		if autoPressEmulatorButtons {
-			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			err := gateway.SetAutoPressButton(true, skyWallet.ButtonRight)
 			if err != nil {
 				logger.Error("generateAddresses failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
@@ -84,7 +84,7 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.AddressGen(req.AddressN, req.StartIndex, req.ConfirmAddress)
+		msg, err := gateway.AddressGen(uint32(req.AddressN), uint32(req.StartIndex), req.ConfirmAddress)
 		if err != nil {
 			logger.Error("generateAddresses failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

@@ -7,7 +7,7 @@ import (
 
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func removePinCode() gcli.Command {

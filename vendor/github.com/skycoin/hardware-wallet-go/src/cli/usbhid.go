@@ -3,7 +3,7 @@ package cli
 import (
 	gcli "github.com/urfave/cli"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func getUsbDetails() gcli.Command {

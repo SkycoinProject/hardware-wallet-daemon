@@ -1,7 +1,7 @@
 package api
 
 import (
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
 	"net/http"
@@ -29,7 +29,7 @@ func cancel(gateway Gatewayer) http.HandlerFunc {
 
 		// for integration tests
 		if autoPressEmulatorButtons {
-			err := gateway.SetAutoPressButton(true, deviceWallet.ButtonRight)
+			err := gateway.SetAutoPressButton(true, skyWallet.ButtonRight)
 			if err != nil {
 				logger.Error("cancel failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
@@ -47,7 +47,7 @@ func cancel(gateway Gatewayer) http.HandlerFunc {
 		}
 
 		if msg.Kind == uint16(messages.MessageType_MessageType_Failure) {
-			failureMsg, err := deviceWallet.DecodeFailMsg(msg)
+			failureMsg, err := skyWallet.DecodeFailMsg(msg)
 			if err != nil {
 				logger.Errorf("cancel failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

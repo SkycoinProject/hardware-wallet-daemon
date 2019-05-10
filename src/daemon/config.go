@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	devicewallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 
 	"github.com/skycoin/skycoin/src/util/file"
 )
@@ -59,7 +59,7 @@ type Config struct {
 
 	// DaemonMode decides with what api is enabled, either wallet or emulator
 	DaemonMode string
-	daemonMode devicewallet.DeviceType
+	daemonMode skyWallet.DeviceType
 }
 
 // NewConfig returns a new config instance
@@ -91,7 +91,7 @@ func NewConfig(port int, datadir string) Config {
 		HTTPProfHost: "localhost:6060",
 
 		// Run daemon in wallet mode by default
-		DaemonMode: devicewallet.DeviceTypeUSB.String(),
+		DaemonMode: skyWallet.DeviceTypeUSB.String(),
 
 		DataDirectory: datadir,
 	}
@@ -115,8 +115,8 @@ func (c *Config) postProcess() error {
 		c.hostWhitelist = strings.Split(c.HostWhitelist, ",")
 	}
 
-	c.daemonMode = devicewallet.DeviceTypeFromString(c.DaemonMode)
-	if c.daemonMode == devicewallet.DeviceTypeInvalid {
+	c.daemonMode = skyWallet.DeviceTypeFromString(c.DaemonMode)
+	if c.daemonMode == skyWallet.DeviceTypeInvalid {
 		return errors.New("invalid device type")
 	}
 

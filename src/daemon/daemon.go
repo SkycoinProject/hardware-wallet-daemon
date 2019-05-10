@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/device-wallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	"github.com/skycoin/skycoin/src/util/apputil"
 	"github.com/skycoin/skycoin/src/util/logging"
 
@@ -95,7 +95,7 @@ func (d *Daemon) Run() error {
 	// Catch SIGUSR1 (prints runtime stack to stdout)
 	go apputil.CatchDebug()
 
-	apiServer, err = d.createServer(host, api.NewGateway(deviceWallet.NewDevice(d.config.daemonMode)))
+	apiServer, err = d.createServer(host, api.NewGateway(skyWallet.NewDevice(d.config.daemonMode)))
 	if err != nil {
 		d.logger.Error(err)
 		retErr = err

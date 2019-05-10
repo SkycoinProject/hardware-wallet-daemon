@@ -4,6 +4,8 @@
 .PHONY: dep mocks
 .PHONY: clean lint check format
 
+GOPATH  ?= $(HOME)/go
+
 all: build
 
 build:
@@ -14,14 +16,13 @@ dep: ## Ensure package dependencies are up to date
 
 mocks: ## Create all mock files for unit tests
 	echo "Generating mock files"
-	mockery -name Devicer -dir ./src/device-wallet -case underscore -inpkg -testonly
-	mockery -name DeviceDriver -dir ./src/device-wallet -case underscore -inpkg -testonly
+	go generate ./src/...
 
 test_unit: ## Run unit tests
-	go test -v github.com/skycoin/hardware-wallet-go/src/device-wallet
+	go test -v github.com/skycoin/hardware-wallet-go/src/skywallet
 
 test_integration: ## Run integration tests
-	go test -count=1 -v github.com/skycoin/hardware-wallet-go/src/device-wallet/integration
+	go test -count=1 -v github.com/skycoin/hardware-wallet-go/src/skywallet/integration
 
 test: test_unit test_integration ## Run all tests
 
