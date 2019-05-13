@@ -34,6 +34,7 @@ It uses the go bindings provided by the hardware wallet go [library](https://git
 	- [Releases](#releases)
 		- [Update the version](#update-the-version)
 		- [Pre-release testing](#pre-release-testing)
+		- [Creating release builds](#creating-release-builds)
 - [Responsible Disclosure](#responsible-disclosure)    
 <!-- /MarkdownTOC -->
 
@@ -117,7 +118,7 @@ The `wallet` integration tests are run only when a physical skycoin hardware wal
 #### Emulator Integration Tests
 
 ```sh
-$ make integration-test-emulator
+$ make test-integration-emulator
 ```
 
 or
@@ -133,7 +134,7 @@ The `-v` option, shows verbose logs.
 #### Wallet Integration Tests
 
 ```sh
-$ make integration-test-wallet
+$ make test-integration-wallet
 ```
 
 or
@@ -166,13 +167,19 @@ When some of the tests are run, their output is compared to the golden files.
 
 To update golden files, use the provided `make` command:
 
-```sh
-$ make update-golden-files
+*Wallet*
+```bash
+$ make DEVICE_TYPE=USB update-golden-files
+```
+
+*EMULATOR*
+```bash
+$ make DEVICE_TYPE=USB update-golden-files
 ```
 
 We can also update a specific test case's golden file with the `-r` option.
 For example:
-```sh
+```bash
 $ ./ci-scripts/integration-test.sh -m emulator -v -u -r TestEmulatorFeatures
 ```
 
@@ -183,7 +190,7 @@ This includes integration test coverage. The coverage output files are placed in
 
 To merge coverage from all tests into a single HTML file for viewing:
 
-```sh
+```bash
 $ make check
 $ make merge-coverage
 ```
@@ -194,7 +201,7 @@ Then open `coverage/all-coverage.html` in the browser.
 
 All `.go` source files should be formatted `goimports`.  You can do this with:
 
-```sh
+```bash
 $ make format
 ```
 
@@ -202,13 +209,13 @@ $ make format
 
 Install prerequisites:
 
-```sh
+```bash
 $ make install-linters
 ```
 
 Run linters:
 
-```sh
+```bash
 $ make lint
 ```
 
@@ -218,7 +225,7 @@ A full CPU profile of the program from start to finish can be obtained by runnin
 Once the node terminates, a profile file is written to `-profile-cpu-file` (defaults to `cpu.prof`).
 This profile can be analyzed with
 
-```sh
+```bash
 go tool pprof cpu.prof
 ```
 
@@ -229,7 +236,7 @@ See https://golang.org/pkg/net/http/pprof/ for guidance on using the HTTP profil
 
 Some useful examples include:
 
-```sh
+```bash
 go tool pprof http://localhost:6060/debug/pprof/profile?seconds=10
 go tool pprof http://localhost:6060/debug/pprof/heap
 ```
@@ -242,7 +249,7 @@ Dependencies are managed with [dep](https://github.com/golang/dep).
 
 To [install `dep` for development](https://github.com/golang/dep/blob/master/docs/installation.md#development):
 
-```sh
+```bash
 go get -u github.com/golang/dep/cmd/dep
 ```
 
@@ -258,25 +265,25 @@ Examples:
 
 Initialize all dependencies:
 
-```sh
+```bash
 dep init
 ```
 
 Update all dependencies:
 
-```sh
+```bash
 dep ensure -update -v
 ```
 
 Add a single dependency (latest version):
 
-```sh
+```bash
 dep ensure github.com/foo/bar
 ```
 
 Add a single dependency (more specific version), or downgrade an existing dependency:
 
-```sh
+```bash
 dep ensure github.com/foo/bar@tag
 ```
 
@@ -286,16 +293,13 @@ dep ensure github.com/foo/bar@tag
 
 0. If the `master` branch has commits that are not in `develop` (e.g. due to a hotfix applied to `master`), merge `master` into `develop` (and fix any build or test failures)
 0. Switch to a new release branch named `release-X.Y.Z` for preparing the release.
-0. Run `make build` to make sure that the code base is up to date
 0. Update `CHANGELOG.md`: move the "unreleased" changes to the version and add the date.
 0. Follow the steps in [pre-release testing](#pre-release-testing)
 0. Make a PR merging the release branch into `master`
 0. Review the PR and merge it
 0. Tag the `master` branch with the version number. Version tags start with `v`, e.g. `v0.20.0`. Sign the tag. If you have your GPG key in github, creating a release on the Github website will automatically tag the release. It can be tagged from the command line with `git tag -as v0.20.0 $COMMIT_ID`, but Github will not recognize it as a "release".
-0. Tag the changeset of the `protob` submodule checkout with the same version number as above.
 0. Release builds are created and uploaded by travis. To do it manually, checkout the master branch and follow the [create release builds instructions](#creating-release-builds).
-0. Checkout `develop` branch and bump `tiny-firmware/VERSION` and `tiny-firmware/bootloader/VERSION` to next [`dev` version number](https://www.python.org/dev/peps/pep-0440/#developmental-releases).
-
+0. Checkout `develop` branch and bump `VERSION` to next [`dev` version number](https://www.python.org/dev/peps/pep-0440/#developmental-releases).
 
 #### Pre-release testing
 
@@ -303,6 +307,15 @@ Performs these actions before releasing:
 
 * `make lint`
 * `make check` (make sure that all the integration tests are passing)
+
+#### Creating release builds
+
+The following instruction creates a full release:
+
+```bash
+make release
+```
+Daemon version will be take from `VERSION`.
 
 ## Responsible Disclosure
 
