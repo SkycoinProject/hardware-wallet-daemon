@@ -183,19 +183,20 @@ Response:
 {
     "data": {
         "vendor": "Skycoin Foundation",
-        "major_version": 1,
-        "minor_version": 6,
-        "patch_version": 1,
-        "device_id": "92FD1C8A06E401ABC524DF1C",
+        "device_id": "617F30E0E10C9C9E93B5EE37",
         "pin_protection": false,
         "passphrase_protection": false,
-        "label": "skywallet",
-        "initialized": true,
-        "bootloader_hash": "/V5yWwVclKtbpzZW/M1CeuNxQZQZTv5ia6OIOiVu5C8=",
+        "label": "617F30E0E10C9C9E93B5EE37",
+        "initialized": false,
+        "bootloader_hash": "k3jy1kG+JbHZxi2cTSScekQK007/YkbZzyXWI6dVJns=",
         "pin_cached": false,
         "passphrase_cached": false,
         "needs_backup": false,
-        "model": "1"
+        "model": "1",
+        "fw_major": 1,
+        "fw_minor": 7,
+        "fw_patch": 0,
+        "firmware_features": 4
     }
 }
 ```

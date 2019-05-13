@@ -2,6 +2,7 @@
 	"data": {
 		"bootloader_hash": "foo",
 		"device_id": "foo",
+		"firmware_features": 3,
 		"fw_major": 1,
 		"fw_minor": 7,
 		"fw_patch": 0,

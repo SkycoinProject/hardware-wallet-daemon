@@ -620,6 +620,7 @@ definitions:
           - fw_major
           - pin_cached
           - initialized
+          - firmware_features
         properties:
           vendor:
             type: string
@@ -654,6 +655,8 @@ definitions:
           fw_minor:
             type: integer
           fw_patch:
+            type: integer
+          firmware_features:
             type: integer
 
   SignMessageResponse:

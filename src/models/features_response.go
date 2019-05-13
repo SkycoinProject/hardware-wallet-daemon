@@ -81,6 +81,10 @@ type FeaturesResponseData struct {
 	// device id
 	DeviceID string `json:"device_id,omitempty"`
 
+	// firmware features
+	// Required: true
+	FirmwareFeatures *int64 `json:"firmware_features"`
+
 	// fw major
 	// Required: true
 	FwMajor *int64 `json:"fw_major"`
@@ -141,6 +145,10 @@ type FeaturesResponseData struct {
 func (m *FeaturesResponseData) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateFirmwareFeatures(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateFwMajor(formats); err != nil {
 		res = append(res, err)
 	}
@@ -184,6 +192,15 @@ func (m *FeaturesResponseData) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *FeaturesResponseData) validateFirmwareFeatures(formats strfmt.Registry) error {
+
+	if err := validate.Required("data"+"."+"firmware_features", "body", m.FirmwareFeatures); err != nil {
+		return err
+	}
+
 	return nil
 }
 
