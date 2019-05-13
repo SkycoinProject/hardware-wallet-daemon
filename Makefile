@@ -1,12 +1,10 @@
 .DEFAULT_GOAL := help
-.PHONY: run lint format generate-client install-linters
-.PHONY: test integration-test-emulator integration-test-wallet
+.PHONY: run run-usb run-emulator test test-race
+.PHONY: test-integration-emulator test-integration-wallet test-integration-emulator-enable-csrf test-integration-wallet-enable-csrf
+.PHONY: check mocks lint
 .PHONY: clean-coverage update-golden-files merge-coverage
-.PHONY: mocks
-
-build: ## daemon build release
-	@mkdir -p release
-	go build -o ./release/skyd ./cmd/daemon
+.PHONY: install-linters format generate-client
+.PHONY: release
 
 run: ## Run hardware wallet daemon
 	./run.sh ${ARGS}
@@ -28,21 +26,21 @@ test-race: ## Run tests for hardware wallet daemon with race flag
 	@mkdir -p coverage/
 	go test -race -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
-integration-test-emulator: ## Run emulator integration tests
+test-integration-emulator: ## Run emulator integration tests
 	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
 
-integration-test-wallet: ## Run wallet integration tests
+test-integration-wallet: ## Run wallet integration tests
 	./ci-scripts/integration-test.sh -m USB -n wallet-integration
 
-integration-test-emulator-enable-csrf: ## Run wallet integration tests with CSRF enabled
+test-integration-emulator-enable-csrf: ## Run wallet integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -a -m EMULATOR -c -n emulator-integration-enable-csrf
 
-integration-test-wallet-enable-csrf: ## Run emulator integration tests with CSRF enabled
+test-integration-wallet-enable-csrf: ## Run emulator integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -m USB -c -n wallet-integration-enable-csrf
 
 check: test \
-    integration-test-emulator \
-    integration-test-wallet ## run unit and integration tests
+    test-integration-emulator \
+    test-integration-wallet ## run unit and integration tests
 
 mocks: ## Create all mock files for unit tests
 	echo "Generating mock files"
@@ -68,7 +66,6 @@ merge-coverage: ## Merge coverage files and create HTML coverage output. gocovme
 	@echo "Total coverage HTML file generated at coverage/all-coverage.html"
 	@echo "Open coverage/all-coverage.html in your browser to view"
 
-
 install-linters: ## Install linters
 	go get -u github.com/FiloSottile/vendorcheck
 	# For some reason this install method is not recommended, see https://github.com/golangci/golangci-lint#install
@@ -81,6 +78,9 @@ format: ## Formats the code. Must have goimports installed (use make install-lin
 
 generate-client: ## Generate go client using swagger
 	swagger generate client swagger.yml --template-dir templates -t ./src
+
+release: ## Build daemon binaries
+	./ci-scripts/build-daemon.sh
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
