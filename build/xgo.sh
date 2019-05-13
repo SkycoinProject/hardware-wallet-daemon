@@ -70,14 +70,14 @@ do
 			find ${OUTPUT_DIR} -name '*daemon-windows*' -name '*386*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}.exe"
 		fi
 		;;
-	"darwin?(-[0-9]?([0-9])\.[0-9]?([0-9]))" )
+	darwin?(-[0-9]?([0-9])\.[0-9]?([0-9])) )
 
 		OUT="${OUTPUT_DIR}${OSX64_OUT}"
 		echo "mkdir ${OUT}"
 		mkdir -p "${OUT}"
 		find ${OUTPUT_DIR} -name '*daemon-darwin*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
 		;;
-	"linux?(-[0-9]?([0-9])\.[0-9]?([0-9]))" )
+	linux?(-[0-9]?([0-9])\.[0-9]?([0-9])) )
 		if [ "${s[1]}" = "amd64" ]; then
 			OUT="${OUTPUT_DIR}${LNX64_OUT}"
 			echo "mkdir ${OUT}"
