@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 .PHONY: run run-usb run-emulator test test-race
-.PHONY: test-integration-emulator test-integration-wallet test-integration--emulator-enable-csrf test-integration--wallet-enable-csrf
+.PHONY: test-integration-emulator test-integration-wallet test-integration-emulator-enable-csrf test-integration-wallet-enable-csrf
 .PHONY: check mocks lint
 .PHONY: clean-coverage update-golden-files merge-coverage
 .PHONY: install-linters format generate-client
@@ -29,13 +29,13 @@ test-race: ## Run tests for hardware wallet daemon with race flag
 test-integration-emulator: ## Run emulator integration tests
 	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
 
-test-integration--wallet: ## Run wallet integration tests
+test-integration-wallet: ## Run wallet integration tests
 	./ci-scripts/integration-test.sh -m USB -n wallet-integration
 
-test-integration--emulator-enable-csrf: ## Run wallet integration tests with CSRF enabled
+test-integration-emulator-enable-csrf: ## Run wallet integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -a -m EMULATOR -c -n emulator-integration-enable-csrf
 
-test-integration--wallet-enable-csrf: ## Run emulator integration tests with CSRF enabled
+test-integration-wallet-enable-csrf: ## Run emulator integration tests with CSRF enabled
 	./ci-scripts/integration-test.sh -m USB -c -n wallet-integration-enable-csrf
 
 check: test \
