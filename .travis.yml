@@ -71,8 +71,8 @@ script:
   - make lint
   - ps aux | grep emulator
   - make test
-  - make integration-test-emulator
-  - make integration-test-emulator-enable-csrf
+  - make test-integration-emulator
+  - make test-integration-emulator-enable-csrf
 after_script:
   - kill -s KILL $(pgrep emulator)
 
