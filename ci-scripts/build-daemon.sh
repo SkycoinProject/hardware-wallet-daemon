@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+
 echo "start to build daemon..."
 pushd "build"
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-daemon-release.sh  'darwin/amd64,windows/386,windows/amd64,linux/arm,linux/amd64' ;fi
+./build-daemon-release.sh  'darwin-10.10/amd64,windows/386,windows/amd64,linux/arm,linux/amd64' ;
 ls release/
 popd
+
+fi
+
