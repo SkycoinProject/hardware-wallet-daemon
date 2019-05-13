@@ -167,12 +167,12 @@ When some of the tests are run, their output is compared to the golden files.
 
 To update golden files, use the provided `make` command:
 
-*Wallet*
+**Wallet**
 ```bash
 $ make DEVICE_TYPE=USB update-golden-files
 ```
 
-*EMULATOR*
+**EMULATOR**
 ```bash
 $ make DEVICE_TYPE=USB update-golden-files
 ```
