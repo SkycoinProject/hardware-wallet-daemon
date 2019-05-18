@@ -1,81 +1,82 @@
 sudo: required
 language: go
 go:
-  - "1.11.x"
+- 1.11.x
+
 services:
-  - xvfb
-  - docker
+- xvfb
+- docker
 
 matrix:
   include:
-    - os: linux
-      env:
-        - PIP='sudo pip'
+  - os: linux
+    env:
+    - PIP='sudo pip'
+
 env:
   global:
-    - XARGS="-screen 0 1024x768x24"
+  - XARGS="-screen 0 1024x768x24"
+
 install:
-  # Install xgo
-  - docker pull karalabe/xgo-latest
-  - go get github.com/karalabe/xgo
-  # Install linters
-  - make install-linters
-  # Install OS-specific test and build dependencies
-  - sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh"
-  # Define env vars for osx builds
-  # Include paths for brew packages e.g. SDL2
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    export SDL_INCLUDE="$(brew --prefix sdl2)/include/SDL2" ;
-    fi
+- docker pull karalabe/xgo-latest
+- go get github.com/karalabe/xgo
+- make install-linters
+- sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh"
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export SDL_INCLUDE="$(brew --prefix sdl2)/include/SDL2"
+  ; fi
+
 before_script:
-  # Start Xvfb on osx
-  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-    ( sudo Xvfb :99 -ac ${XARGS}; echo "Xvfb ok" )&
-    fi
-  # Install hardware wallet for running tests against emulator
-  - mkdir -p tmp/hardware-wallet
-  - git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git tmp/hardware-wallet
-  - git -C tmp/hardware-wallet checkout develop
-  - git -C tmp/hardware-wallet submodule init
-  - git -C tmp/hardware-wallet submodule update
-  - git -C tmp/hardware-wallet submodule update --remote
-  # Install OS-specific test and build dependencies for hardware-wallet
-  - ( cd ./tmp/hardware-wallet && sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh" )
-  # Define env vars for Linux builds
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-    ls -l /usr/local/bin/protoc;
-    export PATH="/usr/local/bin:$(pwd)/tmp/hardware-wallet/protoc/bin:$PATH";
-    fi
-  # Include paths for brew packages e.g. SDL2
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    export SDL_INCLUDE="$(brew --prefix sdl2)/include/SDL2" ;
-    fi
-  - echo "PATH=$PATH";
-  - echo "PIP=$PIP";
+- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then ( sudo Xvfb :99 -ac ${XARGS}; echo "Xvfb
+  ok" )& fi
+- mkdir -p tmp/hardware-wallet
+- git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git
+  tmp/hardware-wallet
+- git -C tmp/hardware-wallet checkout develop
+- git -C tmp/hardware-wallet submodule init
+- git -C tmp/hardware-wallet submodule update
+- git -C tmp/hardware-wallet submodule update --remote
+- ( cd ./tmp/hardware-wallet && sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh" )
+- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /usr/local/bin/protoc; export PATH="/usr/local/bin:$(pwd)/tmp/hardware-wallet/protoc/bin:$PATH";
+  fi
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export SDL_INCLUDE="$(brew --prefix sdl2)/include/SDL2"
+  ; fi
+- echo "PATH=$PATH";
+- echo "PIP=$PIP";
+
 script:
-  - ./ci-scripts/build-daemon.sh;
-  - make -C tmp/hardware-wallet clean
-  - make -C tmp/hardware-wallet/tiny-firmware/protob install-deps-nanopb
-  - make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc
-  - make -C tmp/hardware-wallet/tiny-firmware/protob/nanopb/vendor/nanopb/generator/proto
-  - make -C tmp/hardware-wallet emulator
-  # On GNU/Linux wrap emulator in xvfb graphics context
-  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-    xvfb-run --server-args="${XARGS}" make -C ./tmp/hardware-wallet run-emulator & true ;
-    fi
-  # On osx Xvfb started in before_script step
-  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-    make -C ./tmp/hardware-wallet run-emulator & true ;
-    fi
-  # Run self-tests
-  - make lint
-  - ps aux | grep emulator
-  - make test
-  - make test-integration-emulator
-  - make test-integration-emulator-enable-csrf
+- "./ci-scripts/build-daemon.sh;"
+- make -C tmp/hardware-wallet clean
+- make -C tmp/hardware-wallet/tiny-firmware/protob install-deps-nanopb
+- make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc
+- make -C tmp/hardware-wallet/tiny-firmware/protob/nanopb/vendor/nanopb/generator/proto
+- make -C tmp/hardware-wallet emulator
+- if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then xvfb-run --server-args="${XARGS}"
+  make -C ./tmp/hardware-wallet run-emulator & true ; fi
+- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then make -C ./tmp/hardware-wallet run-emulator
+  & true ; fi
+- make lint
+- ps aux | grep emulator
+- make test
+- make test-integration-emulator
+- make test-integration-emulator-enable-csrf
+
 after_script:
-  - kill -s KILL $(pgrep emulator)
+- kill -s KILL $(pgrep emulator)
 
 notifications:
-  # https://github.com/kvld/travisci-telegram TravisCI Telegram Bot integration
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
+
+before_deploy:
+- make release
+
+deploy:
+  provider: releases
+  api_key:
+    secure: GQuOx1g98HzwfZYkUV6ARNjUxmYWXHe4ApymJ1obut5fMAdD+KMZLw1oxNzNpB+A7yUz7f9Y9Y9MRzY7yxY+DW4jvhWAUpuum5XAbvCs2Y5iAzi/Hv1Sb++1PwIf0C22hpDqruGepYA6c/Ylz0s71zvnHwma/eMV46rXMXdqsFMTjP6jFTi66rRUMPfWn/Sv9Ze2jIhtkP4FPNJ5/RXwC+gTn2AYh516uyJAmkXD49TRou0RdI+oU+cjjRz8M7lulszDiQxQgyKZ3fuveH9gDNI5yo8xwcPX8EPNHywqTHOk5acUuI8a8tRrDaoUy6hHU0OeGjlKIxfz0gI/n5duAd1fJsQNI5OWQ3qWv8+5bfc/a6/Ah2uNNQw5ScIdmg5+Q2/f/hkP0ysmEqNFwGB5akitLqqkWC6c+7h4V3q3Q/JotDBVYw6IYS6srNkUddt9rYOfI6gYIGBEikBjchb6wDPSaS+alOyRiiuzz7Qr+N9vRIWjYNbMd68TcYsEAKaK0bKSrFftTz/A71xIeKoDfRmFvc8ISIzG/E6zfBk6kvajnpnHB7oaK9uBUgSGckZ59Q/ZhYYK1zOvTj9RwuOeNiRf2vfeb6z5y+IXOOAdklqXWw0ZqeTyQEXjOcOPciyZBkEn/Dcum6o39TdJj5Uo0UPuZQdt9QnJvK71WVULlJI=
+  file:
+    - build/releases/*
+  skip_cleanup: true
+  draft: true
+  on:
+    repo: skycoin/hardware-wallet-daemon
+    tags: true

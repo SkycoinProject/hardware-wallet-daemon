@@ -36,8 +36,8 @@ function copy_if_exists {
         cp "$BIN" "$DESTDIR"
 
         # Copy version to dest
-        echo "Copying CHANGELOG.md to $DESTDIR"
-        cp ./VERSION "$DESTDIR"
+        echo "Copying version to $DESTDIR"
+        cp ../VERSION "$DESTDIR"
 
         echo "Adding $DESTSRC to package-source.sh list"
         DESTSRCS+=("$DESTSRC")
