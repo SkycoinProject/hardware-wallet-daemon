@@ -47,7 +47,7 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 	}
 }
 
-// PassPhraseRequest request data from /api/v1/intermediate/passphrases
+// PassPhraseRequest request data from /api/v1/intermediate/passphrase
 type PassPhraseRequest struct {
 	Passphrase string `json:"passphrase"`
 }
