@@ -44,14 +44,14 @@ Args: {"address_n": "<address_n>", "start_index": "<start_index>", "confirm_addr
 - `start_index`: Index where deterministic key generation will start from. Assume 0 if not set.
 - `confirm_address`: If requesting one address it will be sent only if user confirms operation by pressing device's button.
 
-Example:
+**Example**:
 ```sh
 $ curl http://127.0.0.1:9510/api/v1/generate_addresses \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 2, "start_index": 0}'
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": {
@@ -73,14 +73,14 @@ Content-Type: application/json
 Args: {"label": "<label for hardware wallet>", "use_passphrase": "<ask for passphrase before starting operation>"}
 ```
 
-Example:
+**Example**:
 ```sh
 $ curl -X POST http://127.0.0.1:9510/api/v1/apply_settings \
    -H 'Content-Type: application/json' \
    -d '{"label": "skywallet", "use_passphrase": false}'
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": "Settings applied"
@@ -95,15 +95,15 @@ URI: /api/v1/backup
 Method: POST
 ```
 
-Example:
+**Example**:
 ```sh
 $ curl -X POST http://127.0.0.1:9510/api/v1/backup
 ```
 
-Response Flow:
+**Response** Flow:
 - Button confirmation requests are shown for each word of the seed on the hardware wallet screen.
 - The whole procedure is repeated again.
-- Success response
+- Success **Response**
 
 ```json
 {
@@ -124,19 +124,19 @@ Response Flow:
 ### Cancel
 Cancels the current operation.
 
-> This function can be called safely even if no operation is active. The response will be the same.
+> This function can be called safely even if no operation is active. The **Response** will be the same.
 
 ```
 URI: /api/v1/cancel
 Method: PUT
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl -X PUT http://127.0.0.1:9510/api/v1/cancel
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": "Action cancelled by user"
@@ -158,7 +158,7 @@ Args: {"message": "<message>", "signature": "<signature>", "address": "<address>
 - `signature`: Signature of the message.
 - `address`: Address that issued the signature.
 
-Example:
+**Example**:
 ```bash
 curl -X POST http://127.0.0.1:9510/api/v1/check_message_signature \
 -H 'Content-Type: application/json' \
@@ -173,12 +173,12 @@ URI: /api/v1/features
 Method: GET
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl http://127.0.0.1:9510/api/v1/features
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": {
@@ -212,6 +212,10 @@ Args:
     file: firmware file
 ```
 
+**Example**:
+```bash
+$ curl  -i -X PUT -H "Content-Type: multipart/form-data"  -F "file=@/Users/therealssj/go/src/github.com/skycoin/hardware-wallet/tiny-firmware/skyfirmware.bin" http://127.0.0.1:9510/api/v1/firmware_update
+```
 
 ### Recover Wallet
 Recover existing wallet using seed.
@@ -229,18 +233,18 @@ Args: {
       }
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/recovery \
   -H 'Content-Type: application/json' \
   -d '{"word_count": 12, "use_passphrase": false, "dry_run": true}'
 ```
 
-Response Flow:
+**Response** Flow:
 - The user is asked for confirmation on hardware wallet screen to start the recovery process.
-- The daemon then returns intermediate word request type in response.
+- The daemon then returns intermediate word request type in **Response**.
 - The frontend needs to send intermediate word request till the hardware wallet keeps showing instructions on screen.
-- Sucess response:
+- Sucess **Response**:
 
 ```json
 {
@@ -258,14 +262,14 @@ Content-Type: application/json
 Args: {"word_count": "<mnemonic seed length>", "use_passphrase": "<ask for passphrase before starting operation>"}
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl http://127.0.0.1:9510/api/v1/generate_mnemonic \
   -H 'Content-Type: application/json' \
   -d '{"word_count": 12, "use_passphrase": false}'
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": "Mnemonic successfully configured"
@@ -284,14 +288,14 @@ Content-Type: application/json
 Args: {"mnemonic": "<bip39 mnemonic seed>"}
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/set_mnemonic \
   -H 'Content-Type: application/json' \
   -d '{"mnemonic": "cloud flower upset remain green metal below cup stem infant art thank"}'
 ```
 
-Response:
+**Response**:
 - Valid mnemonic
 
 ```json
@@ -321,22 +325,22 @@ Args:
 - remove_pin: (optional) Used to remove current pin
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code
 ```
 
-Response Flow:
+**Response** Flow:
 - User is shown a button confirmation request on hardware wallet to confirm start of pin code process.
 - The daemon returns intermediate pinmatrix request two times to the frontend.
-- Response on success
+- **Response** on success
 
 ```json
 {
     "data": "PIN changed"
 }
 ```
-- Response on failure
+- **Response** on failure
 ```json
 {
     "error": {
@@ -346,24 +350,24 @@ Response Flow:
 }
 ```
 
-Example(Remove Pin):
+**Example**(Remove Pin):
 ```bash
 $  curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code \
    -H 'Content-Type: application/x-www-form-urlencoded' \
    -d 'remove_pin=true'
 ```
 
-Response Flow:
+**Response** Flow:
 - User is shown a button confirmation request on hardware wallet to confirm start of pin remove process.
 - The daemon returns intermediate pinmatrix request once to the frontend.
-- Response on success
+- **Response** on success
 
 ```json
 {
     "data": "PIN removed"
 }
 ```
-- Response on failure
+- **Response** on failure
 ```json
 {
     "error": {
@@ -389,14 +393,14 @@ Args: {
 - `address_n`: Index of the address that will issue the signature.
 - `message`: The message that the signature claims to be signing.
 
-Example:
+**Example**:
 ```bash
 $ curl -X POST http://127.0.0.1:9510/api/v1/sign_message \
   -H 'Content-Type: application/json' \
   -d '{"address_n": 0, "message": "hello world"}'
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": {
@@ -429,7 +433,7 @@ Args: {
   * `coins`: Output coins.
   * `hours`: Output hours.
 
-Example:
+**Example**:
 ```bash
 $ curl http://127.0.0.1:9510/api/v1/transaction_sign \
   -H 'Content-Type: application/json' \
@@ -444,12 +448,12 @@ URI: /api/v1/wipe
 Method: DELETE
 ```
 
-Example:
+**Example**:
 ```bash
 $ curl -X DELETE http://127.0.0.1:9510/api/v1/wipe
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": "Device wiped"
@@ -464,15 +468,63 @@ URI: /api/v1/available
 Method: GET
 ```
 
-Example:
+**Example**:
+
 ```bash
 $ curl -X GET http://127.0.0.1:9510/api/v1/available
 ```
 
-Response:
+**Response**:
 ```json
 {
     "data": true
 }
 ```
 
+### Intermediates
+Intermediate requests are those which require user input like pincode, passphrase or word.
+
+#### Pincode
+```
+URI: /api/v1/intermediate/pin_matrix
+Method: POST
+Args: {"pin": "<pin>"} 
+```
+
+**Example**:
+
+```bash
+$ curl -X POST http://127.0.0.1:9510/api/v1/intermediate/pin_matrix \
+  -H 'Content-Type: application/json' \
+  -d '{"pin": "234"}'
+```
+> Note: The pincode should be a string not a number.
+
+
+#### Passphrase
+```
+URI: /api/v1/intermediate/passphrase
+Method: POST
+Args: {"passphrase": "<passphrase>"} 
+```
+
+**Example**:
+```bash
+$ curl -X POST http://127.0.0.1:9510/api/v1/intermediate/passphrase \
+  -H 'Content-Type: application/json' \
+  -d '{"passphrase": "foobar"}'
+```
+
+#### Word
+```
+URI: /api/v1/intermediate/word
+Method: POST
+Args: {"word": "<word>"} 
+```
+
+**Example**:
+```bash
+$ curl -X POST http://127.0.0.1:9510/api/v1/intermediate/word \
+  -H 'Content-Type: application/json' \
+  -d '{"word": "cloud"}'
+```
