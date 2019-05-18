@@ -184,28 +184,6 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 	}
 }
 
-func serialize(gateway Gatewayer) (func(), error) {
-	select {
-	// acquire the lock
-	case ongoingOperation <- struct{}{}:
-		// defer func to release the lock
-		return func() {
-			<-ongoingOperation
-		}, nil
-	default:
-		// cancel any on-going operation if a lock is acquired already
-		_, err := gateway.Cancel()
-		if err != nil {
-			return nil, err
-		}
-
-		ongoingOperation <- struct{}{}
-		return func() {
-			<-ongoingOperation
-		}, nil
-	}
-}
-
 func parseBoolFlag(v string) (bool, error) {
 	if v == "" {
 		return false, nil
