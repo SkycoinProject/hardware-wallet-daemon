@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # daemon version
-APP_VERSION=$(cat ./VERSION 2> /dev/null)
+APP_VERSION=$(cat ../VERSION 2> /dev/null)
 
 # package name
 PKG_NAME="daemon"
