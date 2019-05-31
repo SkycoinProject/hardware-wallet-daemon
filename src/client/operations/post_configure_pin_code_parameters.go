@@ -13,9 +13,10 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/skycoin/hardware-wallet-daemon/src/models"
 )
 
 // NewPostConfigurePinCodeParams creates a new PostConfigurePinCodeParams object
@@ -62,11 +63,11 @@ for the post configure pin code operation typically these are written to a http.
 */
 type PostConfigurePinCodeParams struct {
 
-	/*RemovePin
-	  remove current pin code. needs to be called without remove_pin again to set a new one
+	/*ConfigurePinCodeRequest
+	  ConfigurePinCodeRequest is request data for /api/v1/configure_pin_code
 
 	*/
-	RemovePin *bool
+	ConfigurePinCodeRequest *models.ConfigurePinCodeRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -106,15 +107,15 @@ func (o *PostConfigurePinCodeParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithRemovePin adds the removePin to the post configure pin code params
-func (o *PostConfigurePinCodeParams) WithRemovePin(removePin *bool) *PostConfigurePinCodeParams {
-	o.SetRemovePin(removePin)
+// WithConfigurePinCodeRequest adds the configurePinCodeRequest to the post configure pin code params
+func (o *PostConfigurePinCodeParams) WithConfigurePinCodeRequest(configurePinCodeRequest *models.ConfigurePinCodeRequest) *PostConfigurePinCodeParams {
+	o.SetConfigurePinCodeRequest(configurePinCodeRequest)
 	return o
 }
 
-// SetRemovePin adds the removePin to the post configure pin code params
-func (o *PostConfigurePinCodeParams) SetRemovePin(removePin *bool) {
-	o.RemovePin = removePin
+// SetConfigurePinCodeRequest adds the configurePinCodeRequest to the post configure pin code params
+func (o *PostConfigurePinCodeParams) SetConfigurePinCodeRequest(configurePinCodeRequest *models.ConfigurePinCodeRequest) {
+	o.ConfigurePinCodeRequest = configurePinCodeRequest
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -125,20 +126,10 @@ func (o *PostConfigurePinCodeParams) WriteToRequest(r runtime.ClientRequest, reg
 	}
 	var res []error
 
-	if o.RemovePin != nil {
-
-		// form param remove_pin
-		var frRemovePin bool
-		if o.RemovePin != nil {
-			frRemovePin = *o.RemovePin
+	if o.ConfigurePinCodeRequest != nil {
+		if err := r.SetBodyParam(o.ConfigurePinCodeRequest); err != nil {
+			return err
 		}
-		fRemovePin := swag.FormatBool(frRemovePin)
-		if fRemovePin != "" {
-			if err := r.SetFormParam("remove_pin", fRemovePin); err != nil {
-				return err
-			}
-		}
-
 	}
 
 	if len(res) > 0 {

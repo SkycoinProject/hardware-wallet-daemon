@@ -1,15 +1,20 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
+// ConfigurePinCodeRequest is request data for /api/v1/configure_pin_code
+type ConfigurePinCodeRequest struct {
+	RemovePin bool `json:"remove_pin"`
+}
+
 // URI: /api/v1/configure_pin_code
 // Method: POST
-// Args:
-// - remove_pin: (optional) Used to remove current pin
+// Args: JSON Body
 func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -18,12 +23,19 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		removePin, err := parseBoolFlag(r.FormValue("remove_pin"))
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for remove_pin")
+		if r.Header.Get("Content-Type") != ContentTypeJSON {
+			resp := NewHTTPErrorResponse(http.StatusUnsupportedMediaType, "")
 			writeHTTPResponse(w, resp)
 			return
 		}
+
+		var req ConfigurePinCodeRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			resp := NewHTTPErrorResponse(http.StatusBadRequest, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+		defer r.Body.Close()
 
 		// for integration tests
 		if autoPressEmulatorButtons {
@@ -36,7 +48,7 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.ChangePin(&removePin)
+		msg, err := gateway.ChangePin(&req.RemovePin)
 		if err != nil {
 			logger.Errorf("configurePinCode failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

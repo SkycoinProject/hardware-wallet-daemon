@@ -240,7 +240,7 @@ func (a *Client) PostConfigurePinCode(params *PostConfigurePinCodeParams, authIn
 		Method:             "POST",
 		PathPattern:        "/configure_pin_code",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostConfigurePinCodeReader{formats: a.formats},
