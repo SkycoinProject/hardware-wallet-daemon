@@ -75,7 +75,7 @@ deploy:
     bucket: $AWS_BUCKET
     skip_cleanup: true
     local_dir: build/release
-    upload-dir: wallet
+    upload-dir: skywallet-daemon
     acl: public_read
     region: $AWS_REGION
     on:
