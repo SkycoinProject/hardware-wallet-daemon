@@ -7,7 +7,7 @@ import (
 
 	gcli "github.com/urfave/cli"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func firmwareUpdate() gcli.Command {
@@ -24,10 +24,11 @@ func firmwareUpdate() gcli.Command {
 		},
 		OnUsageError: onCommandUsageError(name),
 		Action: func(c *gcli.Context) {
-			device := deviceWallet.NewDevice(deviceWallet.DeviceTypeUSB)
+			device := skyWallet.NewDevice(skyWallet.DeviceTypeUSB)
 			if device == nil {
 				return
 			}
+			defer device.Close()
 
 			filePath := c.String("file")
 			fmt.Printf("File : %s\n", filePath)

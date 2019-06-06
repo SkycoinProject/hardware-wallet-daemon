@@ -1,3 +1,5 @@
+![hwgo-01](https://user-images.githubusercontent.com/8619106/57969063-e6255000-798f-11e9-973e-9fdf7a0bd5fc.png)
+
 # Go bindings and CLI tool for the Skycoin hardware wallet
 
 [![Build Status](https://travis-ci.com/skycoin/hardware-wallet-go.svg?branch=master)](https://travis-ci.com/skycoin/hardware-wallet-go)

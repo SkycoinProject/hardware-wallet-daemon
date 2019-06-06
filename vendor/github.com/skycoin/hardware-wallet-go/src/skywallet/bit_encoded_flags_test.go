@@ -1,4 +1,4 @@
-package skwallet
+package skywallet
 
 import (
 	"math/rand"

@@ -3,7 +3,7 @@ package cli
 import (
 	gcli "github.com/urfave/cli"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func getRawEntropyCmd() gcli.Command {
@@ -18,12 +18,15 @@ func getRawEntropyCmd() gcli.Command {
 				log.Error("outFile is mandatory")
 				return
 			}
-			device := deviceWallet.NewDevice(deviceWallet.DeviceTypeFromString(c.String("deviceType")))
+
+			device := skyWallet.NewDevice(skyWallet.DeviceTypeFromString(c.String("deviceType")))
 			if device == nil {
 				return
 			}
+			defer device.Close()
+
 			log.Infoln("Getting raw entropy from device")
-			if err := device.SaveDeviceEntropyInFile(outFile, entropyBytes, deviceWallet.MessageDeviceGetRawEntropy); err != nil {
+			if err := device.SaveDeviceEntropyInFile(outFile, entropyBytes, skyWallet.MessageDeviceGetRawEntropy); err != nil {
 				log.Error(err)
 				return
 			}
