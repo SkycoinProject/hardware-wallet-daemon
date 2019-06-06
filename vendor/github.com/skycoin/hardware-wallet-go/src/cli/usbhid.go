@@ -3,7 +3,7 @@ package cli
 import (
 	gcli "github.com/urfave/cli"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func getUsbDetails() gcli.Command {
@@ -21,10 +21,11 @@ func getUsbDetails() gcli.Command {
 			},
 		},
 		Action: func(c *gcli.Context) {
-			device := deviceWallet.NewDevice(deviceWallet.DeviceTypeFromString(c.String("deviceType")))
+			device := skyWallet.NewDevice(skyWallet.DeviceTypeFromString(c.String("deviceType")))
 			if device == nil {
 				return
 			}
+			defer device.Close()
 
 			infos, err := device.GetUsbInfo()
 			if err != nil {
@@ -32,10 +33,10 @@ func getUsbDetails() gcli.Command {
 			}
 			for infoIdx := range infos {
 				log.Infoln("-----------------------------------------")
-				if infos[infoIdx].VendorID == deviceWallet.SkycoinVendorID {
+				if infos[infoIdx].VendorID == skyWallet.SkycoinVendorID {
 					log.Printf("%-13d%-5s%s", infos[infoIdx].VendorID, "==>", "Skycoin Foundation")
 				}
-				if infos[infoIdx].ProductID == deviceWallet.SkycoinHwProductID {
+				if infos[infoIdx].ProductID == skyWallet.SkycoinHwProductID {
 					log.Printf("%-13d%-5s%s", infos[infoIdx].ProductID, "==>", "Hardware Wallet")
 				}
 				log.Printf("%-13s%-5s%s", "Device path", "==>", infos[infoIdx].Path)

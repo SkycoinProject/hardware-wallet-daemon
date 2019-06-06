@@ -74,6 +74,7 @@ func NewApp() (*App, error) {
 	gcli.CommandHelpTemplate = commandHelpTemplate
 
 	gcliApp := gcli.NewApp()
+
 	app := &App{
 		App: *gcliApp,
 	}

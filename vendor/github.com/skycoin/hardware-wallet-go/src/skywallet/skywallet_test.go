@@ -1,16 +1,17 @@
-package skwallet
+package skywallet
 
 import (
 	"bytes"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
 	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 )
 
 type devicerSuit struct {
@@ -38,26 +39,336 @@ func (cwr testHelperCloseableBuffer) Close(disconnect bool) error {
 	return nil
 }
 
-func (suite *devicerSuit) TestGenerateMnemonic() {
-	// NOTE: Giving
+func (suite *devicerSuit) TestAddressGen() {
 	driverMock := &MockDeviceDriver{}
 	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
 	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
-		wire.Message{Kind: uint16(messages.MessageType_MessageType_EntropyRequest), Data: nil}, nil)
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
 	device := Device{driverMock, nil, false, ButtonType(-1)}
 
-	// NOTE: When
-	msg, err := device.GenerateMnemonic(12, false)
+	tt := []struct {
+		name       string
+		addressN   uint32
+		startIndex uint32
+		err        error
+		msgKind    uint16
+	}{
+		{
+			name:       "addressN zero",
+			addressN:   0,
+			startIndex: 0,
+			err:        ErrAddressNZero,
+			msgKind:    0,
+		},
 
+		{
+			name:       "no error",
+			addressN:   1,
+			startIndex: 0,
+			msgKind:    2,
+		},
+	}
+
+	for _, tc := range tt {
+		msg, err := device.AddressGen(tc.addressN, tc.startIndex, false)
+		suite.Equal(err, tc.err)
+		suite.Equal(msg.Kind, tc.msgKind)
+	}
+
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+}
+
+func (suite *devicerSuit) TestApplySettings() {
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	tt := []struct {
+		name          string
+		usePassphrase *bool
+		label         string
+		language      string
+		err           error
+		msgKind       uint16
+	}{
+		{
+			name:    "usePassphrase nil",
+			err:     ErrUsePassPhraseNil,
+			msgKind: 0,
+		},
+
+		{
+			name:          "no error",
+			usePassphrase: new(bool),
+			msgKind:       2,
+		},
+	}
+
+	for _, tc := range tt {
+		msg, err := device.ApplySettings(tc.usePassphrase, tc.label, tc.language)
+		suite.Equal(err, tc.err)
+		suite.Equal(msg.Kind, tc.msgKind)
+	}
+
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+}
+
+func (suite *devicerSuit) TestBackup() {
+	// NOTE(denisacostaq@gmail.com): Giving
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	// NOTE(denisacostaq@gmail.com): When
+	msg, err := device.Backup()
+
+	// NOTE(denisacostaq@gmail.com): Assert
+	suite.Nil(err)
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
+}
+
+func (suite *devicerSuit) TestCancel() {
+	// NOTE(denisacostaq@gmail.com): Giving
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	// NOTE(denisacostaq@gmail.com): When
+	msg, err := device.Cancel()
+
+	// NOTE(denisacostaq@gmail.com): Assert
+	suite.Nil(err)
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
+}
+
+func (suite *devicerSuit) TestCheckMessageSignature() {
+	// NOTE(denisacostaq@gmail.com): Giving
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	// NOTE(denisacostaq@gmail.com): When
+	msg, err := device.CheckMessageSignature("", "", "")
+
+	// NOTE(denisacostaq@gmail.com): Assert
+	suite.Nil(err)
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
+}
+
+func (suite *devicerSuit) TestFirmwareUpload() {
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	tt := []struct {
+		name       string
+		deviceType DeviceType
+		err        error
+	}{
+		{
+			name:       "emulator",
+			deviceType: DeviceTypeEmulator,
+			err:        ErrDeviceTypeEmulator,
+		},
+	}
+
+	for _, tc := range tt {
+		driverMock.On("DeviceType").Return(tc.deviceType)
+		err := device.FirmwareUpload([]byte{}, [32]byte{})
+		suite.Equal(err, tc.err)
+	}
+
+	driverMock.AssertCalled(suite.T(), "DeviceType")
+}
+
+func (suite *devicerSuit) TestGenerateMnemonic() {
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	tt := []struct {
+		name      string
+		wordCount uint32
+		err       error
+		msgKind   uint16
+	}{
+		{
+			name:      "invalid word count",
+			wordCount: 36,
+			err:       ErrInvalidWordCount,
+			msgKind:   0,
+		},
+
+		{
+			name:      "no error",
+			wordCount: 12,
+			msgKind:   2,
+		},
+	}
+
+	for _, tc := range tt {
+		msg, err := device.GenerateMnemonic(tc.wordCount, false)
+		suite.Equal(err, tc.err)
+		suite.Equal(msg.Kind, tc.msgKind)
+	}
+
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+}
+
+func (suite *devicerSuit) TestRecovery() {
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	tt := []struct {
+		name          string
+		wordCount     uint32
+		usePassphrase bool
+		dryRun        bool
+		err           error
+		msgKind       uint16
+	}{
+		{
+			name:      "invalid word count",
+			wordCount: 36,
+			err:       ErrInvalidWordCount,
+			msgKind:   0,
+		},
+
+		{
+			name:      "no error",
+			wordCount: 12,
+			msgKind:   2,
+		},
+	}
+
+	for _, tc := range tt {
+		msg, err := device.Recovery(tc.wordCount, tc.usePassphrase, tc.dryRun)
+		suite.Equal(err, tc.err)
+		suite.Equal(msg.Kind, tc.msgKind)
+	}
+
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+}
+
+func (suite *devicerSuit) TestSetMnemonic() {
+	// NOTE(denisacostaq@gmail.com): Giving
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	// NOTE(denisacostaq@gmail.com): When
+	msg, err := device.SetMnemonic("cloud flower upset remain green metal below cup stem infant art thank")
+
+	// NOTE(denisacostaq@gmail.com): Assert
+	suite.Nil(err)
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
+}
+
+func (suite *devicerSuit) TestRemovePinCode() {
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	tt := []struct {
+		name      string
+		removePin *bool
+		err       error
+		msgKind   uint16
+	}{
+		{
+			name:    "removePin nil",
+			err:     ErrRemovePinNil,
+			msgKind: 0,
+		},
+
+		{
+			name:      "no error",
+			removePin: new(bool),
+			msgKind:   2,
+		},
+	}
+
+	for _, tc := range tt {
+		msg, err := device.ChangePin(tc.removePin)
+		suite.Equal(err, tc.err)
+		suite.Equal(msg.Kind, tc.msgKind)
+	}
+
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+}
+
+func (suite *devicerSuit) TestTransactionSign() {
+	// NOTE(denisacostaq@gmail.com): Giving
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	// NOTE(denisacostaq@gmail.com): When
+	msg, err := device.TransactionSign(nil, nil)
+
+	// NOTE(denisacostaq@gmail.com): Assert
+	suite.Nil(err)
+	driverMock.AssertCalled(suite.T(), "GetDevice")
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
+	mock.AssertExpectationsForObjects(suite.T(), driverMock)
+	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
+}
+
+func (suite *devicerSuit) TestWipe() {
+	// NOTE(denisacostaq@gmail.com): Giving
+	driverMock := &MockDeviceDriver{}
+	driverMock.On("GetDevice").Return(&testHelperCloseableBuffer{}, nil)
+	driverMock.On("SendToDevice", mock.Anything, mock.Anything).Return(
+		wire.Message{Kind: uint16(messages.MessageType_MessageType_Success), Data: nil}, nil)
+	device := Device{driverMock, nil, false, ButtonType(-1)}
+
+	// NOTE(denisacostaq@gmail.com): When
+	msg, err := device.Wipe()
 	// NOTE: Assert
 	suite.Nil(err)
 	driverMock.AssertCalled(suite.T(), "GetDevice")
-	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 3)
+	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
 	mock.AssertExpectationsForObjects(suite.T(), driverMock)
-	spew.Dump(msg)
-}
-
-func (suite *devicerSuit) TestInterfacesImplemented() {
-	var _ Devicer = (*Device)(nil)
-	var _ DeviceDriver = (*Driver)(nil)
+	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
 }

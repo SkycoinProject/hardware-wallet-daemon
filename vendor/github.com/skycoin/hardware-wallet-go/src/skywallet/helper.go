@@ -1,4 +1,4 @@
-package skwallet
+package skywallet
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -187,6 +188,8 @@ func sendToDeviceNoAnswer(dev usb.Device, chunks [][64]byte) error {
 }
 
 func sendToDevice(dev usb.Device, chunks [][64]byte) (wire.Message, error) {
+	var msg *wire.Message
+	var err error
 	for _, element := range chunks {
 		_, err := dev.Write(element[:])
 		if err != nil {
@@ -194,10 +197,39 @@ func sendToDevice(dev usb.Device, chunks [][64]byte) (wire.Message, error) {
 		}
 	}
 
-	msg, err := wire.ReadFrom(dev)
+	msg, err = wire.ReadFrom(dev)
 	if err != nil {
 		return wire.Message{}, err
 	}
+
+	for msg.Kind == uint16(messages.MessageType_MessageType_EntropyRequest) {
+		var wg sync.WaitGroup
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+			entropyChunks, err := MessageEntropyAck(entropyBufferSize)
+			if err != nil {
+				log.Errorf("failed to create entropy ack msg: %v", err)
+				return
+			}
+
+			for _, element := range entropyChunks {
+				_, err := dev.Write(element[:])
+				if err != nil {
+					log.Errorf("entropy ack error: %v", err)
+					return
+				}
+			}
+		}()
+
+		msg, err = wire.ReadFrom(dev)
+		if err != nil {
+			return wire.Message{}, err
+		}
+		wg.Wait()
+	}
+
 	return *msg, err
 }
 

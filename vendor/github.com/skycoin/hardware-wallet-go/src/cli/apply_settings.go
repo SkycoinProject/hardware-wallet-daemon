@@ -2,14 +2,14 @@ package cli
 
 import (
 	"fmt"
-
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+	"os"
+	"runtime"
 
 	gcli "github.com/urfave/cli"
 
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func applySettingsCmd() gcli.Command {
@@ -44,12 +44,20 @@ func applySettingsCmd() gcli.Command {
 			label := c.String("label")
 			language := c.String("language")
 
-			device := deviceWallet.NewDevice(deviceWallet.DeviceTypeFromString(c.String("deviceType")))
+			device := skyWallet.NewDevice(skyWallet.DeviceTypeFromString(c.String("deviceType")))
 			if device == nil {
 				return
 			}
+			defer device.Close()
 
-			var msg wire.Message
+			if os.Getenv("AUTO_PRESS_BUTTONS") == "1" && device.Driver.DeviceType() == skyWallet.DeviceTypeEmulator && runtime.GOOS == "linux" {
+				err := device.SetAutoPressButton(true, skyWallet.ButtonRight)
+				if err != nil {
+					log.Error(err)
+					return
+				}
+			}
+
 			usePassphrase := new(bool)
 			switch passphrase {
 			case "true":
@@ -93,22 +101,22 @@ func applySettingsCmd() gcli.Command {
 			}
 
 			if msg.Kind == uint16(messages.MessageType_MessageType_Failure) {
-				failMsg, err := deviceWallet.DecodeFailMsg(msg)
+				failMsg, err := skyWallet.DecodeFailMsg(msg)
 				if err != nil {
 					log.Error(err)
 					return
 				}
-				fmt.Println("Failed with code: ", failMsg)
+				fmt.Println(failMsg)
 				return
 			}
 
 			if msg.Kind == uint16(messages.MessageType_MessageType_Success) {
-				successMsg, err := deviceWallet.DecodeSuccessMsg(msg)
+				successMsg, err := skyWallet.DecodeSuccessMsg(msg)
 				if err != nil {
 					log.Error(err)
 					return
 				}
-				fmt.Println("Success with code: ", successMsg)
+				fmt.Println(successMsg)
 				return
 			}
 		},

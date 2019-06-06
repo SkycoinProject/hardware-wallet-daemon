@@ -5,6 +5,12 @@
 .PHONY: clean lint check format
 
 GOPATH  ?= $(HOME)/go
+UNAME_S ?= $(shell uname -s)
+VERSION_RAW  =$(shell ./ci-scripts/version.sh)
+VERSION_MAJOR=$(shell echo $(VERSION_RAW) | tr -d v | cut -d. -f1)
+VERSION_MINOR=$(shell echo $(VERSION_RAW) | cut -d. -f2)
+VERSION_PATCH=$(shell echo $(VERSION_RAW) | cut -d. -f3)
+FULL_VERSION =$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 all: build
 
@@ -16,21 +22,28 @@ dep: ## Ensure package dependencies are up to date
 
 mocks: ## Create all mock files for unit tests
 	echo "Generating mock files"
-	go generate ./src/...
+	mockery -name Devicer -dir ./src/skywallet -case underscore -inpkg -testonly
+	mockery -name DeviceDriver -dir ./src/skywallet -case underscore -inpkg -testonly
 
 test_unit: ## Run unit tests
 	go test -v github.com/skycoin/hardware-wallet-go/src/skywallet
 
-test_integration: ## Run integration tests
-	go test -count=1 -v github.com/skycoin/hardware-wallet-go/src/skywallet/integration
+test-integration-emulator: ## Run emulator integration tests
+	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
 
-test: test_unit test_integration ## Run all tests
+test-integration-wallet: ## Run usb integration tests
+	./ci-scripts/integration-test.sh -m USB -n wallet-integration
+
+test: test_unit integration-test-emulator ## Run all tests
 
 install-linters: ## Install linters
 	go get -u github.com/FiloSottile/vendorcheck
 	# For some reason this install method is not recommended, see https://github.com/golangci/golangci-lint#install
 	# However, they suggest `curl ... | bash` which we should not do
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+
+check-version:
+	test "$(shell cat ./VERSION)" = "$(shell ./ci-scripts/version.sh)"
 
 check: lint test ## Perform self-tests
 
@@ -44,3 +57,6 @@ format: ## Formats the code. Must have goimports installed (use make install-lin
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+release: build
+	cp $(GOPATH)/bin/skycoin-hw-cli skycoin-hw-cli-$(UNAME_S)-v$(VERSION_RAW)

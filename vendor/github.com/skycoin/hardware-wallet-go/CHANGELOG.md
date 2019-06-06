@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Add travis CD instructions for github releases.
 - Add BitEncodedFlags to encode/decode flags from/to a string.
 - Add remove PIN code.
 - Pretty(`json`) print features output.
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Define the device language through `-language` flag of `applySettings` command. Only `english` supported.
 - Only connect to `USB` devices announcing Skycoin vendor and product through HID.
 - Add `Available` function to check if a skycoin wallet is connected to the system.
+- Added cli integration tests.
 
 ### Fixed
 

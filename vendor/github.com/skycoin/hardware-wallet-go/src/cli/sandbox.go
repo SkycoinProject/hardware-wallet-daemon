@@ -3,13 +3,11 @@ package cli
 import (
 	"fmt"
 
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
-
 	gcli "github.com/urfave/cli"
 
 	messages "github.com/skycoin/hardware-wallet-protob/go"
 
-	deviceWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
 func sandbox() gcli.Command {
@@ -21,10 +19,11 @@ func sandbox() gcli.Command {
 		Flags:        []gcli.Flag{},
 		OnUsageError: onCommandUsageError(name),
 		Action: func(c *gcli.Context) {
-			device := deviceWallet.NewDevice(deviceWallet.DeviceTypeFromString(c.String("deviceType")))
+			device := skyWallet.NewDevice(skyWallet.DeviceTypeFromString(c.String("deviceType")))
 			if device == nil {
 				return
 			}
+			defer device.Close()
 
 			_, err := device.Wipe()
 			if err != nil {
@@ -39,8 +38,7 @@ func sandbox() gcli.Command {
 			}
 
 			var pinEnc string
-			var msg wire.Message
-			msg, err = device.ChangePin(nil)
+			msg, err := device.ChangePin(nil)
 			if err != nil {
 				log.Error(err)
 				return
@@ -90,7 +88,7 @@ func sandbox() gcli.Command {
 				}
 
 				if msg.Kind == uint16(messages.MessageType_MessageType_ResponseSkycoinAddress) {
-					addresses, err := deviceWallet.DecodeResponseSkycoinAddress(msg)
+					addresses, err := skyWallet.DecodeResponseSkycoinAddress(msg)
 					if err != nil {
 						log.Error(err)
 						return
@@ -100,7 +98,7 @@ func sandbox() gcli.Command {
 				}
 			} else {
 				log.Println("Got addresses without pin code")
-				addresses, err := deviceWallet.DecodeResponseSkycoinAddress(msg)
+				addresses, err := skyWallet.DecodeResponseSkycoinAddress(msg)
 				if err != nil {
 					log.Error(err)
 					return
