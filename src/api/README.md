@@ -139,7 +139,7 @@ $ curl -X PUT http://127.0.0.1:9510/api/v1/cancel
 **Response**:
 ```json
 {
-    "data": "Action cancelled by user"
+    "data": "Action canceled by user"
 }
 ```
 
@@ -321,13 +321,16 @@ Configure a pin code on the device.
 ```
 URI: /api/v1/configure_pin_code
 Method: POST
-Args:
-- remove_pin: (optional) Used to remove current pin
+Args: {
+    "remove_pin": <bool>, 
+}
 ```
 
 **Example**:
 ```bash
-$ curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code
+$ curl -X POST http://127.0.0.1:19510/api/v1/configure_pin_code \
+  -H 'Content-Type: application/json' \
+  -d '{"remove_pin": false}'
 ```
 
 **Response** Flow:
@@ -353,8 +356,8 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code
 **Example**(Remove Pin):
 ```bash
 $  curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code \
-   -H 'Content-Type: application/x-www-form-urlencoded' \
-   -d 'remove_pin=true'
+  -H 'Content-Type: application/json' \
+  -d '{"remove_pin": true}'
 ```
 
 **Response** Flow:

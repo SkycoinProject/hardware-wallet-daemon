@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gogo/protobuf/proto"
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
@@ -182,14 +181,6 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			return
 		}
 	}
-}
-
-func parseBoolFlag(v string) (bool, error) {
-	if v == "" {
-		return false, nil
-	}
-
-	return strconv.ParseBool(v)
 }
 
 func newStrPtr(s string) *string {

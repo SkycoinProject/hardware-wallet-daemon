@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
@@ -13,10 +13,6 @@ import (
 )
 
 func TestConfigurePinCode(t *testing.T) {
-	type httpBody struct {
-		removePin string
-	}
-
 	failureMsg := messages.Failure{
 		Code:    messages.FailureType_Failure_NotInitialized.Enum(),
 		Message: newStrPtr("failure msg"),
@@ -36,8 +32,8 @@ func TestConfigurePinCode(t *testing.T) {
 		name                          string
 		method                        string
 		status                        int
-		httpBody                      *httpBody
-		removePin                     bool
+		contentType                   string
+		httpBody                      string
 		gatewayConfigurePinCodeResult wire.Message
 		httpResponse                  HTTPResponse
 	}{
@@ -49,19 +45,28 @@ func TestConfigurePinCode(t *testing.T) {
 		},
 
 		{
-			name:         "400 - invalid remove_pin",
+			name:         "400 - EOF",
 			method:       http.MethodPost,
+			contentType:  ContentTypeJSON,
 			status:       http.StatusBadRequest,
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "invalid value for remove_pin"),
-			httpBody: &httpBody{
-				removePin: "foo",
-			},
+			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "EOF"),
+		},
+
+		{
+			name:         "415 - Unsupported Media Type",
+			method:       http.MethodPost,
+			contentType:  ContentTypeForm,
+			status:       http.StatusUnsupportedMediaType,
+			httpResponse: NewHTTPErrorResponse(http.StatusUnsupportedMediaType, ""),
 		},
 
 		{
 			name:   "409 - Failure msg",
 			method: http.MethodPost,
 			status: http.StatusConflict,
+			httpBody: toJSON(t, &ConfigurePinCodeRequest{
+				RemovePin: false,
+			}),
 			gatewayConfigurePinCodeResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
@@ -73,10 +78,9 @@ func TestConfigurePinCode(t *testing.T) {
 			name:   "409 - Failure msg with remove pin",
 			method: http.MethodPost,
 			status: http.StatusConflict,
-			httpBody: &httpBody{
-				removePin: "true",
-			},
-			removePin: true,
+			httpBody: toJSON(t, &ConfigurePinCodeRequest{
+				RemovePin: true,
+			}),
 			gatewayConfigurePinCodeResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
@@ -85,9 +89,12 @@ func TestConfigurePinCode(t *testing.T) {
 		},
 
 		{
-			name:   "200 - OK",
+			name:   "200 - OK remove pin false",
 			method: http.MethodPost,
 			status: http.StatusOK,
+			httpBody: toJSON(t, &ConfigurePinCodeRequest{
+				RemovePin: false,
+			}),
 			gatewayConfigurePinCodeResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
@@ -98,13 +105,12 @@ func TestConfigurePinCode(t *testing.T) {
 		},
 
 		{
-			name:   "200 - OK with remove pin",
+			name:   "200 - OK remove pin true",
 			method: http.MethodPost,
 			status: http.StatusOK,
-			httpBody: &httpBody{
-				removePin: "true",
-			},
-			removePin: true,
+			httpBody: toJSON(t, &ConfigurePinCodeRequest{
+				RemovePin: true,
+			}),
 			gatewayConfigurePinCodeResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
@@ -120,21 +126,21 @@ func TestConfigurePinCode(t *testing.T) {
 			endpoint := "/configure_pin_code"
 			gateway := &MockGatewayer{}
 
-			v := url.Values{}
-			if tc.httpBody != nil {
-				if tc.httpBody.removePin != "" {
-					v.Add("remove_pin", tc.httpBody.removePin)
-				}
-
-				if len(v) > 0 {
-					endpoint += "?" + v.Encode()
-				}
+			var body ConfigurePinCodeRequest
+			err := json.Unmarshal([]byte(tc.httpBody), &body)
+			if err == nil {
+				gateway.On("ChangePin", newBoolPtr(body.RemovePin)).Return(tc.gatewayConfigurePinCodeResult, nil)
 			}
 
-			gateway.On("ChangePin", newBoolPtr(tc.removePin)).Return(tc.gatewayConfigurePinCodeResult, nil)
-
-			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, nil)
+			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
 			require.NoError(t, err)
+
+			contentType := tc.contentType
+			if contentType == "" {
+				contentType = ContentTypeJSON
+			}
+
+			req.Header.Set("Content-Type", contentType)
 
 			rr := httptest.NewRecorder()
 			handler := newServerMux(defaultMuxConfig(), gateway)

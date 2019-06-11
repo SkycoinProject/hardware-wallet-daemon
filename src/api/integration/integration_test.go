@@ -288,7 +288,12 @@ func TestEmulatorConfigurePinCode(t *testing.T) {
 		return
 	}
 
-	resp, err := daemonClient.Operations.PostConfigurePinCode(nil, addCSRFHeader(t, daemonClient))
+	pinParams := operations.NewPostConfigurePinCodeParams()
+	pinParams.ConfigurePinCodeRequest = &models.ConfigurePinCodeRequest{
+		RemovePin: newBoolPtr(false),
+	}
+
+	resp, err := daemonClient.Operations.PostConfigurePinCode(pinParams, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
 	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
 
@@ -549,7 +554,12 @@ func TestWalletConfigurePinCode(t *testing.T) {
 		return
 	}
 
-	resp, err := daemonClient.Operations.PostConfigurePinCode(nil, addCSRFHeader(t, daemonClient))
+	pinParams := operations.NewPostConfigurePinCodeParams()
+	pinParams.ConfigurePinCodeRequest = &models.ConfigurePinCodeRequest{
+		RemovePin: newBoolPtr(false),
+	}
+
+	resp, err := daemonClient.Operations.PostConfigurePinCode(pinParams, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
 	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
 
@@ -674,6 +684,10 @@ func newStrPtr(s string) *string {
 
 func newInt64Ptr(n int64) *int64 {
 	return &n
+}
+
+func newBoolPtr(b bool) *bool {
+	return &b
 }
 
 func loadGoldenFile(t *testing.T, filename string, testData TestData) {

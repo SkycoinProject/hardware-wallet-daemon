@@ -69,23 +69,13 @@ before_deploy:
 - make release
 
 deploy:
-  - provider: releases
-    api_key:
-      secure: GQuOx1g98HzwfZYkUV6ARNjUxmYWXHe4ApymJ1obut5fMAdD+KMZLw1oxNzNpB+A7yUz7f9Y9Y9MRzY7yxY+DW4jvhWAUpuum5XAbvCs2Y5iAzi/Hv1Sb++1PwIf0C22hpDqruGepYA6c/Ylz0s71zvnHwma/eMV46rXMXdqsFMTjP6jFTi66rRUMPfWn/Sv9Ze2jIhtkP4FPNJ5/RXwC+gTn2AYh516uyJAmkXD49TRou0RdI+oU+cjjRz8M7lulszDiQxQgyKZ3fuveH9gDNI5yo8xwcPX8EPNHywqTHOk5acUuI8a8tRrDaoUy6hHU0OeGjlKIxfz0gI/n5duAd1fJsQNI5OWQ3qWv8+5bfc/a6/Ah2uNNQw5ScIdmg5+Q2/f/hkP0ysmEqNFwGB5akitLqqkWC6c+7h4V3q3Q/JotDBVYw6IYS6srNkUddt9rYOfI6gYIGBEikBjchb6wDPSaS+alOyRiiuzz7Qr+N9vRIWjYNbMd68TcYsEAKaK0bKSrFftTz/A71xIeKoDfRmFvc8ISIzG/E6zfBk6kvajnpnHB7oaK9uBUgSGckZ59Q/ZhYYK1zOvTj9RwuOeNiRf2vfeb6z5y+IXOOAdklqXWw0ZqeTyQEXjOcOPciyZBkEn/Dcum6o39TdJj5Uo0UPuZQdt9QnJvK71WVULlJI=
-    file:
-      - build/releases/*
-    skip_cleanup: true
-    draft: true
-    on:
-      repo: skycoin/hardware-wallet-daemon
-      tags: true
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     bucket: $AWS_BUCKET
     skip_cleanup: true
-    local_dir: electron/release
-    upload-dir: wallet
+    local_dir: build/release
+    upload-dir: skywallet-daemon
     acl: public_read
     region: $AWS_REGION
     on:

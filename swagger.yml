@@ -250,15 +250,15 @@ paths:
     post:
       description: Configure a pin code on the device.
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       produces:
         - application/json
       parameters:
-        - in: formData
-          name: remove_pin
-          type: boolean
-          description: remove current pin code. needs to be called without remove_pin again to set a new one
-          required: false
+        - in: body
+          name: ConfigurePinCodeRequest
+          description: ConfigurePinCodeRequest is request data for /api/v1/configure_pin_code
+          schema:
+            $ref: '#/definitions/ConfigurePinCodeRequest'
       responses:
         200:
           description: success
@@ -515,6 +515,14 @@ definitions:
       mnemonic:
         type: string
         example: "cloud flower upset remain green metal below cup stem infant art thank"
+
+  ConfigurePinCodeRequest:
+    type: object
+    required:
+      - remove_pin
+    properties:
+      remove_pin:
+        type: boolean
 
   SignMessageRequest:
     type: object

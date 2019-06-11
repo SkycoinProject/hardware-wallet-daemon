@@ -14,7 +14,7 @@ import (
 func TestCancel(t *testing.T) {
 	cancelMsg := messages.Failure{
 		Code:    messages.FailureType_Failure_ActionCancelled.Enum(),
-		Message: newStrPtr("Action Cancelled by User"),
+		Message: newStrPtr("Action canceled by User"),
 	}
 
 	msgBytes, err := cancelMsg.Marshal()
@@ -43,7 +43,7 @@ func TestCancel(t *testing.T) {
 				Data: msgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "Action Cancelled by User",
+				Data: "Action canceled by User",
 			},
 		},
 	}
