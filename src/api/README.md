@@ -139,7 +139,7 @@ $ curl -X PUT http://127.0.0.1:9510/api/v1/cancel
 **Response**:
 ```json
 {
-    "data": "Action cancelled by user"
+    "data": "Action canceled by user"
 }
 ```
 
