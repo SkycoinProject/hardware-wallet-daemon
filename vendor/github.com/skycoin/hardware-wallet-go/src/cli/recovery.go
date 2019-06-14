@@ -19,7 +19,7 @@ func recoveryCmd() gcli.Command {
 		Usage:       "Ask the device to perform the seed recovery procedure.",
 		Description: "",
 		Flags: []gcli.Flag{
-			gcli.BoolFlag{
+			gcli.StringFlag{
 				Name:  "usePassphrase",
 				Usage: "Configure a passphrase",
 			},
@@ -54,10 +54,15 @@ func recoveryCmd() gcli.Command {
 				}
 			}
 
-			passphrase := c.Bool("usePassphrase")
+			passphrase := c.String("usePassphrase")
+			usePassphrase, _err := parseBool(passphrase)
+			if _err != nil {
+				log.Errorln("Valid values for usePassphrase are true or false")
+				return
+			}
 			dryRun := c.Bool("dryRun")
 			wordCount := uint32(c.Uint64("wordCount"))
-			msg, err := device.Recovery(wordCount, passphrase, dryRun)
+			msg, err := device.Recovery(wordCount, usePassphrase, dryRun)
 			if err != nil {
 				log.Error(err)
 				return

@@ -254,7 +254,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3016917746a46f171b01b17deab0ef6c9145d85a930bff5a2960418cdffdbbda"
+  digest = "1:5ce080b6352330068f2496c858bb43caa8face90143f8b17a8d03640038ebc9f"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/skywallet",
@@ -264,7 +264,7 @@
     "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "cba497d953b76490fd52471f9f4f74d0072f7f4d"
+  revision = "c77dd232b62122ab7486d5fcc29e68aa7c4e5440"
 
 [[projects]]
   digest = "1:3e0a94a91846a3b571c3964df4ed146911df4cb50770bece1563645612518e13"
@@ -323,7 +323,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "f99c8df09eb5bff426315721bfa5f16a99cad32c"
+  revision = "5c40567a22f818bd14a1ea7245dad9f8ef0691aa"
 
 [[projects]]
   branch = "master"
@@ -331,18 +331,18 @@
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "UT"
-  revision = "60506f45cf65977eb3a9c6e30f995f54a721c271"
+  revision = "d28f0bde5980168871434b95cfc858db9f2a7a99"
 
 [[projects]]
   branch = "master"
-  digest = "1:d4547686da8d62d492af9935cab3cd2393ece01474f263f39ca1b303eefca734"
+  digest = "1:3632ee2affa9e498af05fbddf75d88a14302788cb88f3afd85c9cc6c3f7b0966"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "79a91cf218c425e1f4d48cd960839b45dd4d065f"
+  revision = "d442b75600c5d6484576502b3c53a55c54311be9"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"

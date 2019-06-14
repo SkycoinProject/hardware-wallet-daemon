@@ -236,11 +236,13 @@ func MessageGenerateMnemonic(wordCount uint32, usePassphrase bool) ([][64]byte, 
 }
 
 // MessageRecovery prepare MessageRecovery request
-func MessageRecovery(wordCount uint32, usePassphrase, dryRun bool) ([][64]byte, error) {
+func MessageRecovery(wordCount uint32, usePassphrase *bool, dryRun bool) ([][64]byte, error) {
 	recoveryDevice := &messages.RecoveryDevice{
-		WordCount:            proto.Uint32(wordCount),
-		PassphraseProtection: proto.Bool(usePassphrase),
-		DryRun:               proto.Bool(dryRun),
+		WordCount: proto.Uint32(wordCount),
+		DryRun:    proto.Bool(dryRun),
+	}
+	if usePassphrase != nil {
+		recoveryDevice.PassphraseProtection = proto.Bool(*usePassphrase)
 	}
 	data, err := proto.Marshal(recoveryDevice)
 	if err != nil {
