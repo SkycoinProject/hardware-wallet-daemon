@@ -452,6 +452,8 @@ definitions:
 
   ApplySettingsRequest:
     type: object
+    required:
+      - use_passphrase
     properties:
       label:
         type: string
@@ -484,6 +486,7 @@ definitions:
     type: object
     required:
       - word_count
+      - use_passphrase
     properties:
       word_count:
         type: integer

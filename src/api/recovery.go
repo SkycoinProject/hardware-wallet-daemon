@@ -10,7 +10,7 @@ import (
 // RecoveryRequest is request data for /api/v1/recovery
 type RecoveryRequest struct {
 	WordCount     uint32 `json:"word_count"`
-	UsePassphrase bool   `json:"use_passphrase"`
+	UsePassphrase *bool  `json:"use_passphrase"`
 	DryRun        bool   `json:"dry_run"`
 }
 
