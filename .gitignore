@@ -20,3 +20,9 @@ coverage/
 build/.xgo_output
 build/.daemon_output
 build/release
+
+# Temporary files
+*.swp
+*.swo
+.DS_Store
+
