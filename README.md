@@ -329,12 +329,12 @@ Perform these actions before releasing.
 Perform these actions before releasing:
 
 - Open a terminal window and run Skywallet emulator. Wait for emulator UI to display.
-- From a separate trminal window run the test suite as follows, and make sure that all the integration tests are passing.
+- Connect SkyWallet device
+- From a separate terminal window run the test suite as follows, and make sure that all the integration tests are passing.
 ```sh
 make lint
 make check
 ```
-- Close emulator and plug Skywallet device. Run the same command another time.
 
 ##### Run transaction tests
 
