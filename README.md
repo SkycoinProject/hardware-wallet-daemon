@@ -338,6 +338,11 @@ make check
 
 ##### Run transaction tests
 
+- Run daemon service in background or a separate terminal window
+```sh
+cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon/
+make run-usb
+```
 - Create new wallet e.g. with `skycoin-cli` (or reuse existing wallet for testing purposes)
 ```sh
 skycoin-cli walletCreate -f $WALLET1.wlt -l $WALLET1
