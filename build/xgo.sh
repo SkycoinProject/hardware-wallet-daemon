@@ -4,15 +4,6 @@ shopt -s extglob
 
 . build-conf.sh
 
-USAGE="./gox.sh \"osarch\" [output directory] [with builder]
-
-Builds gox with the osarch string (see 'gox --help' for specifications)
-
-Optionally specify an output directory for the build files. Will be created
-if it does not exist.  Defaults to the working directory.
-
-"
-
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 CMDDIR="../cmd"

@@ -1,72 +1,75 @@
 sudo: required
 language: go
 go:
-- 1.11.x
+  - 1.11.x
 
 services:
-- xvfb
-- docker
+  - xvfb
+  - docker
 
 matrix:
   include:
-  - os: linux
-    env:
-    - PIP='sudo pip'
+    - os: linux
+      env:
+        - PIP='sudo pip'
+    - os: osx
+      if: type != pull_request
+      env: VERSION_UPGRADE_TEST_WAIT_TIMEOUT=60s
+      osx_image: xcode8
 
 env:
   global:
-  - XARGS="-screen 0 1024x768x24"
+    - XARGS="-screen 0 1024x768x24"
 
 install:
-- docker pull karalabe/xgo-latest
-- go get github.com/karalabe/xgo
-- make install-linters
-- sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh"
-- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export SDL_INCLUDE="$(brew --prefix sdl2)/include/SDL2"
-  ; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then docker pull karalabe/xgo-latest; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then go get github.com/karalabe/xgo; fi
+  - make install-linters
 
 before_script:
-- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then ( sudo Xvfb :99 -ac ${XARGS}; echo "Xvfb
-  ok" )& fi
-- mkdir -p tmp/hardware-wallet
-- git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git
-  tmp/hardware-wallet
-- git -C tmp/hardware-wallet checkout develop
-- git -C tmp/hardware-wallet submodule init
-- git -C tmp/hardware-wallet submodule update
-- git -C tmp/hardware-wallet submodule update --remote
-- ( cd ./tmp/hardware-wallet && sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh" )
-- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /usr/local/bin/protoc; export PATH="/usr/local/bin:$(pwd)/tmp/hardware-wallet/protoc/bin:$PATH";
-  fi
-- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export SDL_INCLUDE="$(brew --prefix sdl2)/include/SDL2"
-  ; fi
-- echo "PATH=$PATH";
-- echo "PIP=$PIP";
+  - if [[ $TRAVIS_OS_NAME == 'osx' && "$TRAVIS_PULL_REQUEST" == false ]]; then
+    export CHECK_PATH="$(brew --prefix check)" ;
+    export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${CHECK_PATH}/lib" ;
+    ./ci-scripts/add-key.sh ;
+    fi
+  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+    mkdir -p tmp/hardware-wallet ;
+    git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git
+    tmp/hardware-wallet ;
+    git -C tmp/hardware-wallet checkout develop ;
+    git -C tmp/hardware-wallet submodule init ;
+    git -C tmp/hardware-wallet submodule update ;
+    git -C tmp/hardware-wallet submodule update --remote ;
+    ( cd ./tmp/hardware-wallet && sh "ci-scripts/install-${TRAVIS_OS_NAME}.sh" ) ;
+    ls -l /usr/local/bin/protoc ;
+    export PATH="/usr/local/bin:$(pwd)/tmp/hardware-wallet/protoc/bin:$PATH" ;
+    fi
+  - echo "PATH=$PATH";
+  - echo "PIP=$PIP";
 
 script:
-- make -C tmp/hardware-wallet clean
-- make -C tmp/hardware-wallet/tiny-firmware/protob install-deps-nanopb
-- make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc
-- make -C tmp/hardware-wallet/tiny-firmware/protob/nanopb/vendor/nanopb/generator/proto
-- make -C tmp/hardware-wallet emulator
-- if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then xvfb-run --server-args="${XARGS}"
-  make -C ./tmp/hardware-wallet run-emulator & true ; fi
-- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then make -C ./tmp/hardware-wallet run-emulator
-  & true ; fi
-- make lint
-- ps aux | grep emulator
-- make test
-- make test-integration-emulator
-- make test-integration-emulator-enable-csrf
+  - make lint
+  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+    make -C tmp/hardware-wallet clean ;
+    make -C tmp/hardware-wallet/tiny-firmware/protob install-deps-nanopb ;
+    make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc ;
+    make -C tmp/hardware-wallet/tiny-firmware/protob/nanopb/vendor/nanopb/generator/proto ;
+    make -C tmp/hardware-wallet emulator ;
+    xvfb-run --server-args="${XARGS}" make -C ./tmp/hardware-wallet run-emulator & true ;
+    ps aux | grep emulator ;
+    make test-integration-emulator ;
+    make test-integration-emulator-enable-csrf ;
+    fi
+  - make test
 
 after_script:
-- kill -s KILL $(pgrep emulator)
+  - kill -s KILL $(pgrep emulator)
 
 notifications:
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
 
 before_deploy:
-- make release
+  - make release
 
 deploy:
   - provider: s3
@@ -80,4 +83,4 @@ deploy:
     region: $AWS_REGION
     on:
       repo: skycoin/hardware-wallet-daemon
-      branch: master
+      tags: true

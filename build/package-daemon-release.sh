@@ -3,11 +3,11 @@ set -e -o pipefail
 
 # Builds the daemon release
 
-GOX_OSARCH="$@"
+XGO_TARGETS="$@"
 
-echo "In package daemon release: $GOX_OSARCH"
+echo "In package daemon release: $XGO_TARGETS"
 
-. build-conf.sh "$GOX_OSARCH"
+. build-conf.sh "$XGO_TARGETS"
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
