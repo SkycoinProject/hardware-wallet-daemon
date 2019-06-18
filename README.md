@@ -371,11 +371,11 @@ skycoin-cli walletOutputs $WALLET1.wlt
   * `fw_patch` is set to expected firmware patch version number
   * `firmware_features` is set to `0`
 - Ensure device is seedless by [wiping it](src/api/README.md#wipe). Check that device ends up in home screen with `NEEDS SEED!` message at the top.
-- [Recover seed](src/api/README.md#recover-old-wallet) `SEED1` in Skywallet device (`dry-run=false`).
+- [Recover seed](src/api/README.md#recover-old-wallet) `SEED1` in Skywallet device (`dry-run=false`, `word_count=12`).
 - [Get device features](src/api/README.md#get-features) and check that:
   * `vendor` is set to `Skycoin Foundation`
   * `device_id` is set to `ID1`
-  * `pin_protection` is seto to `false`
+  * `pin_protection` is set to to `false`
   * `passphrase_protection` is set to `false`
   * `label` is set to `ID1`
   * `initialized` is set to `true`
@@ -409,17 +409,17 @@ export TXN1_JSON=$(skycoin-cli decodeRawTransaction $TXN1_RAW)
 echo $TXN1_JSON
 ```
 - [Sign transaction](src/api/README.md#transaction-sign) with Skywallet by putting together a message using values resulting from previous step as follows.
-  * Set message `nbIn` to the length of transaction `inputs` array
-  * Set message `nbOut` to the length of transaction `outputs` array
-  * For each hash in transaction `inputs` array there should be an item in messsage `inputs` array with `hashIn` field set to the very same hash and `index` set to `0`.
-  * For each source item in transaction `outputs` array there should be an item in messsage `outputs` array with fields set as follows:
+  * For each hash in transaction `inputs` array there should be an item in messsage `transactions_inputs` array with `hash` field set to the very same hash and `index` set to `0`.
+  * For each source item in transaction `outputs` array there should be an item in messsage `transaction_outputs` array with fields set as follows:
     - `address` : source item's `dst`
-    - `coin` : source item's `coins`
-    - `hour` : source item's `hours`
+    - `coins` : source item's `coins`
+    - `hours` : source item's `hours`
     - `address_index` : set to `0` if source item `address` equals `ADDRESS1` or to `1` otherwise
 - Check that `signatures` array returned by hardware wallet includes entries for each and every transaction input
 - [Check signatures](src/api/README.md#check-message-signature) were signed by corresponding addresses
-- Create transaction `TXN2_JSON` by replacing `TXN1_JSON` signatures with the array returned by SkyWallet
+- Create transaction `TXN2_JSON` by
+  * replacing `TXN1_JSON` signatures with the array returned by SkyWallet
+  * setting inner hash to an empty string
 - Use `TXN2_JSON` to obtain encoded transaction `TXN2_RAW`
 ```sh
 export $TXN2_RAW=$( echo "$TXN2_JSON" | skycoin-cli encodeJsonTransaction - | grep '"rawtx"' | cut -d '"' -f4)
@@ -440,7 +440,7 @@ skycoin-cli walletCreate -f $WALLET2.wlt -l $WALLET2
 - From command output take note of the seed `SEED2` and address `ADDRESS4`
 - List `WALLET2` addresses and confirm that `ADDRESS4` is the only value in the list.
 ```sh
-skycoin-cli lisAddresses $WALLET2.wlt
+skycoin-cli listAddresses $WALLET2.wlt
 ```
 - Transfer funds to `WALLET2` (if not already done) and check balance
 ```sh
@@ -468,35 +468,32 @@ curl -X POST http://127.0.0.1:6420/api/v2/transaction -H 'content-type: applicat
 }"
 ```
 - [Sign transaction](src/api/README.md#transaction-sign) represented by `TXN3_JSON` for inputs owned by Skywallet (i.e. `WALLET1`)
-  * Set message `nbIn` to the 
-  * Set message `nbOut` to the length of transaction `outputs` array
-  * For each object in transaction `inputs` array there should be an item in messsage `inputs` array with:
-    - `hashIn` field set to the value bound to object's `uxid` key
-    - address index as follows
-      * not set if input `address` is `ADDRESS4`
+  * For each object in transaction `inputs` array there should be an item in messsage `transaction_inputs` array with:
+    - `hash` field set to the value bound to object's `uxid` key
+    - `index` set as follows
+      * `null` if input `address` is `ADDRESS4`
       * `0` if input `address` is `ADDRESS1`
       * `1` if input `address` is `ADDRESS2`
-  * For each source item in transaction `outputs` array there should be an item in messsage `outputs` array with fields set as follows:
+  * For each source item in transaction `outputs` array there should be an item in messsage `transaction_outputs` array with fields set as follows:
     - `address` : source item's `address`
-    - `coin` : source item's `coins * 1000000`
-    - `hour` : source item's `hours`
+    - `coins` : source item's `coins * 1000000`
+    - `hours` : source item's `hours`
     - `address_index` set to 2 (since destination address is `ADDRESS3`)
 - Check that signatures array includes one entry for every input except the one associated to `ADDRESS4`, which should be an empty string
-- [Recover seed](src/api/README.md#recover-old-wallet) `SEED2` in Skywallet device (`dry-run=false`).
+- Ensure device is seedless by [wiping it](src/api/README.md#wipe). Check that device ends up in home screen with `NEEDS SEED!` message at the top.
+- [Recover seed](src/api/README.md#recover-old-wallet) `SEED2` in Skywallet device (`dry-run=false`, `word_count=12`).
 - [Sign transaction](src/api/README.md#transaction-sign) represented by `TXN3_JSON` for inputs owned by Skywallet (i.e. `WALLET2`)
-  * Set message `nbIn` to the length of transaction `inputs` array
-  * Set message `nbOut` to the length of transaction `outputs` array
-  * For each hash in transaction `inputs` array there should be an item in messsage `inputs` array with:
-    - `hashIn` field set to the value bound to object's `uxid` key
-    - address index as follows
-      * not set if input `address` is `ADDRESS1`
-      * not set if input `address` is `ADDRESS2`
+  * For each hash in transaction `inputs` array there should be an item in messsage `transaction_inputs` array with:
+    - `hash` field set to the value bound to object's `uxid` key
+    - address `index` as follows
+      * `null` if input `address` is `ADDRESS1`
+      * `null` if input `address` is `ADDRESS2`
       * `0` if input `address` is `ADDRESS4`
-  * For each source item in transaction `outputs` array there should be an item in messsage `outputs` array with fields set as follows:
+  * For each source item in transaction `outputs` array there should be an item in messsage `transaction_outputs` array with fields set as follows:
     - `address` : source item's `dst`
-    - `coin` : source item's `coins * 1000000`
-    - `hour` : source item's `hours`
-    - `address_index` set to 2 (since destination address is `ADDRESS3`)
+    - `coins` : source item's `coins * 1000000`
+    - `hours` : source item's `hours`
+    - `address_index` set to `null`
 - Create a new transaction JSON object (a.k.a `TXN4_JSON`) from `TXN3_JSON` and the previous signatures like this
   * `type` same as in `TXN3_JSON`
   * `inner_hash` should be an empty string
