@@ -61,50 +61,50 @@
   revision = "eeefdecb41b842af6dc652aaea4026e8403e62df"
 
 [[projects]]
-  digest = "1:8c4be86399428a81749056c2d67feba95c1784b742ccf03ac7527d0b426bf22a"
+  digest = "1:9ae75184aad2327e2a0f20e5940bb11fba9a383b091d34fe438a2802a8236cd4"
   name = "github.com/go-openapi/analysis"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "UT"
-  revision = "e2f3fdbb7ed0e56e070ccbfb6fc75b288a33c014"
-  version = "v0.19.0"
+  revision = "147e766af12c74c10c633436007317dbcd9abb0b"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:d4a14966fe8f1ec9306792aaa4d135392b04ab5eb5830d485199dbf0ddb1132b"
+  digest = "1:3bca1e4623bc7e1f9849a14fe730c093953727991f0592be3dad0168cb67758e"
   name = "github.com/go-openapi/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7a7ff1b7b8020f22574411a32f28b4d168d69237"
-  version = "v0.19.0"
+  revision = "0b2a0a1f89aa2eec2d13e03cd80ab0fdaf01f8ce"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:953a2628e4c5c72856b53f5470ed5e071c55eccf943d798d42908102af2a610f"
+  digest = "1:3199d542cd80a8505e4cd90bb6c7d0bca8a67948834239053c78f9e20b8caa5f"
   name = "github.com/go-openapi/jsonpointer"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ef5f0afec364d3b9396b7b77b43dbe26bf1f8004"
-  version = "v0.19.0"
+  revision = "a105a905c5e6ad147f08504784917f3e178e0ba5"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:81210e0af657a0fb3638932ec68e645236bceefa4c839823db0c4d918f080895"
+  digest = "1:8b54a5c13b78b966644a9887433794034c14993a89ac93d532c587fc22d7f6bf"
   name = "github.com/go-openapi/jsonreference"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8483a886a90412cd6858df4ea3483dce9c8e35a3"
-  version = "v0.19.0"
+  revision = "2903bfd4bfbaf188694f1edf731f2725a8fa344f"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:208878abf5fc4e435f9c382a06678f46be91270d0efa1f475134543f6ed7784a"
+  digest = "1:cdace6771905e7cd0656263b5132f012a668c5bf937a6bdabf4c37bc8ed3addf"
   name = "github.com/go-openapi/loads"
   packages = ["."]
   pruneopts = "UT"
-  revision = "74628589c3b94e3526a842d24f46589980f5ab22"
-  version = "v0.19.0"
+  revision = "8548893a17237be4a5b2f74773f23002f4179bbe"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:11d97b8ba87bd5e88777494790e1a134147ea98604351e66e2c44f747e939a7a"
+  digest = "1:d3b9124667851d0c9d0cc1fdd2db1541a79feb15cd738a8c8e0a5256d877685d"
   name = "github.com/go-openapi/runtime"
   packages = [
     ".",
@@ -117,16 +117,16 @@
     "security",
   ]
   pruneopts = "UT"
-  revision = "109737172424d8a656fd1199e28c9f5cc89b0cca"
-  version = "v0.19.0"
+  revision = "1c4afa5263ac1b091911b4f2440b6ae406fc31e1"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:34130204ce3bd3d32bd111e28d9155de1e78132dbf29b2c4cedeca510e954f3e"
+  digest = "1:b1f97d0d316f90c2059f7bfee14855c314d65834a3b93f02856e01c1fb8fbebe"
   name = "github.com/go-openapi/spec"
   packages = ["."]
   pruneopts = "UT"
-  revision = "53d776530bf78a11b03a7b52dd8a083086b045e5"
-  version = "v0.19.0"
+  revision = "bdfd7e07daecc404d77868a88b2364d0aed0ee5a"
+  version = "v0.19.2"
 
 [[projects]]
   digest = "1:46d47ab9ecb073a7feeb21af4f90d3657d793eac41f94d35b64bf3014f812856"
@@ -137,20 +137,20 @@
   version = "v0.19.0"
 
 [[projects]]
-  digest = "1:937e7dbdd1a44b6a295897142108b23001e76a2829968004ecba638ef9b3a88a"
+  digest = "1:4de4d7d52a6a10105bf8425d985f3a3fe204a527d854bfb1aefb5da7ea216950"
   name = "github.com/go-openapi/swag"
   packages = ["."]
   pruneopts = "UT"
-  revision = "b3e2804c8535ee0d1b89320afd98474d5b8e9e3b"
-  version = "v0.19.0"
+  revision = "7e8dd5ceab83c86d17bc967d09e195414fe2b47e"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:965748ac4e6117c32cdcfa06a94384faceec54f7aa0a51128ec76834fbe68bc2"
+  digest = "1:9d2bd059a75e4ac3983cc93fe013dbc7f789fccb996171094279458b15329842"
   name = "github.com/go-openapi/validate"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5b1623be7460f5a3967a82c00d518048fb190f5e"
-  version = "v0.19.0"
+  revision = "6405b9095e4c96aabb45856da08a9323d50d9336"
+  version = "v0.19.2"
 
 [[projects]]
   digest = "1:48092bf6632f55839850666c33469f546f6d45fdbd59a66759ec12e84d853dc2"
@@ -170,7 +170,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:df495c9184b4e6cbb9d55652236dbcbe72c65a1c8b6469da50722628cea474e7"
+  digest = "1:927762c6729b4e72957ba3310e485ed09cf8451c5a637a52fd016a9fe09e7936"
   name = "github.com/mailru/easyjson"
   packages = [
     "buffer",
@@ -178,7 +178,7 @@
     "jwriter",
   ]
   pruneopts = "UT"
-  revision = "1ea4449da9834f4d333f1cc461c374aea217d249"
+  revision = "da37f6c1e4819c2ed4be6542856f9c0f0560348d"
 
 [[projects]]
   digest = "1:7c084e0e780596dd2a7e20d25803909a9a43689c153de953520dfbc0b0e51166"
@@ -254,7 +254,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5ce080b6352330068f2496c858bb43caa8face90143f8b17a8d03640038ebc9f"
+  digest = "1:2c93e96061b7bdcc8fc965e5c7a953e335998771759ff73a96fde4ca5f50d157"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/skywallet",
@@ -264,7 +264,7 @@
     "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "c77dd232b62122ab7486d5fcc29e68aa7c4e5440"
+  revision = "bcda77814889b01f8fddaa637d7eff57205adbd2"
 
 [[projects]]
   digest = "1:3e0a94a91846a3b571c3964df4ed146911df4cb50770bece1563645612518e13"
@@ -323,7 +323,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "5c40567a22f818bd14a1ea7245dad9f8ef0691aa"
+  revision = "ea8f1a30c4438cc8b13f05538385ad8dc6049b43"
 
 [[projects]]
   branch = "master"
@@ -331,18 +331,18 @@
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "UT"
-  revision = "d28f0bde5980168871434b95cfc858db9f2a7a99"
+  revision = "3b0461eec859c4b73bb64fdc8285971fd33e3938"
 
 [[projects]]
   branch = "master"
-  digest = "1:3632ee2affa9e498af05fbddf75d88a14302788cb88f3afd85c9cc6c3f7b0966"
+  digest = "1:887c8f729841e19be77a3584a51e0249a04dc8c55f184c450995ca24770364d4"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "d442b75600c5d6484576502b3c53a55c54311be9"
+  revision = "6f217b454f458f9c81d48c1fff9e6f5ea6b0bbf2"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
