@@ -3,11 +3,12 @@ package daemon
 import (
 	"errors"
 	"flag"
-	"github.com/skycoin/hardware-wallet-daemon/src/api"
 	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 

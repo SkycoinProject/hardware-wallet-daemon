@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/blang/semver"
 	"net/http"
+
+	"github.com/blang/semver"
 )
 
 // BuildInfo represents the build info

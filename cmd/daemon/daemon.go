@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/skycoin/hardware-wallet-daemon/src/api"
 	"os"
+
+	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
 	"github.com/skycoin/skycoin/src/util/logging"
 
