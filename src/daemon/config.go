@@ -25,6 +25,7 @@ type Config struct {
 	Build api.BuildInfo
 }
 
+// AppConfig records the app's configuration
 type AppConfig struct {
 	// Remote web interface port
 	WebInterfacePort int
