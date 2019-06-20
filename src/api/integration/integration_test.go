@@ -101,6 +101,28 @@ func doEmulator(t *testing.T) bool {
 	return false
 }
 
+func TestVersion(t *testing.T) {
+	if !enabled() {
+		return
+	}
+
+	// check that mode is valid
+	mode(t)
+
+	resp, err := daemonClient.Operations.GetVersion(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Payload.Data)
+
+	buildInfo := api.BuildInfo{
+		Version: resp.Payload.Data.Version,
+		Commit:  resp.Payload.Data.Commit,
+		Branch:  resp.Payload.Data.Branch,
+	}
+
+	_, err = buildInfo.Semver()
+	require.NoError(t, err)
+}
+
 func TestEmulatorGenerateAddresses(t *testing.T) {
 	if !doEmulator(t) {
 		return

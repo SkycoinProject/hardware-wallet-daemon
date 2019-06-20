@@ -59,21 +59,6 @@ func init() {
 	}
 }
 
-type muxConfig struct {
-	host               string
-	enableCSRF         bool
-	disableHeaderCheck bool
-	hostWhitelist      []string
-	mode               skyWallet.DeviceType
-}
-
-// Server exposes an HTTP API
-type Server struct {
-	server   *http.Server
-	listener net.Listener
-	done     chan struct{}
-}
-
 // Config configures Server
 type Config struct {
 	EnableCSRF         bool
@@ -83,6 +68,23 @@ type Config struct {
 	WriteTimeout       time.Duration
 	IdleTimeout        time.Duration
 	Mode               skyWallet.DeviceType
+	Build              BuildInfo
+}
+
+type muxConfig struct {
+	host               string
+	enableCSRF         bool
+	disableHeaderCheck bool
+	hostWhitelist      []string
+	mode               skyWallet.DeviceType
+	build              BuildInfo
+}
+
+// Server exposes an HTTP API
+type Server struct {
+	server   *http.Server
+	listener net.Listener
+	done     chan struct{}
 }
 
 // Serve serves the web interface on the configured host
@@ -128,6 +130,7 @@ func create(host string, c Config, gateway *Gateway) *Server {
 		disableHeaderCheck: c.DisableHeaderCheck,
 		hostWhitelist:      c.HostWhitelist,
 		mode:               c.Mode,
+		build:              c.Build,
 	}
 
 	srvMux := newServerMux(mc, gateway.Device)
@@ -265,5 +268,6 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	webHandlerV1("/intermediate/passphrase", passphraseRequestHandler(gateway))
 	webHandlerV1("/intermediate/word", wordRequestHandler(gateway))
 
+	webHandlerV1("/version", versionHandler(c))
 	return mux
 }
