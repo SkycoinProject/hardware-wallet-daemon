@@ -358,6 +358,22 @@ paths:
       security:
         - csrfAuth: []
 
+  /version:
+    get:
+      description: Returns daemon version information.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/VersionResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
 
   /intermediate/pin_matrix:
     post:
@@ -669,6 +685,19 @@ definitions:
             type: integer
           firmware_features:
             type: integer
+
+  VersionResponse:
+    type: object
+    properties:
+      data:
+        type: object
+        properties:
+          version:
+            type: string
+          commit:
+            type: string
+          branch:
+            type: string
 
   SignMessageResponse:
     type: object

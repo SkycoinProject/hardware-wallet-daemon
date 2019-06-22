@@ -36,7 +36,7 @@ func (d *Daemon) Run() error {
 	var retErr error
 	errC := make(chan error, 10)
 
-	logLevel, err := logging.LevelFromString(d.config.LogLevel)
+	logLevel, err := logging.LevelFromString(d.config.App.LogLevel)
 	if err != nil {
 		err = fmt.Errorf("invalid -log-level: %v", err)
 		d.logger.Error(err)
@@ -45,14 +45,14 @@ func (d *Daemon) Run() error {
 
 	logging.SetLevel(logLevel)
 
-	if d.config.ColorLog {
+	if d.config.App.ColorLog {
 		logging.EnableColors()
 	} else {
 		logging.DisableColors()
 	}
 
 	var logFile *os.File
-	if d.config.LogToFile {
+	if d.config.App.LogToFile {
 		var err error
 		logFile, err = d.initLogFile()
 		if err != nil {
@@ -61,10 +61,10 @@ func (d *Daemon) Run() error {
 		}
 	}
 
-	host := fmt.Sprintf("%s:%d", d.config.WebInterfaceAddr, d.config.WebInterfacePort)
+	host := fmt.Sprintf("%s:%d", d.config.App.WebInterfaceAddr, d.config.App.WebInterfacePort)
 
-	if d.config.ProfileCPU {
-		f, err := os.Create(d.config.ProfileCPUFile)
+	if d.config.App.ProfileCPU {
+		f, err := os.Create(d.config.App.ProfileCPUFile)
 		if err != nil {
 			d.logger.Error(err)
 			return err
@@ -77,10 +77,10 @@ func (d *Daemon) Run() error {
 		defer pprof.StopCPUProfile()
 	}
 
-	if d.config.HTTPProf {
+	if d.config.App.HTTPProf {
 		go func() {
-			if err := http.ListenAndServe(d.config.HTTPProfHost, nil); err != nil {
-				d.logger.WithError(err).Errorf("Listen on HTTP profiling interface %s failed", d.config.HTTPProfHost)
+			if err := http.ListenAndServe(d.config.App.HTTPProfHost, nil); err != nil {
+				d.logger.WithError(err).Errorf("Listen on HTTP profiling interface %s failed", d.config.App.HTTPProfHost)
 			}
 		}()
 	}
@@ -95,7 +95,7 @@ func (d *Daemon) Run() error {
 	// Catch SIGUSR1 (prints runtime stack to stdout)
 	go apputil.CatchDebug()
 
-	apiServer, err = d.createServer(host, api.NewGateway(skyWallet.NewDevice(d.config.daemonMode)))
+	apiServer, err = d.createServer(host, api.NewGateway(skyWallet.NewDevice(d.config.App.daemonMode)))
 	if err != nil {
 		d.logger.Error(err)
 		retErr = err
@@ -141,7 +141,7 @@ earlyShutdown:
 }
 
 func (d *Daemon) initLogFile() (*os.File, error) {
-	logDir := filepath.Join(d.config.DataDirectory, "logs")
+	logDir := filepath.Join(d.config.App.DataDirectory, "logs")
 	if err := createDirIfNotExist(logDir); err != nil {
 		d.logger.Errorf("createDirIfNotExist(%s) failed: %v", logDir, err)
 		return nil, fmt.Errorf("createDirIfNotExist(%s) failed: %v", logDir, err)
@@ -173,13 +173,14 @@ func createDirIfNotExist(dir string) error {
 
 func (d *Daemon) createServer(host string, gateway *api.Gateway) (*api.Server, error) {
 	apiConfig := api.Config{
-		EnableCSRF:         d.config.EnableCSRF,
-		DisableHeaderCheck: d.config.DisableHeaderCheck,
-		HostWhitelist:      d.config.hostWhitelist,
-		ReadTimeout:        d.config.HTTPReadTimeout,
-		WriteTimeout:       d.config.HTTPWriteTimeout,
-		IdleTimeout:        d.config.HTTPIdleTimeout,
-		Mode:               d.config.daemonMode,
+		EnableCSRF:         d.config.App.EnableCSRF,
+		DisableHeaderCheck: d.config.App.DisableHeaderCheck,
+		HostWhitelist:      d.config.App.hostWhitelist,
+		ReadTimeout:        d.config.App.HTTPReadTimeout,
+		WriteTimeout:       d.config.App.HTTPWriteTimeout,
+		IdleTimeout:        d.config.App.HTTPIdleTimeout,
+		Mode:               d.config.App.daemonMode,
+		Build:              d.config.Build,
 	}
 
 	var s *api.Server

@@ -21,7 +21,8 @@ type RecoveryRequest struct {
 	DryRun bool `json:"dry_run,omitempty"`
 
 	// use passphrase
-	UsePassphrase bool `json:"use_passphrase,omitempty"`
+	// Required: true
+	UsePassphrase *bool `json:"use_passphrase"`
 
 	// word count
 	// Required: true
@@ -32,6 +33,10 @@ type RecoveryRequest struct {
 func (m *RecoveryRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateUsePassphrase(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateWordCount(formats); err != nil {
 		res = append(res, err)
 	}
@@ -39,6 +44,15 @@ func (m *RecoveryRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *RecoveryRequest) validateUsePassphrase(formats strfmt.Registry) error {
+
+	if err := validate.Required("use_passphrase", "body", m.UsePassphrase); err != nil {
+		return err
+	}
+
 	return nil
 }
 

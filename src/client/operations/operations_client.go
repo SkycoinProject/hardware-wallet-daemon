@@ -140,6 +140,35 @@ func (a *Client) GetFeatures(params *GetFeaturesParams, authInfo runtime.ClientA
 }
 
 /*
+GetVersion Returns daemon version information.
+*/
+func (a *Client) GetVersion(params *GetVersionParams, authInfo runtime.ClientAuthInfoWriter) (*GetVersionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetVersionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetVersion",
+		Method:             "GET",
+		PathPattern:        "/version",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetVersionReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetVersionOK), nil
+
+}
+
+/*
 PostApplySettings Apply hardware wallet settings.
 */
 func (a *Client) PostApplySettings(params *PostApplySettingsParams, authInfo runtime.ClientAuthInfoWriter) (*PostApplySettingsOK, error) {

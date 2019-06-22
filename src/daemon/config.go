@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/skycoin/hardware-wallet-daemon/src/api"
+
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 
 	"github.com/skycoin/skycoin/src/util/file"
@@ -17,8 +19,14 @@ var (
 	help = false
 )
 
-// Config records the daemon's configuration
+// Config records the daemon and build configuration
 type Config struct {
+	App   AppConfig
+	Build api.BuildInfo
+}
+
+// AppConfig records the app's configuration
+type AppConfig struct {
 	// Remote web interface port
 	WebInterfacePort int
 	// Remote web interface address
@@ -62,9 +70,9 @@ type Config struct {
 	daemonMode skyWallet.DeviceType
 }
 
-// NewConfig returns a new config instance
-func NewConfig(port int, datadir string) Config {
-	return Config{
+// NewAppConfig returns a new app config instance
+func NewAppConfig(port int, datadir string) AppConfig {
+	return AppConfig{
 		WebInterfaceAddr: "127.0.0.1",
 		WebInterfacePort: port,
 
@@ -105,18 +113,18 @@ func (c *Config) postProcess() error {
 
 	var err error
 	home := file.UserHome()
-	c.DataDirectory, err = file.InitDataDir(replaceHome(c.DataDirectory, home))
+	c.App.DataDirectory, err = file.InitDataDir(replaceHome(c.App.DataDirectory, home))
 	panicIfError(err, "Invalid DataDirectory")
 
-	if c.HostWhitelist != "" {
-		if c.DisableHeaderCheck {
+	if c.App.HostWhitelist != "" {
+		if c.App.DisableHeaderCheck {
 			return errors.New("host whitelist should be empty when header check is disabled")
 		}
-		c.hostWhitelist = strings.Split(c.HostWhitelist, ",")
+		c.App.hostWhitelist = strings.Split(c.App.HostWhitelist, ",")
 	}
 
-	c.daemonMode = skyWallet.DeviceTypeFromString(c.DaemonMode)
-	if c.daemonMode == skyWallet.DeviceTypeInvalid {
+	c.App.daemonMode = skyWallet.DeviceTypeFromString(c.App.DaemonMode)
+	if c.App.daemonMode == skyWallet.DeviceTypeInvalid {
 		return errors.New("invalid device type")
 	}
 
@@ -124,7 +132,7 @@ func (c *Config) postProcess() error {
 }
 
 // RegisterFlags binds CLI flags to config values
-func (c *Config) RegisterFlags() {
+func (c *AppConfig) RegisterFlags() {
 	flag.BoolVar(&help, "help", false, "Show help")
 	flag.IntVar(&c.WebInterfacePort, "web-interface-port", c.WebInterfacePort, "port to serve web interface on")
 	flag.StringVar(&c.WebInterfaceAddr, "web-interface-addr", c.WebInterfaceAddr, "addr to serve web interface on")
