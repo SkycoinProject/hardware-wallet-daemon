@@ -24,12 +24,14 @@ func TestSignTransaction(t *testing.T) {
 	failureMsgBytes, err := failureMsg.Marshal()
 	require.NoError(t, err)
 
-	successMsg := messages.Success{
-		Message: newStrPtr("transaction sign success"),
+	nullIndexResponse := messages.ResponseTransactionSign{
+		Signatures: []string{"", ""},
+		Padding: newBoolPtr(false),
 	}
 
-	successMsgBytes, err := successMsg.Marshal()
+	nullIndexResponseBytes, err := nullIndexResponse.Marshal()
 	require.NoError(t, err)
+
 
 	cases := []struct {
 		name                         string
@@ -229,8 +231,8 @@ func TestSignTransaction(t *testing.T) {
 				},
 			}),
 			gatewaySignTransactionResult: wire.Message{
-				Kind: uint16(messages.MessageType_MessageType_Success),
-				Data: successMsgBytes,
+				Kind: uint16(messages.MessageType_MessageType_ResponseTransactionSign),
+				Data: nullIndexResponseBytes,
 			},
 			httpResponse: HTTPResponse{
 				Data: "transaction sign success",
