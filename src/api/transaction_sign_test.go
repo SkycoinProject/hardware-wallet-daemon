@@ -234,7 +234,7 @@ func TestSignTransaction(t *testing.T) {
 				Data: nullIndexResponseBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "transaction sign success",
+				Data: []string{"", ""},
 			},
 		},
 	}
@@ -272,7 +272,7 @@ func TestSignTransaction(t *testing.T) {
 			status := rr.Code
 			require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
 
-			var rsp HTTPResponse
+			var rsp ReceivedHTTPResponse
 			err = json.NewDecoder(rr.Body).Decode(&rsp)
 			require.NoError(t, err)
 
@@ -280,11 +280,13 @@ func TestSignTransaction(t *testing.T) {
 
 			if rsp.Data == nil {
 				require.Nil(t, tc.httpResponse.Data)
-				if tc.err != "" {
-					require.Equal(t, tc.err, rsp.Error.Message)
-				}
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
+				var resp []string
+				err = json.Unmarshal(rsp.Data, &resp)
+				require.NoError(t, err)
+
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}
