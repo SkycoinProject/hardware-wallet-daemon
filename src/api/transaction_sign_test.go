@@ -26,12 +26,11 @@ func TestSignTransaction(t *testing.T) {
 
 	nullIndexResponse := messages.ResponseTransactionSign{
 		Signatures: []string{"", ""},
-		Padding: newBoolPtr(false),
+		Padding:    newBoolPtr(false),
 	}
 
 	nullIndexResponseBytes, err := nullIndexResponse.Marshal()
 	require.NoError(t, err)
-
 
 	cases := []struct {
 		name                         string
