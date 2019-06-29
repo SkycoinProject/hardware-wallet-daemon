@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
+	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/skycoin/skycoin/src/cipher"
 	"github.com/skycoin/skycoin/src/util/droplet"
 
 	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
-	messages "github.com/skycoin/hardware-wallet-protob/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,6 +22,14 @@ func TestSignTransaction(t *testing.T) {
 	}
 
 	failureMsgBytes, err := failureMsg.Marshal()
+	require.NoError(t, err)
+
+	nullIndexResponse := messages.ResponseTransactionSign{
+		Signatures: []string{"", ""},
+		Padding:    newBoolPtr(false),
+	}
+
+	nullIndexResponseBytes, err := nullIndexResponse.Marshal()
 	require.NoError(t, err)
 
 	cases := []struct {
@@ -73,25 +81,6 @@ func TestSignTransaction(t *testing.T) {
 			}),
 			err:          "input hash cannot be empty",
 			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "input hash cannot be empty"),
-		},
-
-		{
-			name:        "400 - Input Index Empty",
-			method:      http.MethodPost,
-			contentType: ContentTypeJSON,
-			status:      http.StatusBadRequest,
-			httpBody: toJSON(t, &TransactionSignRequest{
-				TransactionInputs: []TransactionInput{
-					{nil, "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
-					{nil, "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
-				},
-				TransactionOutputs: []TransactionOutput{
-					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "2", Hours: "2"},
-					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
-				},
-			}),
-			err:          "input index cannot be empty",
-			httpResponse: NewHTTPErrorResponse(http.StatusBadRequest, "input index cannot be empty"),
 		},
 
 		{
@@ -221,9 +210,32 @@ func TestSignTransaction(t *testing.T) {
 				Kind: uint16(messages.MessageType_MessageType_Failure),
 				Data: failureMsgBytes,
 			},
-
 			err:          "failure msg",
 			httpResponse: NewHTTPErrorResponse(http.StatusConflict, "failure msg"),
+		},
+
+		{
+			name:        "200 - Input Index Empty",
+			method:      http.MethodPost,
+			contentType: ContentTypeJSON,
+			status:      http.StatusOK,
+			httpBody: toJSON(t, &TransactionSignRequest{
+				TransactionInputs: []TransactionInput{
+					{nil, "c2244e4912330d201d979f80db4df42118e49704e500e2e00a52a61954e8c663"},
+					{nil, "4f7250b0b1f588c4dedd5a4be984fab7215a773773480d8698e8f5ff04ef2611"},
+				},
+				TransactionOutputs: []TransactionOutput{
+					{Address: "2M9hQ4LqEsBF5JZ3uBatnkaMgg9pN965JvG", Coins: "2", Hours: "2"},
+					{Address: "2iNNt6fm9LszSWe51693BeyNUKX34pPaLx8", Coins: "3", Hours: "3"},
+				},
+			}),
+			gatewaySignTransactionResult: wire.Message{
+				Kind: uint16(messages.MessageType_MessageType_ResponseTransactionSign),
+				Data: nullIndexResponseBytes,
+			},
+			httpResponse: HTTPResponse{
+				Data: []string{"", ""},
+			},
 		},
 	}
 
@@ -232,7 +244,7 @@ func TestSignTransaction(t *testing.T) {
 			endpoint := "/transaction_sign"
 			gateway := &MockGatewayer{}
 
-			if tc.err != "" {
+			if tc.httpBody != "" {
 				var body TransactionSignRequest
 				err := json.Unmarshal([]byte(tc.httpBody), &body)
 				if err == nil {
@@ -260,7 +272,7 @@ func TestSignTransaction(t *testing.T) {
 			status := rr.Code
 			require.Equal(t, tc.status, status, "got `%v` want `%v`", status, tc.status)
 
-			var rsp HTTPResponse
+			var rsp ReceivedHTTPResponse
 			err = json.NewDecoder(rr.Body).Decode(&rsp)
 			require.NoError(t, err)
 
@@ -268,11 +280,13 @@ func TestSignTransaction(t *testing.T) {
 
 			if rsp.Data == nil {
 				require.Nil(t, tc.httpResponse.Data)
-				if tc.err != "" {
-					require.Equal(t, tc.err, rsp.Error.Message)
-				}
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
+				var resp []string
+				err = json.Unmarshal(rsp.Data, &resp)
+				require.NoError(t, err)
+
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

@@ -105,7 +105,215 @@ If neither the emulator nor a physical device are connected then tests will be s
 
 # Pre-release testing
 
-Follow [hardware wallet firmware pre-release instructions](https://github.com/skycoin/hardware-wallet/tree/develop/README.md#pre-release-testing) by using library commands.
+Pre-release testing procedure requires [skycoin-cli](https://github.com/skycoin/skycoin/tree/develop/cmd/cli). Please [install it](https://github.com/skycoin/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/skycoin/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/skycoin/hardware-wallet/) in advance.
+
+The instructions that follow are meant to be followed for Skywallet devices flashed without memory protection. If your device memory is protected then some values might be different e.g. `firmwareFeatures`.
+
+During the process beware of the fact that running an Skycoin node in the background can block the Skywallet from running.
+
+Some values need to be known during the process. They are represented by the following variables:
+
+- `WALLET1`, `WALLET2`, ... names of wallets created by `skycoin_cli`
+- `ADDRESS1`, `ADDRESS2`, ... Skycoin addresses
+- `TXN1_RAW`, `TXN2_RAW`, ... transactions data encoded in hex dump format
+- `TXN1_JSON`, `TXN2_JSON`, ... transactions data encoded in JSON format, if numeric index value matches the one of another variable with `RAW` prefix then both refer to the same transaction
+- `TXN1_ID`, `TXN2_ID`, ... Hash ID of transactions after broadcasting to the P2P network
+- `AMOUNT` represents an arbitrary number of coins
+- `ID1`, `ID2`, `ID3`, ... unique ID values , usually strings identifying hardware or software artifacts
+- `AUTHTOKEN` is a CSRF token for the Skycoin REST API
+
+Perform these actions before releasing:
+
+**Note** : In all cases `skycoin-cli` would be equivalent to `go run cmd/cli/cli.go` if current working directory set to `$GOPATH/src/github.com/skycoin/skycoin`.
+
+##### Run project test suite
+
+- Open a terminal window and run Skywallet emulator. Wait for emulator UI to display.
+- From a separate trminal window run the test suite as follows
+```sh
+npm run test
+```
+- Close emulator and plug Skywallet device. Run the same command another time.
+
+##### Run transaction tests
+
+- Create new wallet e.g. with `skycoin-cli` (or reuse existing wallet for testing purposes)
+```sh
+skycoin-cli walletCreate -f $WALLET1.wlt -l $WALLET1
+```
+- From command output take note of the seed `SEED1` and address `ADDRESS1`
+- List wallet addresses and confirm that `ADDRESS1` is the only value in the list.
+```sh
+skycoin-cli listAddresses $WALLET1.wlt
+```
+- Transfer funds to `ADDRESS1` in new wallet in two transactions
+- Check balance
+```sh
+skycoin-cli addressBalance $ADDRESS1
+```
+- List address for `WALLET1` and check that `head_outputs` in response includes to outputs with `address` set to `ADDRESS1`
+```
+skycoin-cli walletOutputs $WALLET1.wlt
+```
+- [Get device features](cmd/cli/README.md#device-features) and check that:
+  * `vendor` is set to `Skycoin Foundation`
+  * `deviceId` is a string of 24 chars, which we'll refer to as `ID1`
+  * write down the value of `bootloaderHash` i.e. `ID2`
+  * `model` is set to `'1'`
+  * `fwMajor` is set to expected firmware major version number
+  * `fwMinor` is set to expected firmware minor version number
+  * `fwPatch` is set to expected firmware patch version number
+  * `firmwareFeatures` is set to `0`
+- Ensure device is seedless by [wiping it](cmd/cli/README.md#wipe-device). Check that device ends up in home screen with `NEEDS SEED!` message at the top.
+- [Recover seed](cmd/cli/README.md#recovery-device) `SEED1` in Skywallet device (`dry-run=false`).
+- [Get device features](cmd/cli/README.md#device-features) and check that:
+  * `vendor` is set to `Skycoin Foundation`
+  * `deviceId` is set to `ID1`
+  * `pinProtection` is seto to `false`
+  * `passphraseProtection` is set to `false`
+  * `label` is set to `ID1`
+  * `initialized` is set to `true`
+  * `bootloaderHash` is set to `ID2`
+  * `passphraseCached` is set to `false`
+  * `needsBackup` is set to `false`
+  * `model` is set to `'1'`
+  * `fwMajor` is set to expected firmware major version number
+  * `fwMinor` is set to expected firmware minor version number
+  * `fwPatch` is set to expected firmware patch version number
+  * `firmwareFeatures` is set to `0`
+- [Set device label](cmd/cli/README.md#apply-settings) to a new value , say `ID3`. Specify `usePassphrase=false`.
+- [Get device features](cmd/cli/README.md#device-features) and check that:
+  * `label` is set to `ID3`
+  * all other values did not change with respect to previous step, especially `deviceId`
+  * as a result device label is displayed on top of Skycoin logo in device home screen
+- Ensure you know at least two addresses for test wallet, if not, [generate some](cmd/cli/README.md#ask-device-to-generate-addresses). Choose the second and third in order, hereinafter referred to as `ADDRESS2`, `ADDRESS3` respectively
+- Check that address sequence generated by SkyWallet matches the values generated by `skycoin-cli`
+```sh
+skycoin-cli walletAddAddresses -f $WALLET1.wlt -n 5
+```
+- Check once again with desktop wallet
+- Create new transaction from `ADDRESS1` to `ADDRESS2` in test wallet (say `TXN_RAW1`) for an spendable amount higher than individual output's coins
+```sh
+export TXN1_RAW="$(skycoin-cli createRawTransaction -a $ADDRESS1 -f $WALLET1.wlt $ADDRESS2 $AMOUNT)"
+echo $TXN1_RAW
+```
+- Display transaction details and confirm that it contains at least two inputs
+```sh
+export TXN1_JSON=$(skycoin-cli decodeRawTransaction $TXN1_RAW)
+echo $TXN1_JSON
+```
+- [Sign transaction](cmd/cli/README.md#transaction-sign) with Skywallet by putting together a message using values resulting from previous step as follows.
+  * Set message `nbIn` to the length of transaction `inputs` array
+  * Set message `nbOut` to the length of transaction `outputs` array
+  * For each hash in transaction `inputs` array there should be an item in messsage `inputs` array with `hashIn` field set to the very same hash and `index` set to `0`.
+  * For each source item in transaction `outputs` array there should be an item in messsage `outputs` array with fields set as follows:
+    - `address` : source item's `dst`
+    - `coin` : source item's `coins`
+    - `hour` : source item's `hours`
+    - `address_index` : set to `0` if source item `address` equals `ADDRESS1` or to `1` otherwise
+- Check that `signatures` array returned by hardware wallet includes entries for each and every transaction input
+- [Check signatures](cmd/cli/README.md#ask-device-to-check-signature) were signed by corresponding addresses
+- Create transaction `TXN2_JSON` by replacing `TXN1_JSON` signatures with the array returned by SkyWallet
+- Use `TXN2_JSON` to obtain encoded transaction `TXN2_RAW`
+```sh
+export $TXN2_RAW=$( echo "$TXN2_JSON" | skycoin-cli encodeJsonTransaction - | grep '"rawtx"' | cut -d '"' -f4)
+echo $TXN2_RAW
+```
+- Broadcast transaction. Refer to its id as `TXN2_ID`
+```sh
+export TXN2_ID=$(skycoin-cli broadcastTransaction $TXN2_RAW)
+```
+- After a a reasonable time check that balance changed.
+```sh
+skycoin-cli walletBalance $WALLET1.wlt
+```
+- Create a second wallet i.e. `WALLET2`
+```sh
+skycoin-cli walletCreate -f $WALLET2.wlt -l $WALLET2
+```
+- From command output take note of the seed `SEED2` and address `ADDRESS4`
+- List `WALLET2` addresses and confirm that `ADDRESS4` is the only value in the list.
+```sh
+skycoin-cli lisAddresses $WALLET2.wlt
+```
+- Transfer funds to `WALLET2` (if not already done) and check balance
+```sh
+skycoin-cli addressBalance $ADDRESS4
+```
+- Request CSRF token (i.e. `AUTHTOKEN`) using Skycoin REST API.
+```sh
+curl http://127.0.0.1:6420/api/v1/csrf
+```
+- Use Skycoin REST API to create one transaction grabbing all funds from `ADDRESS1` (i.e. first address in `WALLET1` previously recovered in Skywallet device), `ADDRESS2` (i.e. second address in `WALLET1` previously recovered in Skywallet device) and `ADDRESS4` (i.e. first address in `WALLET2`) so as to transfer to the third address of `WALLET1` (i.e. `ADDRESS3`). Change should be sent back to `ADDRESS1`. In server response transaction JSON object (a.k.a `TNX3_JSON`) would be the object at `data.transaction` JSON path. If Skycoin node was started with default parameters this can be achieved as follows:
+```sh
+curl -X POST http://127.0.0.1:6420/api/v2/transaction -H 'content-type: application/json' -H "X-CSRF-Token: $AUTHTOKEN" -d "{
+    \"hours_selection\": {
+        \"type\": \"auto\",
+        \"mode\": \"share\",
+        \"share_factor\": \"0.5\"
+    },
+    \"addresses\": [\"$ADDRESS1\", \"$ADDRESS2\", \"$ADDRESS4\"],
+    \"change_address\": \"$ADDRESS1\",
+    \"to\": [{
+        \"address\": \"$ADDRESS3\",
+        \"coins\": \"$AMOUNT\"
+    }],
+    \"ignore_unconfirmed\": false
+}"
+```
+- [Sign transaction](cmd/cli/README.md#transaction-sign) represented by `TXN3_JSON` for inputs owned by Skywallet (i.e. `WALLET1`)
+  * Set message `nbIn` to the 
+  * Set message `nbOut` to the length of transaction `outputs` array
+  * For each object in transaction `inputs` array there should be an item in messsage `inputs` array with:
+    - `hashIn` field set to the value bound to object's `uxid` key
+    - address index as follows
+      * not set if input `address` is `ADDRESS4`
+      * `0` if input `address` is `ADDRESS1`
+      * `1` if input `address` is `ADDRESS2`
+  * For each source item in transaction `outputs` array there should be an item in messsage `outputs` array with fields set as follows:
+    - `address` : source item's `address`
+    - `coin` : source item's `coins * 1000000`
+    - `hour` : source item's `hours`
+    - `address_index` set to 2 (since destination address is `ADDRESS3`)
+- Check that signatures array includes one entry for every input except the one associated to `ADDRESS4`, which should be an empty string
+- [Recover seed](cmd/cli/README.md#recovery-device) `SEED2` in Skywallet device (`dry-run=false`).
+- [Sign transaction](cmd/cli/README.md#transaction-sign) represented by `TXN3_JSON` for inputs owned by Skywallet (i.e. `WALLET2`)
+  * Set message `nbIn` to the length of transaction `inputs` array
+  * Set message `nbOut` to the length of transaction `outputs` array
+  * For each hash in transaction `inputs` array there should be an item in messsage `inputs` array with:
+    - `hashIn` field set to the value bound to object's `uxid` key
+    - address index as follows
+      * not set if input `address` is `ADDRESS1`
+      * not set if input `address` is `ADDRESS2`
+      * `0` if input `address` is `ADDRESS4`
+  * For each source item in transaction `outputs` array there should be an item in messsage `outputs` array with fields set as follows:
+    - `address` : source item's `dst`
+    - `coin` : source item's `coins * 1000000`
+    - `hour` : source item's `hours`
+    - `address_index` set to 2 (since destination address is `ADDRESS3`)
+- Create a new transaction JSON object (a.k.a `TXN4_JSON`) from `TXN3_JSON` and the previous signatures like this
+  * `type` same as in `TXN3_JSON`
+  * `inner_hash` should be an empty string
+  * `sigs` returned by SkyWallet in same order as corresponding input
+  * `inputs` is an array of strings. For each item in `TXN3_JSON` `inputs` include the value of its `uxid` field in `TXN4_JSON` `inputs` array. Respect original order.
+  * `outputs` is an array of objects constructed out of `TXN3_JSON` `outputs` items, in te same order, as follows
+    - `dst` : source item's `address`
+    - `coins` : source item's `coins * 1000000`
+    - `hours` : source item's `hours` as integer
+- Use `TXN4_JSON` to obtain encoded transaction `TXN4_RAW`
+```sh
+export $TXN4_RAW=$( echo "$TXN4_JSON" | skycoin-cli encodeJsonTransaction - | grep '"rawtx"' | cut -d '"' -f4)
+echo $TXN4_RAW
+```
+- Broadcast transaction. Refer to its id as `TXN4_ID`
+```sh
+export TXN4_ID=$(skycoin-cli broadcastTransaction $TXN4_RAW)
+```
+- After a a reasonable time check that wallets balance changed.
+```sh
+skycoin-cli walletBalance $WALLET1.wlt
+skycoin-cli walletBalance $WALLET2.wlt
+```
 
 ## Wiki
 
