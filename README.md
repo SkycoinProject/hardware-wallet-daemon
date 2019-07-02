@@ -307,11 +307,11 @@ Pre-release testing procedure requires [skycoin-cli](https://github.com/skycoin/
 
 The instructions that follow are meant to be followed for Skywallet devices flashed without memory protection. If your device memory is protected then some values might be different e.g. `firmware_features`.
 
-During the process beware of the fact that running an Skycoin node in the background can block the Skywallet from running.
+During the process beware of the fact that running an Skycoin node in the background can block the Skycoin desktop wallet from running.
 
 Some values need to be known during the process. They are represented by the following variables:
 
-- `WALLET1`, `WALLET2`, ... names of wallets created by `skycoin_cli`
+- `WALLET1`, `WALLET2`, ... names of wallets created by `skycoin-cli`
 - `ADDRESS1`, `ADDRESS2`, ... Skycoin addresses
 - `TXN1_RAW`, `TXN2_RAW`, ... transactions data encoded in hex dump format
 - `TXN1_JSON`, `TXN2_JSON`, ... transactions data encoded in JSON format, if numeric index value matches the one of another variable with `RAW` prefix then both refer to the same transaction
