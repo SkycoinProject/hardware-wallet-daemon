@@ -95,8 +95,8 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 				logger.Error(err.Error())
 				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
 				writeHTTPResponse(w, resp)
+				return
 			}
-			return
 		case uint16(messages.MessageType_MessageType_Failure):
 			failureMsg, err := skyWallet.DecodeFailMsg(msg)
 			if err != nil {
