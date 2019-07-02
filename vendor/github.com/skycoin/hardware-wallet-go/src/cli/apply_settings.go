@@ -58,15 +58,8 @@ func applySettingsCmd() gcli.Command {
 				}
 			}
 
-			usePassphrase := new(bool)
-			switch passphrase {
-			case "true":
-				*usePassphrase = true
-			case "false":
-				*usePassphrase = false
-			case "":
-				usePassphrase = nil
-			default:
+			usePassphrase, _err := parseBool(passphrase)
+			if _err != nil {
 				log.Errorln("Valid values for usePassphrase are true or false")
 				return
 			}

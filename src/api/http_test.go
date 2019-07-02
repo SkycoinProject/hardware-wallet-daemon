@@ -63,6 +63,9 @@ var endpointsMethods = map[string][]string{
 	"/api/v1/available": []string{
 		http.MethodGet,
 	},
+	"/api/v1/version": []string{
+		http.MethodGet,
+	},
 }
 
 func allEndpoints() []string {

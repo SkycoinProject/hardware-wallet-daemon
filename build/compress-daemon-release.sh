@@ -4,9 +4,9 @@ set -e -o pipefail
 # Compresses packaged daemon release after
 # ./package-daemon-release.sh is done
 
-GOX_OSARCH="$@"
+XGO_TARGETS="$@"
 
-. build-conf.sh "$GOX_OSARCH"
+. build-conf.sh "$XGO_TARGETS"
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 

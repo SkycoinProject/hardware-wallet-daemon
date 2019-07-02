@@ -484,6 +484,32 @@ $ curl -X GET http://127.0.0.1:9510/api/v1/available
 }
 ```
 
+### Version
+Version returns daemon version information
+
+```
+URI: /api/v1/version
+Method: GET
+```
+
+**Example**:
+
+```bash
+$ curl -X GET http://127.0.0.1:9510/api/v1/version
+```
+
+**Response**:
+```json
+{
+    "data": {
+        "version": "0.1.0",
+        "commit": "d495cb596255dcca3c9e8f487c369b4b08a046d7",
+        "branch": "master"
+    }
+}
+```
+
+
 ### Intermediates
 Intermediate requests are those which require user input like pincode, passphrase or word.
 
@@ -531,3 +557,4 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/intermediate/word \
   -H 'Content-Type: application/json' \
   -d '{"word": "cloud"}'
 ```
+

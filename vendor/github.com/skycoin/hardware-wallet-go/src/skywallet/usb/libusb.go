@@ -124,7 +124,6 @@ func (b *LibUSB) Enumerate(vendorID, productID uint16) ([]Info, error) {
 			path := b.identify(dev)
 			inset := paths[path]
 			if !inset {
-				log.Info(dd)
 				appendInfo := func() {
 					infos = append(infos, Info{
 						Path:      path,
@@ -197,9 +196,8 @@ func (b *LibUSB) setConfiguration(d lowlevel.Device_Handle) {
 	currConf, err := lowlevel.Get_Configuration(d)
 	if err != nil {
 		log.Errorf("current configuration err %s", err.Error())
-	} else {
-		log.Errorf("current configuration %d", currConf)
 	}
+
 	if currConf != usbConfigNum {
 		err = lowlevel.Set_Configuration(d, usbConfigNum)
 		if err != nil {
@@ -381,7 +379,6 @@ func (d *LibUSBDevice) Close(disconnected bool) error {
 		// Finishing read queue is not necessary when we don't allow cancelling
 		// (since when we don't allow cancelling, we don't allow session stealing)
 		if !disconnected {
-			log.Info("finishing read queue")
 			d.finishReadQueue()
 		}
 	}

@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ApplySettingsRequest apply settings request
@@ -22,11 +24,30 @@ type ApplySettingsRequest struct {
 	Language string `json:"language,omitempty"`
 
 	// use passphrase
-	UsePassphrase bool `json:"use_passphrase,omitempty"`
+	// Required: true
+	UsePassphrase *bool `json:"use_passphrase"`
 }
 
 // Validate validates this apply settings request
 func (m *ApplySettingsRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateUsePassphrase(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ApplySettingsRequest) validateUsePassphrase(formats strfmt.Registry) error {
+
+	if err := validate.Required("use_passphrase", "body", m.UsePassphrase); err != nil {
+		return err
+	}
+
 	return nil
 }
 
