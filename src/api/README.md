@@ -24,6 +24,11 @@ The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v
         - [Transaction Sign](#transaction-sign)
         - [Wipe](#wipe)
         - [Available](#available)
+        - [Version](#version)
+    - [Intermediates](#intermediates)
+        - [Pincode](#pincode)
+        - [Passphrase](#passphrase)
+        - [Word](#word)
     
 
 <!-- /MarkdownTOC -->
