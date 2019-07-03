@@ -69,15 +69,15 @@
   revision = "eeefdecb41b842af6dc652aaea4026e8403e62df"
 
 [[projects]]
-  digest = "1:9ae75184aad2327e2a0f20e5940bb11fba9a383b091d34fe438a2802a8236cd4"
+  digest = "1:07cdae808e19d8af6f537aaed8051ba86e042b792f3ef380655988c5ebe6f9df"
   name = "github.com/go-openapi/analysis"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "UT"
-  revision = "147e766af12c74c10c633436007317dbcd9abb0b"
-  version = "v0.19.2"
+  revision = "f30ad6ca23c1cc8d66d1e05267fcd0a6989887e9"
+  version = "v0.19.3"
 
 [[projects]]
   digest = "1:3bca1e4623bc7e1f9849a14fe730c093953727991f0592be3dad0168cb67758e"
@@ -145,12 +145,12 @@
   version = "v0.19.0"
 
 [[projects]]
-  digest = "1:4de4d7d52a6a10105bf8425d985f3a3fe204a527d854bfb1aefb5da7ea216950"
+  digest = "1:9b80c9193b5a2ce85ef89759a064d97a3ea1121bccde05c8bfbba01acad24fa6"
   name = "github.com/go-openapi/swag"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7e8dd5ceab83c86d17bc967d09e195414fe2b47e"
-  version = "v0.19.2"
+  revision = "beaa04455d9d7fadea558e98e60293fd528a89c0"
+  version = "v0.19.3"
 
 [[projects]]
   digest = "1:9d2bd059a75e4ac3983cc93fe013dbc7f789fccb996171094279458b15329842"
@@ -186,7 +186,7 @@
     "jwriter",
   ]
   pruneopts = "UT"
-  revision = "da37f6c1e4819c2ed4be6542856f9c0f0560348d"
+  revision = "b2ccc519800e761ac8000b95e5d57c80a897ff9e"
 
 [[projects]]
   digest = "1:7c084e0e780596dd2a7e20d25803909a9a43689c153de953520dfbc0b0e51166"
@@ -262,7 +262,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2c93e96061b7bdcc8fc965e5c7a953e335998771759ff73a96fde4ca5f50d157"
+  digest = "1:b609969dcd753dd72c083753b98690c9a30ded63a27868db84dd121aed45acd4"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/skywallet",
@@ -272,7 +272,7 @@
     "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "bcda77814889b01f8fddaa637d7eff57205adbd2"
+  revision = "5c7d6256fa1f67e26bb10cc959b540824e90bdea"
 
 [[projects]]
   digest = "1:3e0a94a91846a3b571c3964df4ed146911df4cb50770bece1563645612518e13"
@@ -331,7 +331,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "ea8f1a30c4438cc8b13f05538385ad8dc6049b43"
+  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
 
 [[projects]]
   branch = "master"
@@ -339,18 +339,18 @@
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "UT"
-  revision = "3b0461eec859c4b73bb64fdc8285971fd33e3938"
+  revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
 
 [[projects]]
   branch = "master"
-  digest = "1:887c8f729841e19be77a3584a51e0249a04dc8c55f184c450995ca24770364d4"
+  digest = "1:afb5346f71acefc3da7ad800f952cb2bcdb762194b05304bbf54d7f9490e31c5"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "6f217b454f458f9c81d48c1fff9e6f5ea6b0bbf2"
+  revision = "04f50cda93cbb67f2afa353c52f342100e80e625"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"

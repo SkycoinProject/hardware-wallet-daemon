@@ -66,9 +66,8 @@ func TestApplySettings(t *testing.T) {
 			contentType: ContentTypeJSON,
 			status:      http.StatusConflict,
 			httpBody: toJSON(t, &ApplySettingsRequest{
-				UsePassphrase: true,
-				Label:         "foo",
-				Language:      "english",
+				Label:    "foo",
+				Language: "english",
 			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
@@ -82,9 +81,8 @@ func TestApplySettings(t *testing.T) {
 			method: http.MethodPost,
 			status: http.StatusOK,
 			httpBody: toJSON(t, &ApplySettingsRequest{
-				UsePassphrase: true,
-				Label:         "foo",
-				Language:      "english",
+				Label:    "foo",
+				Language: "english",
 			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
@@ -104,7 +102,7 @@ func TestApplySettings(t *testing.T) {
 			var body ApplySettingsRequest
 			err := json.Unmarshal([]byte(tc.httpBody), &body)
 			if err == nil {
-				gateway.On("ApplySettings", &body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
+				gateway.On("ApplySettings", body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
 			}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))

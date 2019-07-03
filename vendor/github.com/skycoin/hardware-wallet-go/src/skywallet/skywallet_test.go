@@ -97,12 +97,6 @@ func (suite *devicerSuit) TestApplySettings() {
 		msgKind       uint16
 	}{
 		{
-			name:    "usePassphrase nil",
-			err:     ErrUsePassPhraseNil,
-			msgKind: 0,
-		},
-
-		{
 			name:          "no error",
 			usePassphrase: new(bool),
 			msgKind:       2,

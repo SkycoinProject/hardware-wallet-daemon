@@ -10,7 +10,7 @@ import (
 // ApplySettingsRequest is request data for /api/v1/apply_settings
 type ApplySettingsRequest struct {
 	Label         string `json:"label"`
-	UsePassphrase bool   `json:"use_passphrase"`
+	UsePassphrase *bool  `json:"use_passphrase"`
 	Language      string `json:"language"`
 }
 
@@ -51,7 +51,7 @@ func applySettings(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.ApplySettings(&req.UsePassphrase, req.Label, req.Language)
+		msg, err := gateway.ApplySettings(req.UsePassphrase, req.Label, req.Language)
 		if err != nil {
 			logger.Error("applySettings failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())

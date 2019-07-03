@@ -40,8 +40,6 @@ const (
 var (
 	// ErrAddressNZero is returned if addressN is 0
 	ErrAddressNZero = errors.New("addresses to generate should be greater than 0")
-	// ErrUsePassPhraseNil is returned if usePassphrase is nil
-	ErrUsePassPhraseNil = errors.New("usePassphrase cannot be nil")
 	// ErrRemovePinNil is returned if removePin is nil
 	ErrRemovePinNil = errors.New("removePin cannot be nil")
 	// ErrDeviceTypeEmulator is returned if device type is emulator
@@ -378,10 +376,6 @@ func (d *Device) ApplySettings(usePassphrase *bool, label string, language strin
 		return wire.Message{}, err
 	}
 	defer d.Disconnect()
-
-	if usePassphrase == nil {
-		return wire.Message{}, ErrUsePassPhraseNil
-	}
 
 	applySettingsChunks, err := MessageApplySettings(usePassphrase, label, language)
 	if err != nil {
