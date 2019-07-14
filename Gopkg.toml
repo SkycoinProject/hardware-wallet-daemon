@@ -40,10 +40,6 @@
   name = "github.com/NYTimes/gziphandler"
   version = "1.0.1"
 
-[[override]]
-  name = "github.com/skycoin/skycoin"
-  version = "0.25.0"
-
 [[constraint]]
   name = "github.com/skycoin/hardware-wallet-go"
   branch = "master"
