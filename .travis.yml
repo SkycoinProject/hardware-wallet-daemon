@@ -61,6 +61,10 @@ script:
     make test-integration-emulator-enable-csrf ;
     fi
   - make test
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+    sh "./ci-scripts/install-${TRAVIS_OS_NAME}.sh"
+    fi
+  - make release
 
 after_script:
   - kill -s KILL $(pgrep emulator)
@@ -69,6 +73,9 @@ notifications:
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
 
 before_deploy:
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+    sh "./ci-scripts/install-${TRAVIS_OS_NAME}.sh"
+    fi
   - make release
 
 deploy:
