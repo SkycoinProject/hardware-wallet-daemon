@@ -58,26 +58,15 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:7fb51688eadf38272411852d7a2b3538c7caff53309abee6c0964a83c00fe69e"
-  name = "github.com/globalsign/mgo"
-  packages = [
-    "bson",
-    "internal/json",
-  ]
-  pruneopts = "UT"
-  revision = "eeefdecb41b842af6dc652aaea4026e8403e62df"
-
-[[projects]]
-  digest = "1:07cdae808e19d8af6f537aaed8051ba86e042b792f3ef380655988c5ebe6f9df"
+  digest = "1:87082ea822adf4db51d1bec2a92c9fe0a38b56729bbcd7d036a36848a9bb2b97"
   name = "github.com/go-openapi/analysis"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "UT"
-  revision = "f30ad6ca23c1cc8d66d1e05267fcd0a6989887e9"
-  version = "v0.19.3"
+  revision = "48f4521ad6c3df9d6192efb04287c4a411e1f806"
+  version = "v0.19.4"
 
 [[projects]]
   digest = "1:3bca1e4623bc7e1f9849a14fe730c093953727991f0592be3dad0168cb67758e"
@@ -112,7 +101,7 @@
   version = "v0.19.2"
 
 [[projects]]
-  digest = "1:d3b9124667851d0c9d0cc1fdd2db1541a79feb15cd738a8c8e0a5256d877685d"
+  digest = "1:197cfadc30ed5d5225c43d0297c94c9c839a9a6e3c055759a9683f2d0a5a528a"
   name = "github.com/go-openapi/runtime"
   packages = [
     ".",
@@ -125,8 +114,8 @@
     "security",
   ]
   pruneopts = "UT"
-  revision = "1c4afa5263ac1b091911b4f2440b6ae406fc31e1"
-  version = "v0.19.2"
+  revision = "58872d9a7ca5f28beff9effa19ac4c17d3e42cd3"
+  version = "v0.19.3"
 
 [[projects]]
   digest = "1:b1f97d0d316f90c2059f7bfee14855c314d65834a3b93f02856e01c1fb8fbebe"
@@ -137,20 +126,20 @@
   version = "v0.19.2"
 
 [[projects]]
-  digest = "1:46d47ab9ecb073a7feeb21af4f90d3657d793eac41f94d35b64bf3014f812856"
+  digest = "1:60e14b70fbc3b2814e48562179462d7f633fc8733b6ee8e57f576801cd863f57"
   name = "github.com/go-openapi/strfmt"
   packages = ["."]
   pruneopts = "UT"
-  revision = "29177d4b5db488583bb97ebc05d3842ebeda91a8"
-  version = "v0.19.0"
+  revision = "432db8fbcb18bf11f72ca9538e07943e45be4d9f"
+  version = "v0.19.2"
 
 [[projects]]
-  digest = "1:9b80c9193b5a2ce85ef89759a064d97a3ea1121bccde05c8bfbba01acad24fa6"
+  digest = "1:2de91ae845491f7158c1644a1183d2bbcc5a7bd668768b60a91519f848603dad"
   name = "github.com/go-openapi/swag"
   packages = ["."]
   pruneopts = "UT"
-  revision = "beaa04455d9d7fadea558e98e60293fd528a89c0"
-  version = "v0.19.3"
+  revision = "de649ffb9e02183a414820c5b1b4582f7b009792"
+  version = "v0.19.4"
 
 [[projects]]
   digest = "1:9d2bd059a75e4ac3983cc93fe013dbc7f789fccb996171094279458b15329842"
@@ -159,6 +148,14 @@
   pruneopts = "UT"
   revision = "6405b9095e4c96aabb45856da08a9323d50d9336"
   version = "v0.19.2"
+
+[[projects]]
+  digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
+  name = "github.com/go-stack/stack"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
+  version = "v1.8.0"
 
 [[projects]]
   digest = "1:48092bf6632f55839850666c33469f546f6d45fdbd59a66759ec12e84d853dc2"
@@ -262,7 +259,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b609969dcd753dd72c083753b98690c9a30ded63a27868db84dd121aed45acd4"
+  digest = "1:969b5f9a2e8f544fa8bdb325017653967fb1b5bc0aa9ec3827fea6575e260453"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/skywallet",
@@ -272,25 +269,28 @@
     "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "5c7d6256fa1f67e26bb10cc959b540824e90bdea"
+  revision = "6fb67ef5048f2f9dd1ce29856a8660486dfe530e"
 
 [[projects]]
-  digest = "1:3e0a94a91846a3b571c3964df4ed146911df4cb50770bece1563645612518e13"
+  digest = "1:c6d4676e48550d1af188ed2c0d844ec9d31432277080c3ea33126ad7ceeb1421"
   name = "github.com/skycoin/hardware-wallet-protob"
   packages = [
     "go",
     "go/google/protobuf",
   ]
   pruneopts = "UT"
-  revision = "6236272c006d9a5f2aedd55e5af7c8fc104f651f"
+  revision = "bd9f95c53447f97ac56f24a415c25d04680552de"
 
 [[projects]]
-  digest = "1:d9a9e5705b46e2c36e02b3b7c84b940f294f1c681ca9ad54b2fefc70307e745e"
+  branch = "develop"
+  digest = "1:ee514323f747efc765cad1516e7c3ea9b0295f6596014f0e5abdd4df42cac4dc"
   name = "github.com/skycoin/skycoin"
   packages = [
     "src/cipher",
     "src/cipher/base58",
-    "src/cipher/go-bip39",
+    "src/cipher/bip39",
+    "src/cipher/bip39/wordlists",
+    "src/cipher/pbkdf2",
     "src/cipher/ripemd160",
     "src/cipher/secp256k1-go",
     "src/cipher/secp256k1-go/secp256k1-go2",
@@ -302,8 +302,7 @@
     "src/util/logging",
   ]
   pruneopts = "UT"
-  revision = "9b5f9f9715910798b0fa918819c27b362a47a0a4"
-  version = "v0.25.1"
+  revision = "2f8c97d44a88bc1d0f2bfba518014dea39a0d26e"
 
 [[projects]]
   digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
@@ -326,6 +325,21 @@
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:549a140c6c3742fe0df432e860fbf636f71d7589ba1e75acdc33a36346010ddc"
+  name = "go.mongodb.org/mongo-driver"
+  packages = [
+    "bson",
+    "bson/bsoncodec",
+    "bson/bsonrw",
+    "bson/bsontype",
+    "bson/primitive",
+    "x/bsonx/bsoncore",
+  ]
+  pruneopts = "UT"
+  revision = "0d1270edf53072da4da781b76d2e1db58831152f"
+  version = "v1.0.4"
+
+[[projects]]
   branch = "master"
   digest = "1:bbe51412d9915d64ffaa96b51d409e070665efc5194fcf145c4a27d4133107a4"
   name = "golang.org/x/crypto"
@@ -343,14 +357,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:afb5346f71acefc3da7ad800f952cb2bcdb762194b05304bbf54d7f9490e31c5"
+  digest = "1:31d44814b45607afa77c6e8ef20ea8bacc1d1053fe084440c874f311732e7ec3"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "04f50cda93cbb67f2afa353c52f342100e80e625"
+  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
@@ -406,7 +420,7 @@
     "github.com/skycoin/hardware-wallet-go/src/skywallet/wire",
     "github.com/skycoin/hardware-wallet-protob/go",
     "github.com/skycoin/skycoin/src/cipher",
-    "github.com/skycoin/skycoin/src/cipher/go-bip39",
+    "github.com/skycoin/skycoin/src/cipher/bip39",
     "github.com/skycoin/skycoin/src/util/apputil",
     "github.com/skycoin/skycoin/src/util/droplet",
     "github.com/skycoin/skycoin/src/util/file",
