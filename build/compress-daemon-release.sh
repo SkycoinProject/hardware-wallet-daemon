@@ -109,17 +109,20 @@ done
 echo "Create linux packages"
 if [ -e "$DMN_OUTPUT_DIR/$LNX64_DMN" ]; then
   echo "Create linux amd64 packagess"
-  ./linux/fpm-package.sh linux-amd64
+  ./linux/fpm-package.sh linux-amd64 deb
+  ./linux/fpm-package.sh linux-amd64 rpm
 fi
 
 if [ -e "$DMN_OUTPUT_DIR/$LNX32_DMN" ]; then
   echo "Creating linux 386 packages"
-  ./linux/fpm-package.sh linux-386
+  ./linux/fpm-package.sh linux-386 deb
+  ./linux/fpm-package.sh linux-386 rpm
 fi
 
 if [ -e "$DMN_OUTPUT_DIR/$LNX_ARM_DMN" ]; then
   echo "Create linux arm-7 packages"
-  ./linux/fpm-package.sh linux-arm-7
+  ./linux/fpm-package.sh linux-arm-7 deb
+  ./linux/fpm-package.sh linux-arm-7 rpm
 fi
 
 popd >/dev/null
