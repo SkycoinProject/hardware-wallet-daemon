@@ -62,7 +62,7 @@ script:
     fi
   - make test
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-    sh "./ci-scripts/install-${TRAVIS_OS_NAME}.sh"
+    sh "./ci-scripts/install-${TRAVIS_OS_NAME}-release.sh"
     fi
   - make release
 
