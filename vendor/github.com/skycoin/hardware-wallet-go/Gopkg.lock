@@ -66,17 +66,18 @@
   version = "v1.4.2"
 
 [[projects]]
-  digest = "1:3e0a94a91846a3b571c3964df4ed146911df4cb50770bece1563645612518e13"
+  digest = "1:c6d4676e48550d1af188ed2c0d844ec9d31432277080c3ea33126ad7ceeb1421"
   name = "github.com/skycoin/hardware-wallet-protob"
   packages = [
     "go",
     "go/google/protobuf",
   ]
   pruneopts = "UT"
-  revision = "6236272c006d9a5f2aedd55e5af7c8fc104f651f"
+  revision = "bd9f95c53447f97ac56f24a415c25d04680552de"
 
 [[projects]]
-  digest = "1:cda151c59579fb3fe777cc9334e328cb72bd11088ea473ec0af5dc6b87540d1f"
+  branch = "develop"
+  digest = "1:ba8b59a1ae1e9721906f2e53ddc26797bdd08dba4605e0df90fee02fc119ae91"
   name = "github.com/skycoin/skycoin"
   packages = [
     "src/cipher",
@@ -87,8 +88,7 @@
     "src/util/logging",
   ]
   pruneopts = "UT"
-  revision = "9b5f9f9715910798b0fa918819c27b362a47a0a4"
-  version = "v0.25.1"
+  revision = "2f8c97d44a88bc1d0f2bfba518014dea39a0d26e"
 
 [[projects]]
   digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
@@ -125,18 +125,18 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "20be4c3c3ed52bfccdb2d59a412ee1a936d175a7"
+  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
 
 [[projects]]
   branch = "master"
-  digest = "1:a02364950e8c7394b03f886e57a3f7acfc4fba32ce03c186dd9f36b501d0484b"
+  digest = "1:31d44814b45607afa77c6e8ef20ea8bacc1d1053fe084440c874f311732e7ec3"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4c3a928424d249a1013e789cf5e458d480bcba16"
+  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
 
 [solve-meta]
   analyzer-name = "dep"

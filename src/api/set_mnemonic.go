@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	"github.com/skycoin/skycoin/src/cipher/go-bip39"
+	"github.com/skycoin/skycoin/src/cipher/bip39"
 )
 
 // SetMnemonicRequest is request data for /api/v1/set_mnemonic
@@ -38,7 +38,7 @@ func setMnemonic(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		if ok := bip39.IsMnemonicValid(req.Mnemonic); !ok {
+		if err := bip39.ValidateMnemonic(req.Mnemonic); err != nil {
 			resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, "seed is not a valid bip39 seed")
 			writeHTTPResponse(w, resp)
 			return
