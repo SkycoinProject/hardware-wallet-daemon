@@ -4,8 +4,8 @@ set -e -o pipefail
 echo "start to build daemon..."
 pushd "build"
 
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-daemon-release.sh  'windows/386,windows/amd64,linux/386,linux/amd64,linux/arm-7' ;fi
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-daemon-release.sh  'windows/386,windows/amd64,linux/arm,linux/amd64' ;fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     echo "load osx config"
     . build-conf.sh "darwin-10.10/amd64"

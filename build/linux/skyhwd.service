@@ -1,0 +1,11 @@
+[Unit]
+Description=Skycoin Hardware Wallet Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/skyhwd
+User=skyhwd
+
+[Install]
+WantedBy=multi-user.target
