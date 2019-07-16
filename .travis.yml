@@ -23,8 +23,11 @@ env:
     - XARGS="-screen 0 1024x768x24"
 
 install:
-  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then docker pull karalabe/xgo-latest; fi
-  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then go get github.com/karalabe/xgo; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then
+    docker pull karalabe/xgo-latest ;
+    go get github.com/karalabe/xgo;
+    ./ci-scripts/install-${TRAVIS_OS_NAME}-release.sh ;
+    fi
   - make install-linters
 
 before_script:
@@ -70,9 +73,6 @@ notifications:
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
 
 before_deploy:
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-    ./ci-scripts/install-${TRAVIS_OS_NAME}-release.sh
-    fi
   - make release
 
 deploy:
