@@ -27,6 +27,12 @@ FINAL_OUTPUT_DIR="release"
 # _DMN -- our name for daemon releases
 # _DMN_ZIP -- our compressed name for daemon releases
 
+if echo "$XGO_TARGETS" | grep -Eq 'darwin(-[0-9]{1,2}\.[0-9]{1,2})?'; then
+    OSX64_DMN="${BIN_NAME}-${APP_VERSION}-osx-darwin-x64"
+    OSX64_DMN_ZIP="${OSX64_DMN}.zip"
+    OSX64_OUT="mac_x64"
+fi
+
 if echo "$XGO_TARGETS" | grep -Eq 'linux(-[0-9]{1,2}\.[0-9]{1,2})?\/386'; then
     LNX32_DMN="${BIN_NAME}-${APP_VERSION}-linux-x86"
     LNX32_DMN_BIN_DIR="${LNX32_DMN}/usr/bin/"

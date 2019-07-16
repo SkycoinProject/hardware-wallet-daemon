@@ -17,6 +17,19 @@ pushd "$DMN_OUTPUT_DIR" >/dev/null
 
 FINALS=()
 
+# OS X
+if [ -e "$OSX64_DMN" ]; then
+    if [ -e "$OSX64_DMN_ZIP" ]; then
+        echo "Removing old $OSX64_DMN_ZIP"
+        rm "$OSX64_DMN_ZIP"
+    fi
+    echo "Zipping $OSX64_DMN_ZIP"
+    # -y preserves symlinks,
+    # so that the massive .framework library isn't duplicated
+    zip -r -y --quiet "$OSX64_DMN_ZIP" "$OSX64_DMN"
+    FINALS+=("$OSX64_DMN_ZIP")
+fi
+
 # Windows 64bit
 if [ -e "$WIN64_DMN" ]; then
     if [ -e "$WIN64_DMN_ZIP" ]; then
@@ -104,7 +117,7 @@ for var in "${FINALS[@]}"; do
     mv "${DMN_OUTPUT_DIR}/${var}" "$FINAL_OUTPUT_DIR"
 done
 
-
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 # Create linux packages
 echo "Create linux packages"
 if [ -e "$DMN_OUTPUT_DIR/$LNX64_DMN" ]; then
@@ -123,6 +136,8 @@ if [ -e "$DMN_OUTPUT_DIR/$LNX_ARM_DMN" ]; then
   echo "Create linux arm-7 packages"
   ./linux/fpm-package.sh linux-arm-7 deb
   ./linux/fpm-package.sh linux-arm-7 rpm
+fi
+
 fi
 
 popd >/dev/null
