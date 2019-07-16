@@ -12,6 +12,7 @@ matrix:
     - os: linux
       env:
         - PIP='sudo pip'
+      dist: xenial
     - os: osx
       if: type != pull_request
       env: VERSION_UPGRADE_TEST_WAIT_TIMEOUT=60s
