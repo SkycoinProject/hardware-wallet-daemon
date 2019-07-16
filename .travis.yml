@@ -2,7 +2,6 @@ sudo: required
 language: go
 go:
   - 1.11.x
-dist: xenial
 
 services:
   - xvfb
@@ -23,8 +22,8 @@ env:
     - XARGS="-screen 0 1024x768x24"
 
 install:
-  - if [[ $TRAVIS_OS_NAME == 'linux'  ]]; then docker pull karalabe/xgo-latest; fi
-  - if [[ $TRAVIS_OS_NAME == 'linux'  ]]; then go get github.com/karalabe/xgo; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then docker pull karalabe/xgo-latest; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then go get github.com/karalabe/xgo; fi
   - make install-linters
 
 before_script:
@@ -34,7 +33,6 @@ before_script:
     ./ci-scripts/add-key.sh ;
     fi
   - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-    ./ci-scripts/install-linux-release.sh ;
     mkdir -p tmp/hardware-wallet ;
     git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git
     tmp/hardware-wallet ;
@@ -63,7 +61,6 @@ script:
     make test-integration-emulator-enable-csrf ;
     fi
   - make test
-  - make release
 
 after_script:
   - kill -s KILL $(pgrep emulator)
@@ -73,7 +70,7 @@ notifications:
 
 before_deploy:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-    sh "./ci-scripts/install-${TRAVIS_OS_NAME}-release.sh"
+    ./ci-scripts/install-${TRAVIS_OS_NAME}-release.sh
     fi
   - make release
 
