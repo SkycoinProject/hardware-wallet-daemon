@@ -65,15 +65,14 @@ script:
     make test-integration-emulator-enable-csrf ;
     fi
   - make test
+  # Build daemon
+  - if [[ "$TRAVIS_PULL_REQUEST" == false ]]; then make release; fi
 
 after_script:
   - kill -s KILL $(pgrep emulator)
 
 notifications:
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
-
-before_deploy:
-  - make release
 
 deploy:
   - provider: s3
