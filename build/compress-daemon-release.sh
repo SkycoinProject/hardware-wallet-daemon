@@ -74,7 +74,7 @@ if [ -e "$LNX32_DMN" ]; then
     if [[ "$OSTYPE" == "linux"* ]]; then
         tar cjf "$LNX32_DMN_ZIP" --owner=0 --group=0 "$LNX32_DMN"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        tar cjf "$LNX32_DMN_ZIP"  "$LNX32_DMN"
+        tar cjf "$LNX32_DMN_ZIP" -C ${LNX32_DMN} .
     fi
     FINALS+=("$LNX32_DMN_ZIP")
 fi
@@ -89,7 +89,7 @@ if [ -e "$LNX64_DMN" ]; then
     if [[ "$OSTYPE" == "linux"* ]]; then
         tar cjf "$LNX64_DMN_ZIP" --owner=0 --group=0 "$LNX64_DMN"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        tar cjf "$LNX64_DMN_ZIP"  "$LNX64_DMN"
+        tar cjf "$LNX64_DMN_ZIP" -C ${LNX64_DMN} .
     fi
     FINALS+=("$LNX64_DMN_ZIP")
 fi
@@ -104,7 +104,7 @@ if [ -e "$LNX_ARM_DMN" ]; then
     if [[ "$OSTYPE" == "linux"* ]]; then
         tar cjf "$LNX_ARM_DMN_ZIP" --owner=0 --group=0 "$LNX_ARM_DMN"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        tar cjf "$LNX_ARM_DMN_ZIP"  "$LNX_ARM_DMN"
+      tar cjf "$LNX_ARM_DMN_ZIP" -C ${LNX_ARM_DMN} .
     fi
     FINALS+=("$LNX_ARM_DMN_ZIP")
 fi
@@ -114,6 +114,7 @@ popd >/dev/null
 # Move to final release dir
 mkdir -p "$FINAL_OUTPUT_DIR"
 for var in "${FINALS[@]}"; do
+
     mv "${DMN_OUTPUT_DIR}/${var}" "$FINAL_OUTPUT_DIR"
 done
 

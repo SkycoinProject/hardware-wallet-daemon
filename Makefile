@@ -82,5 +82,10 @@ generate-client: ## Generate go client using swagger
 release: ## Build daemon binaries
 	./ci-scripts/build-daemon.sh
 
+clean-release: ## Remove release files
+	rm -rf ./build/release
+	rm -rf ./build/.xgo_output
+	rm -rf ./build/.daemon_output
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
