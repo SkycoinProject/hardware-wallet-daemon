@@ -229,6 +229,20 @@ func sendToDevice(dev usb.Device, chunks [][64]byte) (wire.Message, error) {
 		}
 		wg.Wait()
 	}
+	for msg.Kind == uint16(messages.MessageType_MessageType_Success) {
+		success, err := decodeSuccessMsgStruct(*msg)
+		if err != nil {
+			return wire.Message{}, err
+		}
+		if success.MsgType != nil && *success.MsgType == messages.MessageType(messages.MessageType_MessageType_EntropyAck) {
+			msg, err = wire.ReadFrom(dev)
+			if err != nil {
+				return wire.Message{}, err
+			}
+		} else {
+			break
+		}
+	}
 
 	return *msg, err
 }
@@ -288,18 +302,25 @@ func DecodeSuccessOrFailMsg(msg wire.Message) (string, error) {
 	return "", fmt.Errorf("calling DecodeSuccessOrFailMsg on message kind %s", messages.MessageType(msg.Kind))
 }
 
+func decodeSuccessMsgStruct(msg wire.Message) (messages.Success, error) {
+	if msg.Kind == uint16(messages.MessageType_MessageType_Success) {
+		success := messages.Success{}
+		err := proto.Unmarshal(msg.Data, &success)
+		if err != nil {
+			return messages.Success{}, err
+		}
+		return success, nil
+	}
+	return messages.Success{}, fmt.Errorf("calling DecodeSuccessMsg with wrong message type: %s", messages.MessageType(msg.Kind))
+}
+
 // DecodeSuccessMsg convert byte data into string containing the success message returned by the device
 func DecodeSuccessMsg(msg wire.Message) (string, error) {
-	if msg.Kind == uint16(messages.MessageType_MessageType_Success) {
-		success := &messages.Success{}
-		err := proto.Unmarshal(msg.Data, success)
-		if err != nil {
-			return "", err
-		}
-		return success.GetMessage(), nil
+	success, err := decodeSuccessMsgStruct(msg)
+	if err != nil {
+		return "", err
 	}
-
-	return "", fmt.Errorf("calling DecodeSuccessMsg with wrong message type: %s", messages.MessageType(msg.Kind))
+	return success.GetMessage(), nil
 }
 
 // DecodeFailMsg convert byte data into string containing the failure returned by the device
