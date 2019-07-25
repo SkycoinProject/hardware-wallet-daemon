@@ -44,7 +44,7 @@ if [ ! -z "$LNX64_DMN" ]; then
     LNX32_RULES_DIR="${DMN_OUTPUT_DIR}/${LNX32_DMN_RULES_DIR}"
     LNX32_SERVICE_DIR="${DMN_OUTPUT_DIR}/${LNX32_DMN_SERVICE_DIR}"
     copy_if_exists "${XGO_DMN_OUTPUT_DIR}/${LNX32_OUT}/${BIN_NAME}" "$LNX32_BIN_DIR"
-    copy_if_exists "./linux/skyhwd.rules" "$LNX32_RULES_DIR"
+    copy_if_exists "./linux/50-skyhwd.rules" "$LNX32_RULES_DIR"
     copy_if_exists "./linux/skyhwd.service" "$LNX32_SERVICE_DIR"
 fi
 
@@ -54,7 +54,7 @@ if [ ! -z "$LNX64_DMN" ]; then
     LNX64_RULES_DIR="${DMN_OUTPUT_DIR}/${LNX64_DMN_RULES_DIR}"
     LNX64_SERVICE_DIR="${DMN_OUTPUT_DIR}/${LNX64_DMN_SERVICE_DIR}"
     copy_if_exists "${XGO_DMN_OUTPUT_DIR}/${LNX64_OUT}/${BIN_NAME}" "$LNX64_BIN_DIR"
-    copy_if_exists "./linux/skyhwd.rules" "$LNX64_RULES_DIR"
+    copy_if_exists "./linux/50-skyhwd.rules" "$LNX64_RULES_DIR"
     copy_if_exists "./linux/skyhwd.service" "$LNX64_SERVICE_DIR"
 fi
 
@@ -64,7 +64,7 @@ if [ ! -z "$LNX_ARM_DMN" ]; then
     LNX_ARM_RULES_DIR="${DMN_OUTPUT_DIR}/${LNX_ARM_DMN_RULES_DIR}"
     LNX_ARM_SERVICE_DIR="${DMN_OUTPUT_DIR}/${LNX_ARM_DMN_SERVICE_DIR}"
     copy_if_exists "${XGO_DMN_OUTPUT_DIR}/${LNX_ARM_OUT}/${BIN_NAME}" "$LNX_ARM_BIN_DIR"
-    copy_if_exists "./linux/skyhwd.rules" "$LNX_ARM_RULES_DIR"
+    copy_if_exists "./linux/50-skyhwd.rules" "$LNX_ARM_RULES_DIR"
     copy_if_exists "./linux/skyhwd.service" "$LNX_ARM_SERVICE_DIR"
 fi
 
