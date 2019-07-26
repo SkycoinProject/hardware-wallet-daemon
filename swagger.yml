@@ -450,6 +450,23 @@ paths:
       security:
         - csrfAuth: []
 
+  /intermediate/button:
+    post:
+      description: button ack request.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
+
 definitions:
   GenerateAddressesRequest:
     type: object

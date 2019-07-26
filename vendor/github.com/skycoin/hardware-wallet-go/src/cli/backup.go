@@ -66,6 +66,14 @@ func backupCmd() gcli.Command {
 				}
 			}
 
+			for msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
+				msg, err = device.ButtonAck()
+				if err != nil {
+					log.Error(err)
+					return
+				}
+			}
+
 			responseMsg, err := skyWallet.DecodeSuccessOrFailMsg(msg)
 			if err != nil {
 				log.Error(err)

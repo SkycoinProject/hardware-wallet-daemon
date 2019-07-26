@@ -402,13 +402,6 @@ func (d *Device) Backup() (wire.Message, error) {
 		return wire.Message{}, err
 	}
 
-	for msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		msg, err = d.ButtonAck()
-		if err != nil {
-			return wire.Message{}, err
-		}
-	}
-
 	return msg, err
 }
 

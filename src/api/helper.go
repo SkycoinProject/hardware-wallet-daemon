@@ -89,14 +89,10 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			})
 			return
 		case uint16(messages.MessageType_MessageType_ButtonRequest):
-			var err error
-			msg, err = gateway.ButtonAck()
-			if err != nil {
-				logger.Error(err.Error())
-				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
+			writeHTTPResponse(w, HTTPResponse{
+				Data: "ButtonRequest",
+			})
+			return
 		case uint16(messages.MessageType_MessageType_Failure):
 			failureMsg, err := skyWallet.DecodeFailMsg(msg)
 			if err != nil {

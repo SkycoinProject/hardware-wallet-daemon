@@ -563,3 +563,14 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/intermediate/word \
   -d '{"word": "cloud"}'
 ```
 
+#### Button
+```
+URI: /api/v1/intermediate/button
+Method: POST
+```
+
+**Example**:
+```bash
+$ curl -X POST http://127.0.0.1:9510/api/v1/intermediate/button
+```
+
