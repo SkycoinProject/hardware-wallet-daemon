@@ -95,7 +95,6 @@ func NewApp() (*App, error) {
 		recoveryCmd(),
 		cancelCmd(),
 		transactionSignCmd(),
-		sandbox(),
 		getRawEntropyCmd(),
 		getMixedEntropyCmd(),
 		getUsbDetails(),

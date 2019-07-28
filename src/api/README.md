@@ -29,6 +29,7 @@ The skywallet endpoints start with `/api/v1` and emulator endpoints with `/api/v
         - [Pincode](#pincode)
         - [Passphrase](#passphrase)
         - [Word](#word)
+        - [Button](#button)
     
 
 <!-- /MarkdownTOC -->
@@ -59,12 +60,10 @@ $ curl http://127.0.0.1:9510/api/v1/generate_addresses \
 **Response**:
 ```json
 {
-    "data": {
-        "addresses": [
-            "XA3kV3QYWF9QnktordpYggujDRcGXg4tpQ",
-            "2ew81SqY1C5efFA2ULQ4NvJNhxWnM1jPGxu"
-        ]
-    }
+    "data": [
+        "GHqzSmFBBZqjNWZhFuSmgjES5WTWkNiKqK",
+        "LVhMmHSWvsZ9iu66MMLVY4wih7gp9YwwWK"
+    ]
 }
 ```
 
@@ -85,10 +84,22 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/apply_settings \
    -d '{"label": "skywallet", "use_passphrase": false}'
 ```
 
-**Response**:
+**Response Flow**:
+1. Intermediate button press response is returned multiple times
 ```json
 {
-    "data": "Settings applied"
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
+
+2. Send [Button](#button) request to start button handling process which returns the final response
+```json
+{
+    "data": [
+        "Settings applied"
+    ]
 }
 ```
 
@@ -105,18 +116,25 @@ Method: POST
 $ curl -X POST http://127.0.0.1:9510/api/v1/backup
 ```
 
-**Response** Flow:
-- Button confirmation requests are shown for each word of the seed on the hardware wallet screen.
-- The whole procedure is repeated again.
-- Success **Response**
+**Response Flow**:
+1. Intermediate button press response is returned for each seed
+```json
+{
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
 
+2. Send [Button](#button) request to start button handling process which returns the final response
 ```json
 {
     "data": "Device backed up!"
 }
 ```
 
-- If device has no seed
+
+>Note: If device has no seed then following response is returned
 ```json
 {
     "error": {
@@ -144,7 +162,9 @@ $ curl -X PUT http://127.0.0.1:9510/api/v1/cancel
 **Response**:
 ```json
 {
-    "data": "Action canceled by user"
+    "data": [
+        "Action cancelled by user"
+    ]
 }
 ```
 
@@ -168,6 +188,16 @@ Args: {"message": "<message>", "signature": "<signature>", "address": "<address>
 curl -X POST http://127.0.0.1:9510/api/v1/check_message_signature \
 -H 'Content-Type: application/json' \
 -d '{"message": "Hello World", "signature": "6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300", "address": "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"}'
+```
+
+**Response**:
+The signing address is returned if the signature is correct
+```json
+{
+    "data": [
+        "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"
+    ]
+}
 ```
 
 ### Get Features
@@ -245,15 +275,15 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/recovery \
   -d '{"word_count": 12, "use_passphrase": false, "dry_run": true}'
 ```
 
-**Response** Flow:
+**Response Flow**:
 - The user is asked for confirmation on hardware wallet screen to start the recovery process.
 - The daemon then returns intermediate word request type in **Response**.
 - The frontend needs to send intermediate word request till the hardware wallet keeps showing instructions on screen.
-- Sucess **Response**:
+- Success Response:
 
 ```json
 {
-    "data": "Device recovered"
+    "data": ["Device recovered"]
 }
 ```
 
@@ -277,7 +307,9 @@ $ curl http://127.0.0.1:9510/api/v1/generate_mnemonic \
 **Response**:
 ```json
 {
-    "data": "Mnemonic successfully configured"
+    "data": [
+        "Mnemonic successfully configured"
+    ]
 }
 ```
 
@@ -300,12 +332,24 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/set_mnemonic \
   -d '{"mnemonic": "cloud flower upset remain green metal below cup stem infant art thank"}'
 ```
 
-**Response**:
+**Response Flow**:
+1. Intermediate button press response is returned 
+```json
+{
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
+
+2. Send [Button](#button) request to start button handling process which returns the final response
 - Valid mnemonic
 
 ```json
 {
-    "data": "cloud flower upset remain green metal below cup stem infant art thank"
+    "data": [
+        "cloud flower upset remain green metal below cup stem infant art thank"
+    ]
 }
 ```
 
@@ -322,7 +366,6 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/set_mnemonic \
 ### Configure Pin Code
 Configure a pin code on the device.
 
-
 ```
 URI: /api/v1/configure_pin_code
 Method: POST
@@ -333,19 +376,40 @@ Args: {
 
 **Example**:
 ```bash
-$ curl -X POST http://127.0.0.1:19510/api/v1/configure_pin_code \
+$ curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code \
   -H 'Content-Type: application/json' \
   -d '{"remove_pin": false}'
 ```
 
-**Response** Flow:
-- User is shown a button confirmation request on hardware wallet to confirm start of pin code process.
-- The daemon returns intermediate pinmatrix request two times to the frontend.
-- **Response** on success
-
+**Response Flow**:
+1. Intermediate button press response is returned 
 ```json
 {
-    "data": "PIN changed"
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
+
+2. Send [Button](#button) request to start button handling process.
+   The daemon then returns intermediate pinmatrix request.
+```json
+{
+    "data": [
+        "PinMatrixRequest"
+    ]
+}
+```
+
+3. Send [Pincode](#pincode) request to handle pincode process.
+   Pincode is requested two times.
+
+- **Response** on success
+```json
+{
+    "data": [
+        "PIN changed"
+    ]
 }
 ```
 - **Response** on failure
@@ -366,13 +430,34 @@ $  curl -X POST http://127.0.0.1:9510/api/v1/configure_pin_code \
 ```
 
 **Response** Flow:
-- User is shown a button confirmation request on hardware wallet to confirm start of pin remove process.
-- The daemon returns intermediate pinmatrix request once to the frontend.
+**Response Flow**:
+1. Intermediate button press response is returned 
+```json
+{
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
+
+2. Send [Button](#button) request to start button handling process.
+   The daemon then returns intermediate pinmatrix request.
+```json
+{
+    "data": [
+        "PinMatrixRequest"
+    ]
+}
+```
+
+3. Send [Pincode](#pincode) request to handle pincode process.
 - **Response** on success
 
 ```json
 {
-    "data": "PIN removed"
+    "data": [
+        "PIN removed"
+    ]
 }
 ```
 - **Response** on failure
@@ -408,12 +493,21 @@ $ curl -X POST http://127.0.0.1:9510/api/v1/sign_message \
   -d '{"address_n": 0, "message": "hello world"}'
 ```
 
-**Response**:
+1. Intermediate button press response is returned 
 ```json
 {
-    "data": {
-        "signature": "GvKS4S3CA2YTpEPFA47yFdC5CP3y3qB18jwiX1URXqWQWBXZ4WospXL7bJNu7aSVn5eCPrATSkGjtQfzGYMNFQDYt"
-    }
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
+
+2. Send [Button](#button) request to start button handling process which returns the final response
+```json
+{
+    "data": [
+        "060a690b7ad8abc4d4db2a47e6fa2f0a5e33f877c1d0beceac126daf248651c11148065fb03e992248432a6935ff1f5b36c0a36f595e50fcc9f327d84389e14000"
+    ]
 }
 ```
 
@@ -461,10 +555,22 @@ Method: DELETE
 $ curl -X DELETE http://127.0.0.1:9510/api/v1/wipe
 ```
 
-**Response**:
+**Response Flow**:
+1. Intermediate button press response is returned 
 ```json
 {
-    "data": "Device wiped"
+    "data": [
+        "ButtonRequest"
+    ]
+}
+```
+
+2. Send [Button](#button) request to start button handling process which returns the final response
+```json
+{
+    "data": [
+        "Device wiped"
+    ]
 }
 ```
 
@@ -485,7 +591,9 @@ $ curl -X GET http://127.0.0.1:9510/api/v1/available
 **Response**:
 ```json
 {
-    "data": true
+    "data": [
+        true
+    ]
 }
 ```
 

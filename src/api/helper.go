@@ -75,22 +75,22 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 		switch msg.Kind {
 		case uint16(messages.MessageType_MessageType_PinMatrixRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "PinMatrixRequest",
+				Data: []string{"PinMatrixRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_PassphraseRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "PassPhraseRequest",
+				Data: []string{"PassPhraseRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_WordRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "WordRequest",
+				Data: []string{"WordRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_ButtonRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "ButtonRequest",
+				Data: []string{"ButtonRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_Failure):
@@ -112,7 +112,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			}
 
 			writeHTTPResponse(w, HTTPResponse{
-				Data: successMsg,
+				Data: []string{successMsg},
 			})
 			return
 		// AddressGen Response
@@ -152,7 +152,7 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			}
 
 			writeHTTPResponse(w, HTTPResponse{
-				Data: signature,
+				Data: []string{signature},
 			})
 			return
 		// TransactionSign Response

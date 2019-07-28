@@ -189,9 +189,14 @@ func bootstrap(t *testing.T, testname string, testType string) *skywallet.Device
 	require.NoError(t, err)
 
 	if *features.Initialized == false || *features.NeedsBackup == false {
-		_, err = device.Wipe()
+		msg, err = device.Wipe()
 		require.NoError(t, err)
+		_, err = device.ButtonAck()
+		require.NoError(t, err)
+
 		_, err = device.SetMnemonic(defaultSeed)
+		require.NoError(t, err)
+		_, err = device.ButtonAck()
 		require.NoError(t, err)
 	}
 
@@ -444,6 +449,8 @@ func TestGenerateMnemonic(t *testing.T) {
 			// bootstrap
 			_, err = device.Wipe()
 			require.NoError(t, err)
+			_, err = device.ButtonAck()
+			require.NoError(t, err)
 
 			output, err := execCommandCombinedOutput(tc.args...)
 			if err != nil {
@@ -497,6 +504,8 @@ func TestRecovery(t *testing.T) {
 
 	// bootstrap
 	_, err = device.Wipe()
+	require.NoError(t, err)
+	_, err = device.ButtonAck()
 	require.NoError(t, err)
 
 	cmd := execCommand([]string{"recovery"}...)
@@ -599,6 +608,8 @@ func TestSetMnemonic(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// bootstrap
 			_, err = device.Wipe()
+			require.NoError(t, err)
+			_, err = device.ButtonAck()
 			require.NoError(t, err)
 
 			output, err := execCommandCombinedOutput(tc.args...)
