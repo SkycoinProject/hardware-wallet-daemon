@@ -259,7 +259,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6d1e359e2633d3142ad5c256a092c2548196933dcd0fbf59fbf412e40fa2136d"
+  digest = "1:b7bb68d11a78a94cbdaa9ce5928a0338bad437bb74be9627bcf114424f60e4bb"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/skywallet",
@@ -269,7 +269,7 @@
     "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "7e0c87d9a5de55d0440e2bd2253d27f4e33a03a7"
+  revision = "43112f1f66799b4aef2a4a2a08967e1e8776759c"
 
 [[projects]]
   branch = "master"
@@ -303,7 +303,7 @@
     "src/util/logging",
   ]
   pruneopts = "UT"
-  revision = "bde6df2b71bc8997bef93c3e4098565cf44a406b"
+  revision = "94955dd52540845631475ecb7b87916fc820f233"
 
 [[projects]]
   digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
@@ -358,14 +358,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:31d44814b45607afa77c6e8ef20ea8bacc1d1053fe084440c874f311732e7ec3"
+  digest = "1:f99b0e9035cf86cdc14cb2848308e831193d5e19ab9a23a8493cd925bdc3952b"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
+  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
@@ -408,7 +408,6 @@
     "github.com/NYTimes/gziphandler",
     "github.com/andreyvit/diff",
     "github.com/blang/semver",
-    "github.com/davecgh/go-spew/spew",
     "github.com/go-openapi/errors",
     "github.com/go-openapi/runtime",
     "github.com/go-openapi/runtime/client",

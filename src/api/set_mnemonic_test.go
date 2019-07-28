@@ -96,7 +96,7 @@ func TestSetMnemonic(t *testing.T) {
 				Mnemonic: "cloud flower upset remain green metal below cup stem infant art thank",
 			}),
 			httpResponse: HTTPResponse{
-				Data: "setmnemonic success msg",
+				Data: []string{"setmnemonic success msg"},
 			},
 		},
 	}
@@ -140,11 +140,11 @@ func TestSetMnemonic(t *testing.T) {
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
 
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

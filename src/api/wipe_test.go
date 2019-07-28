@@ -61,7 +61,7 @@ func TestWipe(t *testing.T) {
 				Data: successMsgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "wipe success msg",
+				Data: []string{"wipe success msg"},
 			},
 		},
 	}
@@ -94,11 +94,11 @@ func TestWipe(t *testing.T) {
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
 
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

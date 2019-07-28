@@ -79,7 +79,7 @@ func TestRecovery(t *testing.T) {
 			method: http.MethodPost,
 			status: http.StatusOK,
 			httpResponse: HTTPResponse{
-				Data: "recovery success msg",
+				Data: []string{"recovery success msg"},
 			},
 			httpBody: toJSON(t, &RecoveryRequest{
 				WordCount: 12,
@@ -130,11 +130,11 @@ func TestRecovery(t *testing.T) {
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
 
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

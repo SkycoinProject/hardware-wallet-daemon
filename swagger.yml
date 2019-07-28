@@ -313,7 +313,7 @@ paths:
         200:
           description: success
           schema:
-            $ref: '#/definitions/TransactionSignResponse'
+            $ref: '#/definitions/HTTPSuccessResponse'
         default:
           description: error
           schema:
@@ -350,7 +350,9 @@ paths:
             type: object
             properties:
               data:
-                type: boolean
+                type: array
+                items:
+                  type: boolean
         default:
           description: error
           schema:
@@ -438,6 +440,23 @@ paths:
           description: WordRequest is request data for /api/v1/intermediate/word
           schema:
             $ref: '#/definitions/WordRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
+
+  /intermediate/button:
+    post:
+      description: button ack request.
+      produces:
+        - application/json
       responses:
         200:
           description: success
@@ -723,7 +742,9 @@ definitions:
     type: object
     properties:
       data:
-        type: string
+        type: array
+        items:
+          type: string
 
   HTTPErrorResponse:
     type: object

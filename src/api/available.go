@@ -15,7 +15,7 @@ func available(gateway Gatewayer) http.HandlerFunc {
 		}
 
 		writeHTTPResponse(w, HTTPResponse{
-			Data: gateway.Available(),
+			Data: []bool{gateway.Available()},
 		})
 	}
 }

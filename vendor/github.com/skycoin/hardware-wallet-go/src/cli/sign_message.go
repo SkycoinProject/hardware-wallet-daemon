@@ -59,6 +59,15 @@ func signMessageCmd() gcli.Command {
 				log.Error(err)
 				return
 			}
+
+			if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
+				msg, err = device.ButtonAck()
+				if err != nil {
+					log.Error(err)
+					return
+				}
+			}
+
 			for msg.Kind != uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage) && msg.Kind != uint16(messages.MessageType_MessageType_Failure) {
 				if msg.Kind == uint16(messages.MessageType_MessageType_PinMatrixRequest) {
 					var pinEnc string

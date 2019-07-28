@@ -267,6 +267,7 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	webHandlerV1("/intermediate/pin_matrix", pinMatrixRequestHandler(gateway))
 	webHandlerV1("/intermediate/passphrase", passphraseRequestHandler(gateway))
 	webHandlerV1("/intermediate/word", wordRequestHandler(gateway))
+	webHandlerV1("/intermediate/button", buttonRequestHandler(gateway))
 
 	webHandlerV1("/version", versionHandler(c))
 	return mux

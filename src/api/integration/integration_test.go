@@ -10,7 +10,6 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
@@ -18,7 +17,6 @@ import (
 	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
 	"github.com/andreyvit/diff"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 
 	"github.com/skycoin/hardware-wallet-daemon/src/client"
@@ -101,6 +99,18 @@ func doEmulator(t *testing.T) bool {
 	return false
 }
 
+func doEmulatorOrWallet(t *testing.T) bool {
+	if enabled() {
+		switch mode(t) {
+		case testModeEmulator, testModeUSB:
+			return true
+		}
+	}
+
+	t.Skip("emulator tests disabled")
+	return false
+}
+
 func TestVersion(t *testing.T) {
 	if !enabled() {
 		return
@@ -123,33 +133,12 @@ func TestVersion(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestEmulatorGenerateAddresses(t *testing.T) {
-	if !doEmulator(t) {
-		return
-	}
-
-	bootstrap(t)
-
-	params := operations.NewPostGenerateAddressesParams()
-	params.GenerateAddressesRequest = &models.GenerateAddressesRequest{
-		AddressN:       newInt64Ptr(2),
-		ConfirmAddress: false,
-		StartIndex:     0,
-	}
-
-	resp, err := daemonClient.Operations.PostGenerateAddresses(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-
-	var expected models.GenerateAddressesResponse
-	checkGoldenFile(t, "generate-addresses-emulator.golden", TestData{*resp.Payload, &expected})
-}
-
-func TestEmulatorApplySettings(t *testing.T) {
+func TestApplySettings(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
@@ -160,34 +149,44 @@ func TestEmulatorApplySettings(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostApplySettings(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Settings applied", resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, "Settings applied", buttonResp.Payload.Data[0])
 }
 
-func TestEmulatorBackup(t *testing.T) {
+func TestBackup(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
 	bootstrap(t)
 
-	// increase timeout as wallet backup takes time
-	params := operations.NewPostBackupParamsWithTimeout(time.Minute * 10)
-
-	resp, err := daemonClient.Operations.PostBackup(params, addCSRFHeader(t, daemonClient))
+	resp, err := daemonClient.Operations.PostBackup(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device backed up!", resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	for {
+		buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+		require.NoError(t, err)
+		if buttonResp.Payload.Data[0] != "ButtonRequest" {
+			require.Equal(t, "Device backed up!", buttonResp.Payload.Data[0])
+			break
+		}
+	}
 }
 
-func TestEmulatorCheckMessageSignature(t *testing.T) {
+func TestCheckMessageSignature(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
@@ -200,7 +199,7 @@ func TestEmulatorCheckMessageSignature(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", resp.Payload.Data)
+	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", resp.Payload.Data[0])
 }
 
 func TestEmulatorFeatures(t *testing.T) {
@@ -223,19 +222,23 @@ func TestEmulatorFeatures(t *testing.T) {
 	checkGoldenFile(t, "features-emulator.golden", TestData{*resp.Payload, &expected})
 }
 
-func TestEmulatorGenerateMnemonic(t *testing.T) {
+func TestGenerateMnemonic(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
 	// wipe existing data
 	resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
 	mnemonicParams.GenerateMnemonicRequest = &models.GenerateMnemonicRequest{
@@ -244,22 +247,26 @@ func TestEmulatorGenerateMnemonic(t *testing.T) {
 
 	mnemonicResp, err := daemonClient.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Mnemonic successfully configured", mnemonicResp.Payload.Data)
+	require.Equal(t, "Mnemonic successfully configured", mnemonicResp.Payload.Data[0])
 }
 
-func TestEmulatorRecovery(t *testing.T) {
+func TestRecovery(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
 	// wipe existing data
 	resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
 
 	params := operations.NewPostRecoveryParams()
 	params.RecoveryRequest = &models.RecoveryRequest{
@@ -268,7 +275,11 @@ func TestEmulatorRecovery(t *testing.T) {
 
 	recoveryResp, err := daemonClient.Operations.PostRecovery(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "WordRequest", recoveryResp.Payload.Data)
+	require.Equal(t, recoveryResp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err = daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, "WordRequest", buttonResp.Payload.Data[0])
 
 	wordParams := operations.NewPostIntermediateWordParams()
 	wordParams.WordRequest = &models.WordRequest{
@@ -281,12 +292,12 @@ func TestEmulatorRecovery(t *testing.T) {
 	require.Subset(t, [2]string{"Wrong word retyped", "Word not found in a wordlist"}, [1]string{err.Error()})
 }
 
-func TestEmulatorSetMnemonic(t *testing.T) {
+func TestSetMnemonic(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
@@ -298,15 +309,19 @@ func TestEmulatorSetMnemonic(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostSetMnemonic(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, mnemonic, resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, mnemonic, buttonResp.Payload.Data[0])
 }
 
-func TestEmulatorConfigurePinCode(t *testing.T) {
+func TestConfigurePinCode(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
@@ -317,7 +332,11 @@ func TestEmulatorConfigurePinCode(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostConfigurePinCode(pinParams, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, "PinMatrixRequest", buttonResp.Payload.Data[0])
 
 	params := operations.NewPostIntermediatePinMatrixParams()
 	params.PinMatrixRequest = &models.PinMatrixRequest{
@@ -326,7 +345,7 @@ func TestEmulatorConfigurePinCode(t *testing.T) {
 
 	pinAckResp, err := daemonClient.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "PinMatrixRequest", pinAckResp.Payload.Data)
+	require.Equal(t, "PinMatrixRequest", pinAckResp.Payload.Data[0])
 
 	params = operations.NewPostIntermediatePinMatrixParams()
 	params.PinMatrixRequest = &models.PinMatrixRequest{
@@ -335,61 +354,29 @@ func TestEmulatorConfigurePinCode(t *testing.T) {
 
 	pinAckResp, err = daemonClient.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, daemonClient))
 	require.Nil(t, pinAckResp)
-	require.Equal(t, "PIN mismatch", err.Error())
+	require.Subset(t, [2]string{"PIN mismatch", "Pin invalid"}, [1]string{err.Error()})
 }
 
-func TestEmulatorTransactionSign(t *testing.T) {
+func TestWipe(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doEmulator(t) {
-		return
-	}
-
-	bootstrap(t)
-
-	params := operations.NewPostTransactionSignParams()
-	params.TransactionSignRequest = &models.TransactionSignRequest{
-		TransactionInputs: []*models.TransactionInput{
-			{
-				Index: newInt64Ptr(0),
-				Hash:  newStrPtr("181bd5656115172fe81451fae4fb56498a97744d89702e73da75ba91ed5200f9"),
-			},
-		},
-
-		TransactionOutputs: []*models.TransactionOutput{
-			{
-				Address: newStrPtr("K9TzLrgqz7uXn3QJHGxmzdRByAzH33J2ot"),
-				Coins:   newStrPtr("0.1"),
-				Hours:   newStrPtr("2"),
-			},
-		},
-	}
-
-	resp, err := daemonClient.Operations.PostTransactionSign(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-
-	spew.Dump(resp)
-}
-
-func TestEmulatorWipe(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doEmulator(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
 	resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", resp.Payload.Data)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+	require.NoError(t, err)
+	require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
 }
 
-// ---------------------------- HW Wallet Tests ---------------------------- //
-func TestWalletGeGenerateAddresses(t *testing.T) {
-	if !doWallet(t) {
+func TestGenerateAddresses(t *testing.T) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
@@ -406,67 +393,7 @@ func TestWalletGeGenerateAddresses(t *testing.T) {
 	require.NoError(t, err)
 
 	var expected models.GenerateAddressesResponse
-	checkGoldenFile(t, "generate-addresses-wallet.golden", TestData{*resp.Payload, &expected})
-}
-
-func TestWalletApplySettings(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	params := operations.NewPostApplySettingsParams()
-	params.ApplySettingsRequest = &models.ApplySettingsRequest{
-		Label: "skywallet",
-	}
-
-	resp, err := daemonClient.Operations.PostApplySettings(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, "Settings applied", resp.Payload.Data)
-
-}
-
-func TestWalletBackup(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	bootstrap(t)
-
-	// increase timeout as wallet backup takes time
-	params := operations.NewPostBackupParamsWithTimeout(time.Minute * 10)
-
-	resp, err := daemonClient.Operations.PostBackup(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, "Device backed up!", resp.Payload.Data)
-}
-
-func TestWalletCheckMessageSignature(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	params := operations.NewPostCheckMessageSignatureParams()
-	params.CheckMessageSignatureRequest = &models.CheckMessageSignatureRequest{
-		Address:   newStrPtr("2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"),
-		Message:   newStrPtr("Hello World"),
-		Signature: newStrPtr("6ebd63dd5e57cad07b6d229e96b5d2ac7d1bec1466d2a95bd200c21be6a0bf194b5ad5123f6e37c6393ee3635b38b938fcd91bbf1327fc957849a9e5736f6e4300"),
-	}
-
-	resp, err := daemonClient.Operations.PostCheckMessageSignature(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", resp.Payload.Data)
+	checkGoldenFile(t, "generate-addresses.golden", TestData{*resp.Payload, &expected})
 }
 
 func TestWalletFeatures(t *testing.T) {
@@ -489,127 +416,12 @@ func TestWalletFeatures(t *testing.T) {
 	checkGoldenFile(t, "features-wallet.golden", TestData{*resp.Payload, &expected})
 }
 
-func TestWalletGenerateMnemonic(t *testing.T) {
+func TestTransactionSign(t *testing.T) {
 	if *update {
 		t.SkipNow()
 	}
 
-	if !doWallet(t) {
-		return
-	}
-
-	// wipe existing data
-	resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
-
-	mnemonicParams := operations.NewPostGenerateMnemonicParams()
-	mnemonicParams.GenerateMnemonicRequest = &models.GenerateMnemonicRequest{
-		WordCount: newInt64Ptr(12),
-	}
-
-	mnemonicResp, err := daemonClient.Operations.PostGenerateMnemonic(mnemonicParams, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, "Mnemonic successfully configured", mnemonicResp.Payload.Data)
-}
-
-func TestWalletRecovery(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	// wipe existing data
-	resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, "Device wiped")
-
-	params := operations.NewPostRecoveryParams()
-	params.RecoveryRequest = &models.RecoveryRequest{
-		WordCount: newInt64Ptr(12),
-	}
-
-	recoveryResp, err := daemonClient.Operations.PostRecovery(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, recoveryResp.Payload.Data, "WordRequest")
-
-	wordParams := operations.NewPostIntermediateWordParams()
-	wordParams.WordRequest = &models.WordRequest{
-		Word: newStrPtr("foobar"),
-	}
-
-	wordParamsResp, err := daemonClient.Operations.PostIntermediateWord(wordParams, addCSRFHeader(t, daemonClient))
-	require.Nil(t, wordParamsResp)
-	// match that it contains any of the two available error responses.
-	require.Subset(t, [2]string{"Wrong word retyped", "Word not found in a wordlist"}, [1]string{err.Error()})
-}
-
-func TestWalletSetMnemonic(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
-	params := operations.NewPostSetMnemonicParams()
-	params.SetMnemonicRequest = &models.SetMnemonicRequest{
-		Mnemonic: newStrPtr(mnemonic),
-	}
-
-	resp, err := daemonClient.Operations.PostSetMnemonic(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, mnemonic, resp.Payload.Data)
-}
-
-func TestWalletConfigurePinCode(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	pinParams := operations.NewPostConfigurePinCodeParams()
-	pinParams.ConfigurePinCodeRequest = &models.ConfigurePinCodeRequest{
-		RemovePin: newBoolPtr(false),
-	}
-
-	resp, err := daemonClient.Operations.PostConfigurePinCode(pinParams, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, "PinMatrixRequest", resp.Payload.Data)
-
-	params := operations.NewPostIntermediatePinMatrixParams()
-	params.PinMatrixRequest = &models.PinMatrixRequest{
-		Pin: newStrPtr("123"),
-	}
-
-	pinAckResp, err := daemonClient.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, daemonClient))
-	require.NoError(t, err)
-	require.Equal(t, "PinMatrixRequest", pinAckResp.Payload.Data)
-
-	params = operations.NewPostIntermediatePinMatrixParams()
-	params.PinMatrixRequest = &models.PinMatrixRequest{
-		Pin: newStrPtr("123"),
-	}
-
-	pinAckResp, err = daemonClient.Operations.PostIntermediatePinMatrix(params, addCSRFHeader(t, daemonClient))
-	require.Nil(t, pinAckResp)
-	require.Equal(t, "PIN mismatch", err.Error())
-}
-
-func TestWalletTransactionSign(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
+	if !doEmulatorOrWallet(t) {
 		return
 	}
 
@@ -635,35 +447,31 @@ func TestWalletTransactionSign(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostTransactionSign(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Len(t, resp.Payload.Data, 1)
+	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+	var signature string
+	for {
+		buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+		require.NoError(t, err)
+		if buttonResp.Payload.Data[0] != "ButtonRequest" {
+			require.Len(t, buttonResp.Payload.Data, 1)
+			signature = buttonResp.Payload.Data[0]
+			break
+		}
+	}
 
 	// verify the message signature
-	fmt.Println(resp.Payload.Data[0])
+	fmt.Println(signature)
 	verifParams := operations.NewPostCheckMessageSignatureParams()
 	verifParams.CheckMessageSignatureRequest = &models.CheckMessageSignatureRequest{
 		Address:   newStrPtr("2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw"),
 		Message:   newStrPtr("d11c62b1e0e9abf629b1f5f4699cef9fbc504b45ceedf0047ead686979498218"),
-		Signature: newStrPtr(resp.Payload.Data[0]),
+		Signature: newStrPtr(signature),
 	}
 
 	verifResp, err := daemonClient.Operations.PostCheckMessageSignature(verifParams, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", verifResp.Payload.Data)
-}
-
-func TestWalletWipe(t *testing.T) {
-	if *update {
-		t.SkipNow()
-	}
-
-	if !doWallet(t) {
-		return
-	}
-
-	resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
-
-	require.NoError(t, err)
-	require.Equal(t, "Device wiped", resp.Payload.Data)
+	require.Equal(t, "2EU3JbveHdkxW6z5tdhbbB2kRAWvXC2pLzw", verifResp.Payload.Data[0])
 }
 
 func TestWalletConnected(t *testing.T) {
@@ -677,7 +485,7 @@ func TestWalletConnected(t *testing.T) {
 
 	resp, err := daemonClient.Operations.GetAvailable(nil, nil)
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data, true)
+	require.Equal(t, resp.Payload.Data[0], true)
 }
 
 func bootstrap(t *testing.T) {
@@ -685,7 +493,11 @@ func bootstrap(t *testing.T) {
 		// wipe existing data
 		resp, err := daemonClient.Operations.DeleteWipe(nil, addCSRFHeader(t, daemonClient))
 		require.NoError(t, err)
-		require.Equal(t, "Device wiped", resp.Payload.Data)
+		require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
+
+		buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+		require.NoError(t, err)
+		require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
 
 		// set mnemonic
 		mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"
@@ -696,7 +508,11 @@ func bootstrap(t *testing.T) {
 
 		mnemonicResp, err := daemonClient.Operations.PostSetMnemonic(mnemonicParams, addCSRFHeader(t, daemonClient))
 		require.NoError(t, err)
-		require.Equal(t, mnemonic, mnemonicResp.Payload.Data)
+		require.Equal(t, mnemonicResp.Payload.Data[0], "ButtonRequest")
+
+		buttonResp, err = daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
+		require.NoError(t, err)
+		require.Equal(t, mnemonic, buttonResp.Payload.Data[0])
 	}
 }
 

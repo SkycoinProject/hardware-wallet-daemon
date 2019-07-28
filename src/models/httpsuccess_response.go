@@ -16,7 +16,7 @@ import (
 type HttpsuccessResponse struct {
 
 	// data
-	Data string `json:"data,omitempty"`
+	Data []string `json:"data"`
 }
 
 // Validate validates this httpsuccess response

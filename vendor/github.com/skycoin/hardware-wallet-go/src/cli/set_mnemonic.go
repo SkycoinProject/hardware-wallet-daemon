@@ -5,6 +5,8 @@ import (
 	"os"
 	"runtime"
 
+	messages "github.com/skycoin/hardware-wallet-protob/go"
+
 	gcli "github.com/urfave/cli"
 
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
@@ -48,6 +50,14 @@ func setMnemonicCmd() gcli.Command {
 			if err != nil {
 				log.Error(err)
 				return
+			}
+
+			if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
+				msg, err = device.ButtonAck()
+				if err != nil {
+					log.Error(err)
+					return
+				}
 			}
 
 			responseMsg, err := skyWallet.DecodeSuccessOrFailMsg(msg)
