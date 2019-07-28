@@ -89,7 +89,7 @@ func TestApplySettings(t *testing.T) {
 				Data: successMsgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "success msg",
+				Data: []string{"success msg"},
 			},
 		},
 	}
@@ -132,11 +132,11 @@ func TestApplySettings(t *testing.T) {
 				require.Nil(t, tc.httpResponse.Data)
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

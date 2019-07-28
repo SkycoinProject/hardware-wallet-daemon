@@ -75,11 +75,11 @@ func TestBackup(t *testing.T) {
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
 
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

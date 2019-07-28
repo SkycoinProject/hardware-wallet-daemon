@@ -30,7 +30,7 @@ func TestAvailable(t *testing.T) {
 			status:                 http.StatusOK,
 			gatewayAvailableResult: true,
 			httpResponse: HTTPResponse{
-				Data: true,
+				Data: []bool{true},
 			},
 		},
 	}
@@ -62,7 +62,7 @@ func TestAvailable(t *testing.T) {
 				require.Nil(t, tc.httpResponse.Data)
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
-				var resp bool
+				var resp []bool
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
