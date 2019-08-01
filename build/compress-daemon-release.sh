@@ -72,7 +72,7 @@ if [ -e "$LNX32_DMN" ]; then
     fi
     echo "Zipping $LNX32_DMN_ZIP"
     if [[ "$OSTYPE" == "linux"* ]]; then
-        tar cjf "$LNX32_DMN_ZIP" --owner=0 --group=0 "$LNX32_DMN"
+        tar cjf "$LNX32_DMN_ZIP"  -C ${LNX32_DMN} .
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         tar cjf "$LNX32_DMN_ZIP" -C ${LNX32_DMN} .
     fi
@@ -87,7 +87,7 @@ if [ -e "$LNX64_DMN" ]; then
     fi
     echo "Zipping $LNX64_DMN_ZIP"
     if [[ "$OSTYPE" == "linux"* ]]; then
-        tar cjf "$LNX64_DMN_ZIP" --owner=0 --group=0 "$LNX64_DMN"
+        tar cjf "$LNX64_DMN_ZIP" -C ${LNX64_DMN} .
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         tar cjf "$LNX64_DMN_ZIP" -C ${LNX64_DMN} .
     fi
@@ -102,7 +102,7 @@ if [ -e "$LNX_ARM_DMN" ]; then
     fi
     echo "Zipping $LNX_ARM_DMN_ZIP"
     if [[ "$OSTYPE" == "linux"* ]]; then
-        tar cjf "$LNX_ARM_DMN_ZIP" --owner=0 --group=0 "$LNX_ARM_DMN"
+        tar cjf "$LNX_ARM_DMN_ZIP" -C ${LNX_ARM_DMN} .
     elif [[ "$OSTYPE" == "darwin"* ]]; then
       tar cjf "$LNX_ARM_DMN_ZIP" -C ${LNX_ARM_DMN} .
     fi
@@ -118,22 +118,23 @@ for var in "${FINALS[@]}"; do
     mv "${DMN_OUTPUT_DIR}/${var}" "$FINAL_OUTPUT_DIR"
 done
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ "$OSTYPE" == "linux"* ]]; then
 # Create linux packages
 echo "Create linux packages"
-if [ -e "$DMN_OUTPUT_DIR/$LNX64_DMN" ]; then
-  echo "Create linux amd64 packagess"
-  ./linux/fpm-package.sh linux-amd64 deb
-  ./linux/fpm-package.sh linux-amd64 rpm
-fi
 
-if [ -e "$DMN_OUTPUT_DIR/$LNX32_DMN" ]; then
+if [ ! -z "$LNX32_DMN"  ]; then
   echo "Creating linux 386 packages"
   ./linux/fpm-package.sh linux-386 deb
   ./linux/fpm-package.sh linux-386 rpm
 fi
 
-if [ -e "$DMN_OUTPUT_DIR/$LNX_ARM_DMN" ]; then
+if [ ! -z "$LNX64_DMN"  ]; then
+  echo "Create linux amd64 packagess"
+  ./linux/fpm-package.sh linux-amd64 deb
+  ./linux/fpm-package.sh linux-amd64 rpm
+fi
+
+if [ ! -z "$LNX_ARM_DMN" ]; then
   echo "Create linux arm-7 packages"
   ./linux/fpm-package.sh linux-arm-7 deb
   ./linux/fpm-package.sh linux-arm-7 rpm

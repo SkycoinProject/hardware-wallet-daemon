@@ -39,7 +39,7 @@ function copy_if_exists {
 echo "Copying ${PKG_NAME} binaries"
 
 # Linux i386
-if [ ! -z "$LNX64_DMN" ]; then
+if [ ! -z "$LNX32_DMN" ]; then
     LNX32_BIN_DIR="${DMN_OUTPUT_DIR}/${LNX32_DMN_BIN_DIR}"
     LNX32_RULES_DIR="${DMN_OUTPUT_DIR}/${LNX32_DMN_RULES_DIR}"
     LNX32_SERVICE_DIR="${DMN_OUTPUT_DIR}/${LNX32_DMN_SERVICE_DIR}"
