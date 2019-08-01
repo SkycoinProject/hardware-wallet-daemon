@@ -20,6 +20,7 @@ coverage/
 build/.xgo_output
 build/.daemon_output
 build/release
+build/osx/build
 
 # Temporary files
 *.swp

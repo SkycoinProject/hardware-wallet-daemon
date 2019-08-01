@@ -35,7 +35,6 @@ fi
 
 COMMIT=`git rev-parse HEAD`
 
-
 xgo -targets="$OSARCH" \
 	-dest="${OUTPUT_DIR}" \
 	-out="$CMD" \

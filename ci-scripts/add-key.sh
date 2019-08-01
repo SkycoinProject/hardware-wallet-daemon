@@ -2,7 +2,7 @@
 
 set -e -o pipefail
 
-KEY_CHAIN=login.keychain
+KEY_CHAIN=build.keychain
 echo "security create keychain"
 if ! security show-keychain-info $KEY_CHAIN ; then
 	security create-keychain -p $OSX_KEYCHAIN_PWD $KEY_CHAIN ;
@@ -19,13 +19,13 @@ security set-keychain-settings -t 3600 -u $KEY_CHAIN
 
 # Add certificates to keychain and allow codesign to access them
 echo "import distp12"
-security import $GOPATH/src/github.com/skycoin/hardware-wallet-daemon/ci-scripts/certs/dist.p12 -k $KEY_CHAIN -P $CERT_PWD  -A /usr/bin/codesign
+security import $GOPATH/src/github.com/skycoin/hardware-wallet-daemon/ci-scripts/certs/pkg-dist.p12 -k $KEY_CHAIN -P $CERT_PWD  -A /usr/bin/productsign
 
 echo "list keychains: "
 security list-keychains
 echo " ****** "
 
 echo "find indentities keychains: "
-security find-identity -p codesigning  ~/Library/Keychains/$KEY_CHAIN
+security find-identity  ~/Library/Keychains/$KEY_CHAIN
 echo " ****** "
 

@@ -23,6 +23,11 @@ env:
     - XARGS="-screen 0 1024x768x24"
 
 install:
+  - if [[ ! -d "$GOPATH/src/github.com/skycoin/hardware-wallet-daemon" ]]; then
+    mkdir -p "$GOPATH/src/github.com/skycoin";
+    cp -rf $TRAVIS_BUILD_DIR $GOPATH/src/github.com/skycoin/;
+    fi
+  - cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
   - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then
     docker pull karalabe/xgo-latest ;
     go get github.com/karalabe/xgo;
@@ -31,7 +36,7 @@ install:
   - make install-linters
 
 before_script:
-  - if [[ $TRAVIS_OS_NAME == 'osx' && "$TRAVIS_PULL_REQUEST" == false ]]; then
+  - if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_PULL_REQUEST" == false ]]; then
     export CHECK_PATH="$(brew --prefix check)" ;
     export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${CHECK_PATH}/lib" ;
     ./ci-scripts/add-key.sh ;
