@@ -303,7 +303,7 @@ dep ensure github.com/foo/bar@tag
 
 #### Pre-release testing
 
-Pre-release testing procedure requires [skycoin-cli](https://github.com/skycoin/skycoin/tree/develop/cmd/cli). Please [install it](https://github.com/skycoin/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/skycoin/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/skycoin/hardware-wallet/) in advance.
+Pre-release testing procedure requires [skycoin-cli](https://github.com/skycoin/skycoin/tree/develop/cmd/cli) of version strictly greater than `0.26.0`. Please [install it](https://github.com/skycoin/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/skycoin/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/skycoin/hardware-wallet/) in advance.
 
 The instructions that follow are meant to be followed for Skywallet devices flashed without memory protection. If your device memory is protected then some values might be different e.g. `firmware_features`.
 
@@ -422,7 +422,7 @@ echo $TXN1_JSON
   * setting inner hash to an empty string
 - Use `TXN2_JSON` to obtain encoded transaction `TXN2_RAW`
 ```sh
-export $TXN2_RAW=$( echo "$TXN2_JSON" | skycoin-cli encodeJsonTransaction - | grep '"rawtx"' | cut -d '"' -f4)
+export $TXN2_RAW=$( echo "$TXN2_JSON" | skycoin-cli encodeJsonTransaction --fix - | grep '"rawtx"' | cut -d '"' -f4)
 echo $TXN2_RAW
 ```
 - Broadcast transaction. Refer to its id as `TXN2_ID`
@@ -505,7 +505,7 @@ curl -X POST http://127.0.0.1:6420/api/v2/transaction -H 'content-type: applicat
     - `hours` : source item's `hours` as integer
 - Use `TXN4_JSON` to obtain encoded transaction `TXN4_RAW`
 ```sh
-export $TXN4_RAW=$( echo "$TXN4_JSON" | skycoin-cli encodeJsonTransaction - | grep '"rawtx"' | cut -d '"' -f4)
+export $TXN4_RAW=$( echo "$TXN4_JSON" | skycoin-cli encodeJsonTransaction --fix - | grep '"rawtx"' | cut -d '"' -f4)
 echo $TXN4_RAW
 ```
 - Broadcast transaction. Refer to its id as `TXN4_ID`
