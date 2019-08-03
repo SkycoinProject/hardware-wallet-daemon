@@ -77,7 +77,7 @@
 
 [[projects]]
   branch = "develop"
-  digest = "1:ba8b59a1ae1e9721906f2e53ddc26797bdd08dba4605e0df90fee02fc119ae91"
+  digest = "1:738ae44a75f643024f215f9b5c3c79f46c72f4327dc2fbeaec7ed92d7443f207"
   name = "github.com/skycoin/skycoin"
   packages = [
     "src/cipher",
@@ -88,7 +88,7 @@
     "src/util/logging",
   ]
   pruneopts = "UT"
-  revision = "2f8c97d44a88bc1d0f2bfba518014dea39a0d26e"
+  revision = "94955dd52540845631475ecb7b87916fc820f233"
 
 [[projects]]
   digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
@@ -129,14 +129,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:31d44814b45607afa77c6e8ef20ea8bacc1d1053fe084440c874f311732e7ec3"
+  digest = "1:f99b0e9035cf86cdc14cb2848308e831193d5e19ab9a23a8493cd925bdc3952b"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
+  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
 
 [solve-meta]
   analyzer-name = "dep"

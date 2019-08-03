@@ -34,7 +34,7 @@ test-integration-emulator: ## Run emulator integration tests
 test-integration-wallet: ## Run usb integration tests
 	./ci-scripts/integration-test.sh -m USB -n wallet-integration
 
-test: test_unit integration-test-emulator ## Run all tests
+test: test_unit test-integration-emulator ## Run all tests
 
 install-linters: ## Install linters
 	go get -u github.com/FiloSottile/vendorcheck
