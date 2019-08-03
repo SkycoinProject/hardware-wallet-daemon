@@ -89,7 +89,7 @@ func TestGenerateMnemonic(t *testing.T) {
 			method: http.MethodPost,
 			status: http.StatusOK,
 			httpResponse: HTTPResponse{
-				Data: *successMsg.Message,
+				Data: []string{*successMsg.Message},
 			},
 			httpBody: toJSON(t, &GenerateMnemonicRequest{
 				WordCount: 12,
@@ -140,11 +140,11 @@ func TestGenerateMnemonic(t *testing.T) {
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
 
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

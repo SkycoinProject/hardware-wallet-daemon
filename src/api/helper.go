@@ -75,27 +75,24 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 		switch msg.Kind {
 		case uint16(messages.MessageType_MessageType_PinMatrixRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "PinMatrixRequest",
+				Data: []string{"PinMatrixRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_PassphraseRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "PassPhraseRequest",
+				Data: []string{"PassPhraseRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_WordRequest):
 			writeHTTPResponse(w, HTTPResponse{
-				Data: "WordRequest",
+				Data: []string{"WordRequest"},
 			})
 			return
 		case uint16(messages.MessageType_MessageType_ButtonRequest):
-			var err error
-			msg, err = gateway.ButtonAck()
-			if err != nil {
-				logger.Error(err.Error())
-				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
-				writeHTTPResponse(w, resp)
-			}
+			writeHTTPResponse(w, HTTPResponse{
+				Data: []string{"ButtonRequest"},
+			})
+			return
 		case uint16(messages.MessageType_MessageType_Failure):
 			failureMsg, err := skyWallet.DecodeFailMsg(msg)
 			if err != nil {
@@ -115,10 +112,9 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			}
 
 			writeHTTPResponse(w, HTTPResponse{
-				Data: successMsg,
+				Data: []string{successMsg},
 			})
 			return
-
 		// AddressGen Response
 		case uint16(messages.MessageType_MessageType_ResponseSkycoinAddress):
 			addresses, err := skyWallet.DecodeResponseSkycoinAddress(msg)
@@ -132,7 +128,6 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 				Data: addresses,
 			})
 			return
-
 		// Features Response
 		case uint16(messages.MessageType_MessageType_Features):
 			features := &messages.Features{}
@@ -147,7 +142,6 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 				Data: features,
 			})
 			return
-
 		// SignMessage Response
 		case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
 			signature, err := skyWallet.DecodeResponseSkycoinSignMessage(msg)
@@ -158,10 +152,9 @@ func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, ms
 			}
 
 			writeHTTPResponse(w, HTTPResponse{
-				Data: signature,
+				Data: []string{signature},
 			})
 			return
-
 		// TransactionSign Response
 		case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
 			signatures, err := skyWallet.DecodeResponseTransactionSign(msg)

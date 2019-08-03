@@ -53,12 +53,12 @@ func NewPostTransactionSignOK() *PostTransactionSignOK {
 success
 */
 type PostTransactionSignOK struct {
-	Payload *models.TransactionSignResponse
+	Payload *models.HttpsuccessResponse
 }
 
 func (o *PostTransactionSignOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.TransactionSignResponse)
+	o.Payload = new(models.HttpsuccessResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

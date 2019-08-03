@@ -113,7 +113,7 @@ swagger:model GetAvailableOKBody
 type GetAvailableOKBody struct {
 
 	// data
-	Data bool `json:"data,omitempty"`
+	Data []bool `json:"data"`
 }
 
 // Validate validates this get available o k body

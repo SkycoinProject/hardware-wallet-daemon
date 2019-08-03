@@ -108,10 +108,6 @@ func (r *TransactionSignRequest) validate() error {
 		if input.Hash == "" {
 			return errors.New("input hash cannot be empty")
 		}
-
-		if input.Index == nil {
-			return errors.New("input index cannot be empty")
-		}
 	}
 
 	for _, output := range r.TransactionOutputs {
@@ -143,6 +139,8 @@ func (r *TransactionSignRequest) TransactionParams() ([]*messages.SkycoinTransac
 
 		if input.Index != nil {
 			transactionInput.Index = proto.Uint32(*input.Index)
+		} else {
+			transactionInput.Index = nil
 		}
 		transactionInputs = append(transactionInputs, &transactionInput)
 	}

@@ -35,7 +35,6 @@ fi
 
 COMMIT=`git rev-parse HEAD`
 
-
 xgo -targets="$OSARCH" \
 	-dest="${OUTPUT_DIR}" \
 	-out="$CMD" \
@@ -62,7 +61,6 @@ do
 		fi
 		;;
 	darwin?(-[0-9]?([0-9])\.[0-9]?([0-9])) )
-
 		OUT="${OUTPUT_DIR}${OSX64_OUT}"
 		echo "mkdir ${OUT}"
 		mkdir -p "${OUT}"
@@ -74,7 +72,12 @@ do
 			echo "mkdir ${OUT}"
 			mkdir -p "${OUT}"
 			find ${OUTPUT_DIR} -name '*daemon-linux*' -name '*amd64*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
-		elif [ "${s[1]}" = "arm" ]; then
+		elif [ "${s[1]}" = "386" ]; then
+			OUT="${OUTPUT_DIR}${LNX32_OUT}"
+			echo "mkdir ${OUT}"
+			mkdir -p "${OUT}"
+			find ${OUTPUT_DIR} -name '*daemon-linux*' -name '*386*' | xargs -I {} mv {} "${OUT}/${BIN_NAME}"
+		elif [ "${s[1]}" = "arm-7" ]; then
 			OUT="${OUTPUT_DIR}${LNX_ARM_OUT}"
 			echo "mkdir ${OUT}"
 			mkdir -p "${OUT}"

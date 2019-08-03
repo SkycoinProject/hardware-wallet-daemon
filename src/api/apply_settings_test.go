@@ -66,9 +66,8 @@ func TestApplySettings(t *testing.T) {
 			contentType: ContentTypeJSON,
 			status:      http.StatusConflict,
 			httpBody: toJSON(t, &ApplySettingsRequest{
-				UsePassphrase: true,
-				Label:         "foo",
-				Language:      "english",
+				Label:    "foo",
+				Language: "english",
 			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
@@ -82,16 +81,15 @@ func TestApplySettings(t *testing.T) {
 			method: http.MethodPost,
 			status: http.StatusOK,
 			httpBody: toJSON(t, &ApplySettingsRequest{
-				UsePassphrase: true,
-				Label:         "foo",
-				Language:      "english",
+				Label:    "foo",
+				Language: "english",
 			}),
 			gatewayApplySettingsResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Success),
 				Data: successMsgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "success msg",
+				Data: []string{"success msg"},
 			},
 		},
 	}
@@ -104,7 +102,7 @@ func TestApplySettings(t *testing.T) {
 			var body ApplySettingsRequest
 			err := json.Unmarshal([]byte(tc.httpBody), &body)
 			if err == nil {
-				gateway.On("ApplySettings", &body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
+				gateway.On("ApplySettings", body.UsePassphrase, body.Label, body.Language).Return(tc.gatewayApplySettingsResult, nil)
 			}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))
@@ -134,11 +132,11 @@ func TestApplySettings(t *testing.T) {
 				require.Nil(t, tc.httpResponse.Data)
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

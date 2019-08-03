@@ -343,6 +343,35 @@ func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams, authIn
 }
 
 /*
+PostIntermediateButton button ack request.
+*/
+func (a *Client) PostIntermediateButton(params *PostIntermediateButtonParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediateButtonOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostIntermediateButtonParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostIntermediateButton",
+		Method:             "POST",
+		PathPattern:        "/intermediate/button",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostIntermediateButtonReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostIntermediateButtonOK), nil
+
+}
+
+/*
 PostIntermediatePassphrase passphrase ack request.
 */
 func (a *Client) PostIntermediatePassphrase(params *PostIntermediatePassphraseParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePassphraseOK, error) {

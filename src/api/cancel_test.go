@@ -43,7 +43,7 @@ func TestCancel(t *testing.T) {
 				Data: msgBytes,
 			},
 			httpResponse: HTTPResponse{
-				Data: "Action canceled by User",
+				Data: []string{"Action canceled by User"},
 			},
 		},
 	}
@@ -76,11 +76,11 @@ func TestCancel(t *testing.T) {
 			} else {
 				require.NotNil(t, tc.httpResponse.Data)
 
-				var resp string
+				var resp []string
 				err = json.Unmarshal(rsp.Data, &resp)
 				require.NoError(t, err)
 
-				require.Equal(t, tc.httpResponse.Data.(string), resp)
+				require.Equal(t, tc.httpResponse.Data, resp)
 			}
 		})
 	}

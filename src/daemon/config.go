@@ -78,9 +78,9 @@ func NewAppConfig(port int, datadir string) AppConfig {
 
 		// Timeout settings for http.Server
 		// https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
-		HTTPReadTimeout:  time.Minute * 10,
-		HTTPWriteTimeout: time.Minute * 10,
-		HTTPIdleTimeout:  time.Minute * 10,
+		HTTPReadTimeout:  time.Second * 10,
+		HTTPWriteTimeout: time.Second * 60,
+		HTTPIdleTimeout:  time.Second * 120,
 
 		// Logging
 		ColorLog:  true,

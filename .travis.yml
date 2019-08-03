@@ -12,6 +12,7 @@ matrix:
     - os: linux
       env:
         - PIP='sudo pip'
+      dist: xenial
     - os: osx
       if: type != pull_request
       env: VERSION_UPGRADE_TEST_WAIT_TIMEOUT=60s
@@ -22,12 +23,20 @@ env:
     - XARGS="-screen 0 1024x768x24"
 
 install:
-  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then docker pull karalabe/xgo-latest; fi
-  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then go get github.com/karalabe/xgo; fi
+  - if [[ ! -d "$GOPATH/src/github.com/skycoin/hardware-wallet-daemon" ]]; then
+    mkdir -p "$GOPATH/src/github.com/skycoin";
+    cp -rf $TRAVIS_BUILD_DIR $GOPATH/src/github.com/skycoin/;
+    fi
+  - cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
+  - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then
+    docker pull karalabe/xgo-latest ;
+    go get github.com/karalabe/xgo;
+    ./ci-scripts/install-${TRAVIS_OS_NAME}-release.sh ;
+    fi
   - make install-linters
 
 before_script:
-  - if [[ $TRAVIS_OS_NAME == 'osx' && "$TRAVIS_PULL_REQUEST" == false ]]; then
+  - if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_PULL_REQUEST" == false ]]; then
     export CHECK_PATH="$(brew --prefix check)" ;
     export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${CHECK_PATH}/lib" ;
     ./ci-scripts/add-key.sh ;
@@ -55,21 +64,20 @@ script:
     make -C tmp/hardware-wallet/tiny-firmware/protob install-protoc ;
     make -C tmp/hardware-wallet/tiny-firmware/protob/nanopb/vendor/nanopb/generator/proto ;
     make -C tmp/hardware-wallet emulator ;
-    xvfb-run --server-args="${XARGS}" make -C ./tmp/hardware-wallet run-emulator & true ;
+    xvfb-run --server-args="${XARGS}" -e /dev/stdout -a make -C ./tmp/hardware-wallet run-emulator & true ;
     ps aux | grep emulator ;
     make test-integration-emulator ;
     make test-integration-emulator-enable-csrf ;
     fi
   - make test
+  # Build daemon
+  - if [[ "$TRAVIS_PULL_REQUEST" == false ]]; then make release; fi
 
 after_script:
   - kill -s KILL $(pgrep emulator)
 
 notifications:
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
-
-before_deploy:
-  - make release
 
 deploy:
   - provider: s3
