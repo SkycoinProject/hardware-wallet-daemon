@@ -40,8 +40,6 @@ const (
 var (
 	// ErrAddressNZero is returned if addressN is 0
 	ErrAddressNZero = errors.New("addresses to generate should be greater than 0")
-	// ErrUsePassPhraseNil is returned if usePassphrase is nil
-	ErrUsePassPhraseNil = errors.New("usePassphrase cannot be nil")
 	// ErrRemovePinNil is returned if removePin is nil
 	ErrRemovePinNil = errors.New("removePin cannot be nil")
 	// ErrDeviceTypeEmulator is returned if device type is emulator
@@ -84,10 +82,10 @@ type Devicer interface {
 type Device struct {
 	Driver DeviceDriver
 
-	// add mutex for atomic access to dev connection
+	// mutex to force connect requests to be sequential
 	sync.Mutex
-	dev usb.Device
-
+	dev                 usb.Device
+	devReferenceCounter int
 	simulateButtonPress bool
 	simulateButtonType  ButtonType
 }
@@ -109,8 +107,10 @@ func DeviceTypeFromString(deviceType string) DeviceType {
 	return dtRet
 }
 
-// NewDevice returns a new device instance
-func NewDevice(deviceType DeviceType) *Device {
+var devSingleCreator sync.Once
+var devSingleInstance *Device
+
+func newDevice(deviceType DeviceType) *Device {
 	driver, err := NewDriver(deviceType)
 	if err != nil {
 		log.Fatalf("failed to create driver: %s", err)
@@ -120,9 +120,20 @@ func NewDevice(deviceType DeviceType) *Device {
 		driver,
 		sync.Mutex{},
 		nil,
+		0,
 		false,
 		ButtonType(-1),
 	}
+}
+
+// NewDevice returns a new device instance
+func NewDevice(deviceType DeviceType) *Device {
+	// TODO rename NewDevice to DeviceInstance as this is a singleton
+	// implementation.
+	devSingleCreator.Do(func() {
+		devSingleInstance = newDevice(deviceType)
+	})
+	return devSingleInstance
 }
 
 // Close closes the usb bus
@@ -135,18 +146,16 @@ func (d *Device) Close() {
 func (d *Device) Connect() error {
 	d.Lock()
 	defer d.Unlock()
-	// close any existing connections
-	if d.dev != nil {
-		d.dev.Close(false)
-		d.dev = nil
-	}
+	if d.devReferenceCounter == 0 {
 
-	dev, err := d.Driver.GetDevice()
-	if err != nil {
+		dev, err := d.Driver.GetDevice()
+		if err == nil {
+			d.dev = dev
+			d.devReferenceCounter++
+		}
 		return err
 	}
-
-	d.dev = dev
+	d.devReferenceCounter++
 	return nil
 }
 
@@ -154,14 +163,15 @@ func (d *Device) Connect() error {
 func (d *Device) Disconnect() error {
 	d.Lock()
 	defer d.Unlock()
-
-	if d.dev != nil {
-		d.dev.Close(false)
-		d.dev = nil
+	d.devReferenceCounter--
+	if d.devReferenceCounter == 0 {
+		err := d.dev.Close(false)
+		if err == nil {
+			d.dev = nil
+		}
 		return nil
 	}
-
-	return errors.New("no device connected")
+	return nil
 }
 
 // GetUsbInfo returns information from the attached usb
@@ -379,10 +389,6 @@ func (d *Device) ApplySettings(usePassphrase *bool, label string, language strin
 	}
 	defer d.Disconnect()
 
-	if usePassphrase == nil {
-		return wire.Message{}, ErrUsePassPhraseNil
-	}
-
 	applySettingsChunks, err := MessageApplySettings(usePassphrase, label, language)
 	if err != nil {
 		return wire.Message{}, err
@@ -392,29 +398,19 @@ func (d *Device) ApplySettings(usePassphrase *bool, label string, language strin
 }
 
 // Backup ask the device to perform the seed backup
-func (d *Device) Backup() (wire.Message, error) {
+func (d *Device) Backup() (msg wire.Message, err error) {
 	if err := d.Connect(); err != nil {
 		return wire.Message{}, err
 	}
 	defer d.Disconnect()
-
 	backupChunks, err := MessageBackup()
 	if err != nil {
 		return wire.Message{}, err
 	}
-
-	msg, err := d.Driver.SendToDevice(d.dev, backupChunks)
+	msg, err = d.Driver.SendToDevice(d.dev, backupChunks)
 	if err != nil {
 		return wire.Message{}, err
 	}
-
-	for msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		msg, err = d.ButtonAck()
-		if err != nil {
-			return wire.Message{}, err
-		}
-	}
-
 	return msg, err
 }
 
@@ -483,11 +479,6 @@ func (d *Device) ChangePin(removePin *bool) (wire.Message, error) {
 	msg, err := d.Driver.SendToDevice(d.dev, changePinChunks)
 	if err != nil {
 		return wire.Message{}, err
-	}
-
-	// Acknowledge that a button has been pressed
-	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		return d.ButtonAck()
 	}
 
 	return msg, nil
@@ -688,10 +679,6 @@ func (d *Device) GenerateMnemonic(wordCount uint32, usePassphrase bool) (wire.Me
 		return msg, err
 	}
 
-	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		return d.ButtonAck()
-	}
-
 	return msg, err
 }
 
@@ -718,10 +705,6 @@ func (d *Device) Recovery(wordCount uint32, usePassphrase *bool, dryRun bool) (w
 	}
 	log.Printf("Recovery device response kind is: %d\n", msg.Kind)
 
-	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		return d.ButtonAck()
-	}
-
 	return msg, nil
 }
 
@@ -742,10 +725,6 @@ func (d *Device) SetMnemonic(mnemonic string) (wire.Message, error) {
 		return wire.Message{}, err
 	}
 
-	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		return d.ButtonAck()
-	}
-
 	return msg, err
 }
 
@@ -764,10 +743,6 @@ func (d *Device) SignMessage(addressIndex int, message string) (wire.Message, er
 	msg, err := d.Driver.SendToDevice(d.dev, signMessageChunks)
 	if err != nil {
 		return wire.Message{}, err
-	}
-
-	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		return d.ButtonAck()
 	}
 
 	return msg, err
@@ -803,10 +778,6 @@ func (d *Device) Wipe() (wire.Message, error) {
 	msg, err := d.Driver.SendToDevice(d.dev, wipeChunks)
 	if err != nil {
 		return wire.Message{}, err
-	}
-
-	if msg.Kind == uint16(messages.MessageType_MessageType_ButtonRequest) {
-		return d.ButtonAck()
 	}
 
 	return msg, err

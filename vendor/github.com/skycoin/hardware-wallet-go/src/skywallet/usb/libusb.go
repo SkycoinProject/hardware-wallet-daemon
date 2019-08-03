@@ -14,6 +14,7 @@ const (
 	libusbPrefix   = "lib"
 	usbConfigNum   = 1
 	usbConfigIndex = 0
+	transferTimeout = 250
 )
 
 type libusbIfaceData struct {
@@ -432,8 +433,7 @@ func (d *LibUSBDevice) readWrite(buf []byte, endpoint uint8) (int, error) {
 		}
 
 		d.transferMutexLock()
-		// This has no timeout, but is stopped by Cancel_Sync_Transfers_On_Device
-		p, err := lowlevel.Interrupt_Transfer(d.dev, endpoint, buf, 0)
+		p, err := lowlevel.Interrupt_Transfer(d.dev, endpoint, buf, transferTimeout)
 		d.transferMutexUnlock()
 
 		if err != nil {
@@ -472,7 +472,14 @@ func (d *LibUSBDevice) Write(buf []byte) (int, error) {
 	return d.readWrite(buf, usbEpOut)
 }
 
-func (d *LibUSBDevice) Read(buf []byte) (int, error) {
+func (d *LibUSBDevice) Read(buf []byte) (c int, err error) {
 	usbEpIn := normalIface.epIn
-	return d.readWrite(buf, usbEpIn)
+	for {
+		c, err = d.readWrite(buf, usbEpIn)
+		if err != nil && err.Error() == "LIBUSB_ERROR_TIMEOUT" {
+			continue
+		}
+		return c, err
+	}
+	return c, err
 }

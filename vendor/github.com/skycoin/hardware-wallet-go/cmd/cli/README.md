@@ -91,7 +91,6 @@ COMMANDS:
      recovery               Ask the device to perform the seed recovery procedure.
      cancel                 Ask the device to cancel the ongoing procedure.
      transactionSign        Ask the device to sign a transaction using the provided information.
-     sandbox                Sandbox.
      getRawEntropy          Get device raw internal entropy and write it down to a file
      getMixedEntropy        Get device internal mixed entropy and write it down to a file
      getUsbDetails          Ask host usb about details for the hardware wallet
@@ -229,7 +228,6 @@ MessageButtonAck Answer is: 2 /
 Ecloud flower upset remain green metal below cup stem infant art thank
 ```
 </details>
-
 
 ### Generate mnemonic
 
@@ -400,7 +398,6 @@ Device wiped
 ```
 </details>
 
-
 ### Backup device
 
 Ask the device to perform the seed backup procedure.
@@ -423,7 +420,6 @@ $ skycoin-hw-cli backup
 2018/11/15 17:14:58 Success 2! Answer is: Seed successfully backed up
 ```
 </details>
-
 
 ### Recovery device
 

@@ -97,12 +97,6 @@ func (suite *devicerSuit) TestApplySettings() {
 		msgKind       uint16
 	}{
 		{
-			name:    "usePassphrase nil",
-			err:     ErrUsePassPhraseNil,
-			msgKind: 0,
-		},
-
-		{
 			name:          "no error",
 			usePassphrase: new(bool),
 			msgKind:       2,
@@ -375,5 +369,5 @@ func (suite *devicerSuit) TestWipe() {
 }
 
 func getMockDevice(mock *MockDeviceDriver) Device {
-	return Device{mock, sync.Mutex{}, nil, false, ButtonType(-1)}
+	return Device{mock, sync.Mutex{}, nil, 0, false, ButtonType(-1)}
 }
