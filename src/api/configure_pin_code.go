@@ -56,6 +56,6 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		HandleFirmwareResponseMessages(w, msg)
 	}
 }

@@ -49,7 +49,7 @@ func cancel(gateway Gatewayer) http.HandlerFunc {
 				Data: []string{failureMsg},
 			})
 		} else {
-			HandleFirmwareResponseMessages(w, gateway, msg)
+			HandleFirmwareResponseMessages(w, msg)
 		}
 	}
 }

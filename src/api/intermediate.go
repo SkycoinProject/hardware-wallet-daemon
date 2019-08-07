@@ -33,7 +33,7 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		HandleFirmwareResponseMessages(w, msg)
 	}
 }
 
@@ -65,7 +65,7 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		HandleFirmwareResponseMessages(w, msg)
 	}
 }
 
@@ -97,7 +97,7 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		HandleFirmwareResponseMessages(w, msg)
 	}
 }
 
@@ -115,6 +115,7 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			writeHTTPResponse(w, resp)
 			return
 		}
-		HandleFirmwareResponseMessages(w, gateway, msg)
+
+		HandleFirmwareResponseMessages(w, msg)
 	}
 }

@@ -70,109 +70,96 @@ func writeHTTPResponse(w http.ResponseWriter, resp HTTPResponse) {
 }
 
 // HandleFirmwareResponseMessages handles response messages from the firmware
-func HandleFirmwareResponseMessages(w http.ResponseWriter, gateway Gatewayer, msg wire.Message) {
-	for {
-		switch msg.Kind {
-		case uint16(messages.MessageType_MessageType_PinMatrixRequest):
-			writeHTTPResponse(w, HTTPResponse{
-				Data: []string{"PinMatrixRequest"},
-			})
-			return
-		case uint16(messages.MessageType_MessageType_PassphraseRequest):
-			writeHTTPResponse(w, HTTPResponse{
-				Data: []string{"PassPhraseRequest"},
-			})
-			return
-		case uint16(messages.MessageType_MessageType_WordRequest):
-			writeHTTPResponse(w, HTTPResponse{
-				Data: []string{"WordRequest"},
-			})
-			return
-		case uint16(messages.MessageType_MessageType_ButtonRequest):
-			writeHTTPResponse(w, HTTPResponse{
-				Data: []string{"ButtonRequest"},
-			})
-			return
-		case uint16(messages.MessageType_MessageType_Failure):
-			failureMsg, err := skyWallet.DecodeFailMsg(msg)
-			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
-			resp := NewHTTPErrorResponse(http.StatusConflict, failureMsg)
-			writeHTTPResponse(w, resp)
-			return
-		case uint16(messages.MessageType_MessageType_Success):
-			successMsg, err := skyWallet.DecodeSuccessMsg(msg)
-			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
-
-			writeHTTPResponse(w, HTTPResponse{
-				Data: []string{successMsg},
-			})
-			return
-		// AddressGen Response
-		case uint16(messages.MessageType_MessageType_ResponseSkycoinAddress):
-			addresses, err := skyWallet.DecodeResponseSkycoinAddress(msg)
-			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
-
-			writeHTTPResponse(w, HTTPResponse{
-				Data: addresses,
-			})
-			return
-		// Features Response
-		case uint16(messages.MessageType_MessageType_Features):
-			features := &messages.Features{}
-			err := proto.Unmarshal(msg.Data, features)
-			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
-
-			writeHTTPResponse(w, HTTPResponse{
-				Data: features,
-			})
-			return
-		// SignMessage Response
-		case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
-			signature, err := skyWallet.DecodeResponseSkycoinSignMessage(msg)
-			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
-
-			writeHTTPResponse(w, HTTPResponse{
-				Data: []string{signature},
-			})
-			return
-		// TransactionSign Response
-		case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
-			signatures, err := skyWallet.DecodeResponseTransactionSign(msg)
-			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
-				return
-			}
-
-			writeHTTPResponse(w, HTTPResponse{
-				Data: &signatures,
-			})
-			return
-		default:
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, fmt.Sprintf("recevied unexpected response message type: %s", messages.MessageType(msg.Kind)))
+func HandleFirmwareResponseMessages(w http.ResponseWriter, msg wire.Message) {
+	switch msg.Kind {
+	case uint16(messages.MessageType_MessageType_PinMatrixRequest):
+		writeHTTPResponse(w, HTTPResponse{
+			Data: []string{"PinMatrixRequest"},
+		})
+	case uint16(messages.MessageType_MessageType_PassphraseRequest):
+		writeHTTPResponse(w, HTTPResponse{
+			Data: []string{"PassPhraseRequest"},
+		})
+	case uint16(messages.MessageType_MessageType_WordRequest):
+		writeHTTPResponse(w, HTTPResponse{
+			Data: []string{"WordRequest"},
+		})
+	case uint16(messages.MessageType_MessageType_ButtonRequest):
+		writeHTTPResponse(w, HTTPResponse{
+			Data: []string{"ButtonRequest"},
+		})
+	case uint16(messages.MessageType_MessageType_Failure):
+		failureMsg, err := skyWallet.DecodeFailMsg(msg)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 			writeHTTPResponse(w, resp)
 			return
 		}
+		resp := NewHTTPErrorResponse(http.StatusConflict, failureMsg)
+		writeHTTPResponse(w, resp)
+	case uint16(messages.MessageType_MessageType_Success):
+		successMsg, err := skyWallet.DecodeSuccessMsg(msg)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusUnauthorized, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+
+		writeHTTPResponse(w, HTTPResponse{
+			Data: []string{successMsg},
+		})
+	// AddressGen Response
+	case uint16(messages.MessageType_MessageType_ResponseSkycoinAddress):
+		addresses, err := skyWallet.DecodeResponseSkycoinAddress(msg)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+
+		writeHTTPResponse(w, HTTPResponse{
+			Data: addresses,
+		})
+	// Features Response
+	case uint16(messages.MessageType_MessageType_Features):
+		features := &messages.Features{}
+		err := proto.Unmarshal(msg.Data, features)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+
+		writeHTTPResponse(w, HTTPResponse{
+			Data: features,
+		})
+	// SignMessage Response
+	case uint16(messages.MessageType_MessageType_ResponseSkycoinSignMessage):
+		signature, err := skyWallet.DecodeResponseSkycoinSignMessage(msg)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+
+		writeHTTPResponse(w, HTTPResponse{
+			Data: []string{signature},
+		})
+	// TransactionSign Response
+	case uint16(messages.MessageType_MessageType_ResponseTransactionSign):
+		signatures, err := skyWallet.DecodeResponseTransactionSign(msg)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
+			return
+		}
+
+		writeHTTPResponse(w, HTTPResponse{
+			Data: &signatures,
+		})
+	default:
+		resp := NewHTTPErrorResponse(http.StatusInternalServerError, fmt.Sprintf("recevied unexpected response message type: %s", messages.MessageType(msg.Kind)))
+		writeHTTPResponse(w, resp)
 	}
 }
 
