@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
 )
 
 // PinMatrixRequest request data from /api/v1/intermediate/pin_matrix
@@ -26,14 +28,31 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		msg, err := gateway.PinMatrixAck(req.Pin)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		var err error
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		go func() {
+			msg, err = gateway.PinMatrixAck(req.Pin)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			err = gateway.Disconnect()
+			if err != nil {
+				logger.Error(err)
+			}
+		}
 	}
 }
 
@@ -58,14 +77,31 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		msg, err := gateway.PassphraseAck(req.Passphrase)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		var err error
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		go func() {
+			msg, err = gateway.PassphraseAck(req.Passphrase)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			err = gateway.Disconnect()
+			if err != nil {
+				logger.Error(err)
+			}
+		}
 	}
 }
 
@@ -90,14 +126,31 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		msg, err := gateway.WordAck(req.Word)
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		var err error
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		go func() {
+			msg, err = gateway.WordAck(req.Word)
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			err = gateway.Disconnect()
+			if err != nil {
+				logger.Error(err)
+			}
+		}
 	}
 }
 
@@ -109,12 +162,29 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		msg, err := gateway.ButtonAck()
-		if err != nil {
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
+		var msg wire.Message
+		var err error
+		retCH := make(chan int)
+		ctx := r.Context()
+
+		go func() {
+			msg, err = gateway.ButtonAck()
+			if err != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			err = gateway.Disconnect()
+			if err != nil {
+				logger.Error(err)
+			}
 		}
-		HandleFirmwareResponseMessages(w, gateway, msg)
 	}
 }

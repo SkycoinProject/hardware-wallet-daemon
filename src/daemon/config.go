@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
@@ -41,11 +40,6 @@ type AppConfig struct {
 	HostWhitelist string
 	hostWhitelist []string
 
-	// Timeouts for the HTTP listener
-	HTTPReadTimeout  time.Duration
-	HTTPWriteTimeout time.Duration
-	HTTPIdleTimeout  time.Duration
-
 	// Logging
 	ColorLog bool
 	// This is the value registered with flag, it is converted to LogLevel after parsing
@@ -75,12 +69,6 @@ func NewAppConfig(port int, datadir string) AppConfig {
 	return AppConfig{
 		WebInterfaceAddr: "127.0.0.1",
 		WebInterfacePort: port,
-
-		// Timeout settings for http.Server
-		// https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
-		HTTPReadTimeout:  time.Minute * 10,
-		HTTPWriteTimeout: time.Minute * 10,
-		HTTPIdleTimeout:  time.Minute * 10,
 
 		// Logging
 		ColorLog:  true,

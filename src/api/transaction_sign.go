@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+
 	"github.com/gogo/protobuf/proto"
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	messages "github.com/skycoin/hardware-wallet-protob/go"
@@ -87,15 +89,27 @@ func transactionSign(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.TransactionSign(txnInputs, txnOutputs)
-		if err != nil {
-			logger.Errorf("transactionSign failed: %s", err.Error())
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		go func() {
+			msg, err = gateway.TransactionSign(txnInputs, txnOutputs)
+			if err != nil {
+				logger.Errorf("transactionSign failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			logger.Error(gateway.Disconnect())
+		}
 	}
 }
 

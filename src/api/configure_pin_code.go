@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
@@ -48,14 +50,27 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.ChangePin(&req.RemovePin)
-		if err != nil {
-			logger.Errorf("configurePinCode failed: %s", err.Error())
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		var err error
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, gateway, msg)
+		go func() {
+			msg, err = gateway.ChangePin(&req.RemovePin)
+			if err != nil {
+				logger.Errorf("configurePinCode failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			logger.Error(gateway.Disconnect())
+		}
 	}
 }

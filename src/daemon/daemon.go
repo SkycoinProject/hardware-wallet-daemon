@@ -176,9 +176,6 @@ func (d *Daemon) createServer(host string, gateway *api.Gateway) (*api.Server, e
 		EnableCSRF:         d.config.App.EnableCSRF,
 		DisableHeaderCheck: d.config.App.DisableHeaderCheck,
 		HostWhitelist:      d.config.App.hostWhitelist,
-		ReadTimeout:        d.config.App.HTTPReadTimeout,
-		WriteTimeout:       d.config.App.HTTPWriteTimeout,
-		IdleTimeout:        d.config.App.HTTPIdleTimeout,
 		Mode:               d.config.App.daemonMode,
 		Build:              d.config.Build,
 	}

@@ -178,6 +178,20 @@ func (_m *MockGatewayer) Close() {
 	_m.Called()
 }
 
+// Connect provides a mock function with given fields:
+func (_m *MockGatewayer) Connect() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Connected provides a mock function with given fields:
 func (_m *MockGatewayer) Connected() bool {
 	ret := _m.Called()
@@ -187,6 +201,20 @@ func (_m *MockGatewayer) Connected() bool {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
+// Disconnect provides a mock function with given fields:
+func (_m *MockGatewayer) Disconnect() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
 	}
 
 	return r0

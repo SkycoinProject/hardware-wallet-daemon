@@ -259,7 +259,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b4cf444d4f76282aa41f0358992f1ca57d5221f342485438242c352015688e3e"
+  digest = "1:a268803acf9537788512dae479b20588731d010650bd9e62711ef792042d351a"
   name = "github.com/skycoin/hardware-wallet-go"
   packages = [
     "src/skywallet",
@@ -269,7 +269,7 @@
     "src/usb/lowlevel/libusb",
   ]
   pruneopts = ""
-  revision = "ef6b68844005cc5c150ee9926f61964773e9136d"
+  revision = "cde8af2770f90f22ee9a69705027b4f4b5700c37"
 
 [[projects]]
   branch = "master"

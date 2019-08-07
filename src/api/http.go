@@ -7,7 +7,6 @@ import (
 	"os"
 	"regexp"
 	"runtime"
-	"time"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/rs/cors"
@@ -17,10 +16,6 @@ import (
 )
 
 const (
-	defaultReadTimeout  = time.Second * 10
-	defaultWriteTimeout = time.Second * 60
-	defaultIdleTimeout  = time.Second * 120
-
 	// ContentTypeJSON json content type header
 	ContentTypeJSON = "application/json"
 	// ContentTypeForm form data content type header
@@ -64,9 +59,6 @@ type Config struct {
 	EnableCSRF         bool
 	DisableHeaderCheck bool
 	HostWhitelist      []string
-	ReadTimeout        time.Duration
-	WriteTimeout       time.Duration
-	IdleTimeout        time.Duration
 	Mode               skyWallet.DeviceType
 	Build              BuildInfo
 }
@@ -114,16 +106,6 @@ func (s *Server) Shutdown() {
 }
 
 func create(host string, c Config, gateway *Gateway) *Server {
-	if c.ReadTimeout == 0 {
-		c.ReadTimeout = defaultReadTimeout
-	}
-	if c.WriteTimeout == 0 {
-		c.WriteTimeout = defaultWriteTimeout
-	}
-	if c.IdleTimeout == 0 {
-		c.IdleTimeout = defaultIdleTimeout
-	}
-
 	mc := muxConfig{
 		host:               host,
 		enableCSRF:         c.EnableCSRF,
@@ -136,10 +118,7 @@ func create(host string, c Config, gateway *Gateway) *Server {
 	srvMux := newServerMux(mc, gateway.Device)
 
 	srv := &http.Server{
-		Handler:      srvMux,
-		ReadTimeout:  c.ReadTimeout,
-		WriteTimeout: c.WriteTimeout,
-		IdleTimeout:  c.IdleTimeout,
+		Handler: srvMux,
 	}
 
 	return &Server{

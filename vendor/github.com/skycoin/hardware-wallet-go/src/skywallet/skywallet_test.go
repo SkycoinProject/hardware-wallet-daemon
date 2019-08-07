@@ -369,5 +369,5 @@ func (suite *devicerSuit) TestWipe() {
 }
 
 func getMockDevice(mock *MockDeviceDriver) Device {
-	return Device{mock, sync.Mutex{}, nil, 0, false, ButtonType(-1)}
+	return Device{mock, sync.Mutex{}, nil, false, false, ButtonType(-1)}
 }
