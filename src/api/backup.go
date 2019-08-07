@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 )
 
@@ -27,14 +29,27 @@ func backup(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.Backup()
-		if err != nil {
-			logger.Errorf("backup failed: %s", err.Error())
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		var err error
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, msg)
+		go func() {
+			msg, err = gateway.Backup()
+			if err != nil {
+				logger.Errorf("backup failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			logger.Error(gateway.Disconnect())
+		}
 	}
 }

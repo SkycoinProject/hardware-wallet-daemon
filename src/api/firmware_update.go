@@ -45,14 +45,25 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 			return
 		}
 
-		err = gateway.FirmwareUpload(fileBytes, sha256.Sum256(fileBytes[0x100:]))
-		if err != nil {
-			logger.Errorf("firmwareUpdate failed: %s", err.Error())
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		writeHTTPResponse(w, HTTPResponse{})
+		go func() {
+			err = gateway.FirmwareUpload(fileBytes, sha256.Sum256(fileBytes[0x100:]))
+			if err != nil {
+				logger.Errorf("firmwareUpdate failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			writeHTTPResponse(w, HTTPResponse{})
+		case <-ctx.Done():
+			logger.Error(gateway.Disconnect())
+		}
 	}
 }

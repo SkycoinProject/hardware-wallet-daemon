@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+
 	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
 	"github.com/skycoin/skycoin/src/cipher"
 )
@@ -77,14 +79,26 @@ func checkMessageSignature(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		msg, err := gateway.CheckMessageSignature(req.Message, req.Signature, req.Address)
-		if err != nil {
-			logger.Errorf("checkMessageSignature failed: %s", err.Error())
-			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-			writeHTTPResponse(w, resp)
-			return
-		}
+		var msg wire.Message
+		retCH := make(chan int)
+		ctx := r.Context()
 
-		HandleFirmwareResponseMessages(w, msg)
+		go func() {
+			msg, err = gateway.CheckMessageSignature(req.Message, req.Signature, req.Address)
+			if err != nil {
+				logger.Errorf("checkMessageSignature failed: %s", err.Error())
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+				return
+			}
+			retCH <- 1
+		}()
+
+		select {
+		case <-retCH:
+			HandleFirmwareResponseMessages(w, msg)
+		case <-ctx.Done():
+			logger.Error(gateway.Disconnect())
+		}
 	}
 }
