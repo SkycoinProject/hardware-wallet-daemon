@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	libusbPrefix   = "lib"
-	usbConfigNum   = 1
-	usbConfigIndex = 0
+	libusbPrefix    = "lib"
+	usbConfigNum    = 1
+	usbConfigIndex  = 0
 	transferTimeout = 250
 )
 
