@@ -31,6 +31,7 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		var msg wire.Message
 		var err error
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
@@ -38,6 +39,7 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 
@@ -47,6 +49,7 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
+		case <-errCH:
 		case <-ctx.Done():
 			err = gateway.Disconnect()
 			if err != nil {
@@ -80,6 +83,7 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		var msg wire.Message
 		var err error
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
@@ -87,6 +91,7 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 
@@ -96,6 +101,7 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
+		case <-errCH:
 		case <-ctx.Done():
 			err = gateway.Disconnect()
 			if err != nil {
@@ -129,6 +135,7 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		var msg wire.Message
 		var err error
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
@@ -136,6 +143,7 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 
@@ -145,6 +153,7 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
+		case <-errCH:
 		case <-ctx.Done():
 			err = gateway.Disconnect()
 			if err != nil {
@@ -165,6 +174,7 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		var msg wire.Message
 		var err error
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
@@ -172,6 +182,7 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 			if err != nil {
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 			retCH <- 1
@@ -180,6 +191,7 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
+		case <-errCH:
 		case <-ctx.Done():
 			err = gateway.Disconnect()
 			if err != nil {

@@ -46,6 +46,7 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 		}
 
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
@@ -54,6 +55,7 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 				logger.Errorf("firmwareUpdate failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 			retCH <- 1
@@ -62,6 +64,7 @@ func firmwareUpdate(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			writeHTTPResponse(w, HTTPResponse{})
+		case <-errCH:
 		case <-ctx.Done():
 			logger.Error(gateway.Disconnect())
 		}

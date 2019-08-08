@@ -53,6 +53,7 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 		var msg wire.Message
 		var err error
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
@@ -61,6 +62,7 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 				logger.Errorf("configurePinCode failed: %s", err.Error())
 				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
 				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 			retCH <- 1
@@ -69,6 +71,7 @@ func configurePinCode(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
+		case <-errCH:
 		case <-ctx.Done():
 			logger.Error(gateway.Disconnect())
 		}
