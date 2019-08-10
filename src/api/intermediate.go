@@ -37,8 +37,6 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		go func() {
 			msg, err = gateway.PinMatrixAck(req.Pin)
 			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
 				errCH <- 1
 				return
 			}
@@ -50,10 +48,16 @@ func pinMatrixRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
 		case <-errCH:
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			err = gateway.Disconnect()
-			if err != nil {
-				logger.Error(err)
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
 			}
 		}
 	}
@@ -89,8 +93,6 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		go func() {
 			msg, err = gateway.PassphraseAck(req.Passphrase)
 			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
 				errCH <- 1
 				return
 			}
@@ -102,10 +104,16 @@ func passphraseRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
 		case <-errCH:
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			err = gateway.Disconnect()
-			if err != nil {
-				logger.Error(err)
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
 			}
 		}
 	}
@@ -141,8 +149,6 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		go func() {
 			msg, err = gateway.WordAck(req.Word)
 			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
 				errCH <- 1
 				return
 			}
@@ -154,10 +160,16 @@ func wordRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
 		case <-errCH:
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			err = gateway.Disconnect()
-			if err != nil {
-				logger.Error(err)
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
 			}
 		}
 	}
@@ -173,15 +185,13 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 
 		var msg wire.Message
 		var err error
-		retCH := make(chan int)
-		errCH := make(chan int)
+		retCH := make(chan int, 1)
+		errCH := make(chan int, 1)
 		ctx := r.Context()
 
 		go func() {
 			msg, err = gateway.ButtonAck()
 			if err != nil {
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
 				errCH <- 1
 				return
 			}
@@ -192,10 +202,17 @@ func buttonRequestHandler(gateway Gatewayer) http.HandlerFunc {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
 		case <-errCH:
+			logger.Errorf("button ack failed: %s", err.Error())
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			err = gateway.Disconnect()
-			if err != nil {
-				logger.Error(err)
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
 			}
 		}
 	}

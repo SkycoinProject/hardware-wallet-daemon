@@ -62,9 +62,6 @@ func recovery(gateway Gatewayer) http.HandlerFunc {
 		go func() {
 			msg, err = gateway.Recovery(req.WordCount, req.UsePassphrase, req.DryRun)
 			if err != nil {
-				logger.Errorf("recovery failed: %s", err.Error())
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
 				errCH <- 1
 				return
 			}
@@ -75,8 +72,18 @@ func recovery(gateway Gatewayer) http.HandlerFunc {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
 		case <-errCH:
+			logger.Errorf("recovery failed: %s", err.Error())
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			logger.Error(gateway.Disconnect())
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
+			}
 		}
 	}
 }
