@@ -62,14 +62,13 @@ func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 		var msg wire.Message
 		var err error
 		retCH := make(chan int)
+		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
 			msg, err = gateway.GenerateMnemonic(req.WordCount, req.UsePassphrase)
 			if err != nil {
-				logger.Errorf("generateMnemonic failed: %s", err.Error())
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
+				errCH <- 1
 				return
 			}
 			retCH <- 1
@@ -78,8 +77,19 @@ func generateMnemonic(gateway Gatewayer) http.HandlerFunc {
 		select {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
+		case <-errCH:
+			logger.Errorf("generateMnemonic failed: %s", err.Error())
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			logger.Error(gateway.Disconnect())
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
+			}
 		}
 	}
 }

@@ -38,9 +38,6 @@ func features(gateway Gatewayer) http.HandlerFunc {
 		go func() {
 			msg, err = gateway.GetFeatures()
 			if err != nil {
-				logger.Errorf("features failed: %s", err.Error())
-				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
-				writeHTTPResponse(w, resp)
 				errCH <- 1
 				return
 			}
@@ -51,8 +48,18 @@ func features(gateway Gatewayer) http.HandlerFunc {
 		case <-retCH:
 			HandleFirmwareResponseMessages(w, msg)
 		case <-errCH:
+			logger.Errorf("features failed: %s", err.Error())
+			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+			writeHTTPResponse(w, resp)
 		case <-ctx.Done():
-			logger.Error(gateway.Disconnect())
+			disConnErr := gateway.Disconnect()
+			if disConnErr != nil {
+				resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
+				writeHTTPResponse(w, resp)
+			} else {
+				resp := NewHTTPErrorResponse(499, "Client Closed Request")
+				writeHTTPResponse(w, resp)
+			}
 		}
 	}
 }
