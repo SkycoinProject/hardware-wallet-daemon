@@ -28,7 +28,7 @@ var (
 	logger = logging.MustGetLogger("daemon-api")
 
 	// custom lock to help with serializing requests
-	ongoingOperation chan struct{}
+	// ongoingOperation chan struct{}
 )
 
 // corsRegex matches all localhost origin headers
@@ -46,7 +46,7 @@ func init() {
 	}
 
 	// set size to 1 to allow only 1 request at a time
-	ongoingOperation = make(chan struct{}, 1)
+	// ongoingOperation = make(chan struct{}, 1)
 
 	apb := os.Getenv("AUTO_PRESS_BUTTONS")
 	if apb == "1" && runtime.GOOS == "linux" {

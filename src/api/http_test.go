@@ -144,7 +144,7 @@ func TestCORS(t *testing.T) {
 		},
 	}
 
-	for _, e := range append(allEndpoints()) {
+	for _, e := range allEndpoints() {
 		for _, tc := range cases {
 			for _, m := range []string{http.MethodPost, http.MethodGet} {
 				name := fmt.Sprintf("%s %s %s", tc.name, m, e)
