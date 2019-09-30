@@ -1,8 +1,8 @@
 package api
 
 import (
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	messages "github.com/skycoin/hardware-wallet-protob/go"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
+	messages "github.com/SkycoinProject/hardware-wallet-protob/go"
 
 	"net/http"
 )

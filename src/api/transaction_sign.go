@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
 
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
+	messages "github.com/SkycoinProject/hardware-wallet-protob/go"
+	"github.com/SkycoinProject/skycoin/src/cipher"
+	"github.com/SkycoinProject/skycoin/src/util/droplet"
 	"github.com/gogo/protobuf/proto"
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	messages "github.com/skycoin/hardware-wallet-protob/go"
-	"github.com/skycoin/skycoin/src/cipher"
-	"github.com/skycoin/skycoin/src/util/droplet"
 )
 
 // TransactionSignRequest is request data for /api/v1/transaction_sign

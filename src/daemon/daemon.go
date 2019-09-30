@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	"github.com/skycoin/skycoin/src/util/apputil"
-	"github.com/skycoin/skycoin/src/util/logging"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
+	"github.com/SkycoinProject/skycoin/src/util/apputil"
+	"github.com/SkycoinProject/skycoin/src/util/logging"
 
 	"github.com/skycoin/hardware-wallet-daemon/src/api"
 )

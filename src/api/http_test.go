@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
 	"github.com/stretchr/testify/require"
 )
 

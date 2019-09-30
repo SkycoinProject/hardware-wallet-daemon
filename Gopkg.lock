@@ -27,6 +27,54 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:56f795d51f754b295a5f19a76449537a22ad29ca93ed0918e3140b943cb751e3"
+  name = "github.com/SkycoinProject/hardware-wallet-go"
+  packages = [
+    "src/skywallet",
+    "src/skywallet/usb",
+    "src/skywallet/wire",
+    "src/usb/lowlevel/hidapi",
+    "src/usb/lowlevel/libusb",
+  ]
+  pruneopts = ""
+  revision = "bf9bce887eeeb8f64dd5604eb0c274cd476d7243"
+
+[[projects]]
+  branch = "develop"
+  digest = "1:e718fe42263acc8383b6968e9b433d3a32aebe5226dca11640c72f37fd12d7c9"
+  name = "github.com/SkycoinProject/hardware-wallet-protob"
+  packages = [
+    "go",
+    "go/google/protobuf",
+  ]
+  pruneopts = "UT"
+  revision = "a729a2a1936c8ccd41c66c3924f86a2ef859d274"
+
+[[projects]]
+  branch = "develop"
+  digest = "1:bed622b2c046fb75118c6c9433d15c309f2f30a2f569ea35e74d711b304a9766"
+  name = "github.com/SkycoinProject/skycoin"
+  packages = [
+    "src/cipher",
+    "src/cipher/base58",
+    "src/cipher/bip39",
+    "src/cipher/bip39/wordlists",
+    "src/cipher/pbkdf2",
+    "src/cipher/ripemd160",
+    "src/cipher/secp256k1-go",
+    "src/cipher/secp256k1-go/secp256k1-go2",
+    "src/util/apputil",
+    "src/util/droplet",
+    "src/util/file",
+    "src/util/http",
+    "src/util/iputil",
+    "src/util/logging",
+  ]
+  pruneopts = "UT"
+  revision = "1e7ba0c81cd2944e771d3ebcfeae9f739b170137"
+
+[[projects]]
+  branch = "master"
   digest = "1:86d119ee8a0fb122f2d0e0fbbbd5d2f65953029248743462ee3908a21ae04247"
   name = "github.com/andreyvit/diff"
   packages = ["."]
@@ -258,54 +306,6 @@
   version = "v1.4.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:a268803acf9537788512dae479b20588731d010650bd9e62711ef792042d351a"
-  name = "github.com/skycoin/hardware-wallet-go"
-  packages = [
-    "src/skywallet",
-    "src/skywallet/usb",
-    "src/skywallet/wire",
-    "src/usb/lowlevel/hidapi",
-    "src/usb/lowlevel/libusb",
-  ]
-  pruneopts = ""
-  revision = "cde8af2770f90f22ee9a69705027b4f4b5700c37"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c6d4676e48550d1af188ed2c0d844ec9d31432277080c3ea33126ad7ceeb1421"
-  name = "github.com/skycoin/hardware-wallet-protob"
-  packages = [
-    "go",
-    "go/google/protobuf",
-  ]
-  pruneopts = "UT"
-  revision = "bd9f95c53447f97ac56f24a415c25d04680552de"
-
-[[projects]]
-  branch = "develop"
-  digest = "1:762489ace59cfed00684d34369a6ceb80b1b02328ce2b115fe041de5a8b73f45"
-  name = "github.com/skycoin/skycoin"
-  packages = [
-    "src/cipher",
-    "src/cipher/base58",
-    "src/cipher/bip39",
-    "src/cipher/bip39/wordlists",
-    "src/cipher/pbkdf2",
-    "src/cipher/ripemd160",
-    "src/cipher/secp256k1-go",
-    "src/cipher/secp256k1-go/secp256k1-go2",
-    "src/util/apputil",
-    "src/util/droplet",
-    "src/util/file",
-    "src/util/http",
-    "src/util/iputil",
-    "src/util/logging",
-  ]
-  pruneopts = "UT"
-  revision = "94955dd52540845631475ecb7b87916fc820f233"
-
-[[projects]]
   digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
   name = "github.com/stretchr/objx"
   packages = ["."]
@@ -406,6 +406,17 @@
   analyzer-version = 1
   input-imports = [
     "github.com/NYTimes/gziphandler",
+    "github.com/SkycoinProject/hardware-wallet-go/src/skywallet",
+    "github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire",
+    "github.com/SkycoinProject/hardware-wallet-protob/go",
+    "github.com/SkycoinProject/skycoin/src/cipher",
+    "github.com/SkycoinProject/skycoin/src/cipher/bip39",
+    "github.com/SkycoinProject/skycoin/src/util/apputil",
+    "github.com/SkycoinProject/skycoin/src/util/droplet",
+    "github.com/SkycoinProject/skycoin/src/util/file",
+    "github.com/SkycoinProject/skycoin/src/util/http",
+    "github.com/SkycoinProject/skycoin/src/util/iputil",
+    "github.com/SkycoinProject/skycoin/src/util/logging",
     "github.com/andreyvit/diff",
     "github.com/blang/semver",
     "github.com/go-openapi/errors",
@@ -416,17 +427,6 @@
     "github.com/go-openapi/validate",
     "github.com/gogo/protobuf/proto",
     "github.com/rs/cors",
-    "github.com/skycoin/hardware-wallet-go/src/skywallet",
-    "github.com/skycoin/hardware-wallet-go/src/skywallet/wire",
-    "github.com/skycoin/hardware-wallet-protob/go",
-    "github.com/skycoin/skycoin/src/cipher",
-    "github.com/skycoin/skycoin/src/cipher/bip39",
-    "github.com/skycoin/skycoin/src/util/apputil",
-    "github.com/skycoin/skycoin/src/util/droplet",
-    "github.com/skycoin/skycoin/src/util/file",
-    "github.com/skycoin/skycoin/src/util/http",
-    "github.com/skycoin/skycoin/src/util/iputil",
-    "github.com/skycoin/skycoin/src/util/logging",
     "github.com/stretchr/testify/mock",
     "github.com/stretchr/testify/require",
   ]

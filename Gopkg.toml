@@ -28,7 +28,7 @@
   go-tests = true
   unused-packages = true
   [[prune.project]]
-    name = "github.com/skycoin/hardware-wallet-go"
+    name = "github.com/SkycoinProject/hardware-wallet-go"
      go-tests = false
      unused-packages = false
 
@@ -37,7 +37,7 @@
   version = "1.2.1"
 
 [[constraint]]
-  name = "github.com/skycoin/skycoin"
+  name = "github.com/SkycoinProject/skycoin"
   branch = "develop"
 
 [[constraint]]
@@ -45,7 +45,7 @@
   version = "1.0.1"
 
 [[constraint]]
-  name = "github.com/skycoin/hardware-wallet-go"
+  name = "github.com/SkycoinProject/hardware-wallet-go"
   branch = "master"
 
 [[constraint]]

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
 )
 
 // PinMatrixRequest request data from /api/v1/intermediate/pin_matrix

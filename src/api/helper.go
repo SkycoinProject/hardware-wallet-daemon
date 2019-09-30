@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
+	messages "github.com/SkycoinProject/hardware-wallet-protob/go"
+	wh "github.com/SkycoinProject/skycoin/src/util/http"
 	"github.com/gogo/protobuf/proto"
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
-	messages "github.com/skycoin/hardware-wallet-protob/go"
-	wh "github.com/skycoin/skycoin/src/util/http"
 )
 
 // HTTPResponse represents the http response struct

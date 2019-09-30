@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
 
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
 )
 
 // URI: /api/v1/wipe

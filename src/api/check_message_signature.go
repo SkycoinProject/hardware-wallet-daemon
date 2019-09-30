@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
 
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	"github.com/skycoin/skycoin/src/cipher"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
+	"github.com/SkycoinProject/skycoin/src/cipher"
 )
 
 // CheckMessageSignatureRequest is request data for /api/v1/check_message_signature

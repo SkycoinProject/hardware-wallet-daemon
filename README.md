@@ -1,12 +1,12 @@
 ![daemon logo](https://user-images.githubusercontent.com/8619106/55698557-0bfc2400-59e4-11e9-972d-e33b640ff9a6.png)
- 
+
 # Hardware Wallet Daemon
 [![Build Status](https://travis-ci.com/skycoin/hardware-wallet-daemon.svg)](https://travis-ci.com/skycoin/hardware-wallet-daemon)
 [![GoDoc](https://godoc.org/github.com/skycoin/hardware-wallet-daemon?status.svg)](https://godoc.org/github.com/skycoin/hardware-walletd-daemon)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skycoin/hardware-wallet-daemon)](https://goreportcard.com/report/github.com/skycoin/hardware-wallet-daemon)
 
 The hardware walllet daemon provides an HTTP API to interface with the wallets supported by skycoin.
-It uses the go bindings provided by the hardware wallet go [library](https://github.com/skycoin/hardware-wallet-go).
+It uses the go bindings provided by the hardware wallet go [library](https://github.com/SkycoinProject/hardware-wallet-go).
 
 ## Table of contents
 
@@ -35,7 +35,7 @@ It uses the go bindings provided by the hardware wallet go [library](https://git
 		- [Update the version](#update-the-version)
 		- [Pre-release testing](#pre-release-testing)
 		- [Creating release builds](#creating-release-builds)
-- [Responsible Disclosure](#responsible-disclosure)    
+- [Responsible Disclosure](#responsible-disclosure)
 <!-- /MarkdownTOC -->
 
 ## Installation
@@ -44,7 +44,7 @@ Hardware Daemon supports go1.10+.
 
 ### Go 1.10+ Installation and Setup
 
-[Golang 1.10+ Installation/Setup](https://github.com/skycoin/skycoin/blob/develop/INSTALLATION.md)
+[Golang 1.10+ Installation/Setup](https://github.com/SkycoinProject/skycoin/blob/develop/INSTALLATION.md)
 
 ## Run Daemon from the command line
 ### Modes
@@ -82,7 +82,7 @@ $ make run-help
 
 # Development guidelines
 
-Code added in this repository should comply to development guidelines documented in [Skycoin wiki](https://github.com/skycoin/skycoin/wiki).
+Code added in this repository should comply to development guidelines documented in [Skycoin wiki](https://github.com/SkycoinProject/skycoin/wiki).
 
 The project has two branches: `master` and `develop`.
 
@@ -303,7 +303,7 @@ dep ensure github.com/foo/bar@tag
 
 #### Pre-release testing
 
-Pre-release testing procedure requires [skycoin-cli](https://github.com/skycoin/skycoin/tree/develop/cmd/cli) of version strictly greater than `0.26.0`. Please [install it](https://github.com/skycoin/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/skycoin/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/skycoin/hardware-wallet/) in advance.
+Pre-release testing procedure requires [skycoin-cli](https://github.com/SkycoinProject/skycoin/tree/develop/cmd/cli) of version strictly greater than `0.26.0`. Please [install it](https://github.com/SkycoinProject/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/SkycoinProject/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/skycoin/hardware-wallet/) in advance.
 
 The instructions that follow are meant to be followed for Skywallet devices flashed without memory protection. If your device memory is protected then some values might be different e.g. `firmware_features`.
 
@@ -322,7 +322,7 @@ Some values need to be known during the process. They are represented by the fol
 
 Perform these actions before releasing.
 
-**Note** : In all cases `skycoin-cli` would be equivalent to `go run cmd/cli/cli.go` if current working directory set to `$GOPATH/src/github.com/skycoin/skycoin`.
+**Note** : In all cases `skycoin-cli` would be equivalent to `go run cmd/cli/cli.go` if current working directory set to `$GOPATH/src/github.com/SkycoinProject/skycoin`.
 
 ##### Run project test suite
 

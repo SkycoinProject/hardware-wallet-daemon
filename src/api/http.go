@@ -9,10 +9,10 @@ import (
 	"runtime"
 
 	"github.com/NYTimes/gziphandler"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
+	wh "github.com/SkycoinProject/skycoin/src/util/http"
+	"github.com/SkycoinProject/skycoin/src/util/logging"
 	"github.com/rs/cors"
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
-	wh "github.com/skycoin/skycoin/src/util/http"
-	"github.com/skycoin/skycoin/src/util/logging"
 )
 
 const (

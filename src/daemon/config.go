@@ -9,9 +9,9 @@ import (
 
 	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
-	skyWallet "github.com/skycoin/hardware-wallet-go/src/skywallet"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
 
-	"github.com/skycoin/skycoin/src/util/file"
+	"github.com/SkycoinProject/skycoin/src/util/file"
 )
 
 var (

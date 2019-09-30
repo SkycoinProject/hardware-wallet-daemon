@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/skycoin/skycoin/src/util/iputil"
+	"github.com/SkycoinProject/skycoin/src/util/iputil"
 )
 
 // HostCheck checks that the request's Host header is 127.0.0.1:$port or localhost:$port

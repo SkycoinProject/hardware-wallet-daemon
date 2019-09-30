@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	messages "github.com/skycoin/hardware-wallet-protob/go"
-	"github.com/skycoin/skycoin/src/cipher"
-	"github.com/skycoin/skycoin/src/util/droplet"
+	messages "github.com/SkycoinProject/hardware-wallet-protob/go"
+	"github.com/SkycoinProject/skycoin/src/cipher"
+	"github.com/SkycoinProject/skycoin/src/util/droplet"
 
-	"github.com/skycoin/hardware-wallet-go/src/skywallet/wire"
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
 	"github.com/stretchr/testify/require"
 )
 

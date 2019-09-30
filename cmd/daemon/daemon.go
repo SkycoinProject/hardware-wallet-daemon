@@ -6,7 +6,7 @@ import (
 
 	"github.com/skycoin/hardware-wallet-daemon/src/api"
 
-	"github.com/skycoin/skycoin/src/util/logging"
+	"github.com/SkycoinProject/skycoin/src/util/logging"
 
 	"github.com/skycoin/hardware-wallet-daemon/src/daemon"
 )
