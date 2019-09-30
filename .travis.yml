@@ -43,7 +43,7 @@ before_script:
     fi
   - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
     mkdir -p tmp/hardware-wallet ;
-    git clone --depth=1 --single-branch --branch develop https://github.com/skycoin/hardware-wallet.git
+    git clone --depth=1 --single-branch --branch develop https://github.com/SkycoinProject/hardware-wallet.git
     tmp/hardware-wallet ;
     git -C tmp/hardware-wallet checkout develop ;
     git -C tmp/hardware-wallet submodule init ;
@@ -90,5 +90,5 @@ deploy:
     acl: public_read
     region: $AWS_REGION
     on:
-      repo: skycoin/hardware-wallet-daemon
+      repo: SkycoinProject/hardware-wallet-daemon
       tags: true
