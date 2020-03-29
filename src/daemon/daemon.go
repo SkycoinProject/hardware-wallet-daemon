@@ -13,7 +13,7 @@ import (
 	"github.com/SkycoinProject/skycoin/src/util/apputil"
 	"github.com/SkycoinProject/skycoin/src/util/logging"
 
-	"github.com/skycoin/hardware-wallet-daemon/src/api"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/api"
 )
 
 // Daemon represents a hardware wallet daemon instance

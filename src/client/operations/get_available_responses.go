@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/skycoin/hardware-wallet-daemon/src/models"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/models"
 )
 
 // GetAvailableReader is a Reader for the GetAvailable structure.
@@ -110,6 +110,7 @@ func (o *GetAvailableDefault) readResponse(response runtime.ClientResponse, cons
 /*GetAvailableOKBody get available o k body
 swagger:model GetAvailableOKBody
 */
+
 type GetAvailableOKBody struct {
 
 	// data

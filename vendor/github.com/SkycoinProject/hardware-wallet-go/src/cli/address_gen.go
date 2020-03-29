@@ -38,12 +38,23 @@ func addressGenCmd() gcli.Command {
 				Usage:  "Device type to send instructions to, hardware wallet (USB) or emulator.",
 				EnvVar: "DEVICE_TYPE",
 			},
+			gcli.StringFlag{
+				Name:   "coinType",
+				Value:  "SKY",
+				Usage:  "Coin type to use on hardware-wallet.",
+				EnvVar: "COIN_TYPE",
+			},
 		},
 		OnUsageError: onCommandUsageError(name),
 		Action: func(c *gcli.Context) {
 			addressN := c.Int("addressN")
 			startIndex := c.Int("startIndex")
 			confirmAddress := c.Bool("confirmAddress")
+			coinType, err := skyWallet.CoinTypeFromString(c.String("coinType"))
+			if err != nil {
+				log.Error(err)
+				return
+			}
 
 			device := skyWallet.NewDevice(skyWallet.DeviceTypeFromString(c.String("deviceType")))
 			if device == nil {
@@ -60,7 +71,7 @@ func addressGenCmd() gcli.Command {
 			}
 
 			var pinEnc string
-			msg, err := device.AddressGen(uint32(addressN), uint32(startIndex), confirmAddress)
+			msg, err := device.AddressGen(uint32(addressN), uint32(startIndex), confirmAddress, coinType)
 			if err != nil {
 				log.Error(err)
 				return

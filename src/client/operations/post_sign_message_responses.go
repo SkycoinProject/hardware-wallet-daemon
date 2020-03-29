@@ -12,7 +12,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/skycoin/hardware-wallet-daemon/src/models"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/models"
 )
 
 // PostSignMessageReader is a Reader for the PostSignMessage structure.

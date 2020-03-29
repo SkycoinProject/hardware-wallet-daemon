@@ -11,9 +11,10 @@ import (
 
 // GenerateAddressesRequest is request data for /api/v1/generate_addresses
 type GenerateAddressesRequest struct {
-	AddressN       int  `json:"address_n"`
-	StartIndex     int  `json:"start_index"`
-	ConfirmAddress bool `json:"confirm_address"`
+	AddressN       int    `json:"address_n"`
+	StartIndex     int    `json:"start_index"`
+	ConfirmAddress bool   `json:"confirm_address"`
+	CoinType       string `json:"coin_type"`
 }
 
 // generateAddresses generates addresses for hardware wallet.
@@ -65,6 +66,13 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 			logger.Warnf("wallet generating high index addresses: start_index: %d; address_n: %d", req.StartIndex, req.AddressN)
 		}
 
+		coinType, err := skyWallet.CoinTypeFromString(req.CoinType)
+		if err != nil {
+			resp := NewHTTPErrorResponse(http.StatusUnprocessableEntity, "currently unsupported coin")
+			writeHTTPResponse(w, resp)
+			return
+		}
+
 		// for integration tests
 		if autoPressEmulatorButtons {
 			err := gateway.SetAutoPressButton(true, skyWallet.ButtonRight)
@@ -77,13 +85,12 @@ func generateAddresses(gateway Gatewayer) http.HandlerFunc {
 		}
 
 		var msg wire.Message
-		var err error
 		retCH := make(chan int)
 		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
-			msg, err = gateway.AddressGen(uint32(req.AddressN), uint32(req.StartIndex), req.ConfirmAddress)
+			msg, err = gateway.AddressGen(uint32(req.AddressN), uint32(req.StartIndex), req.ConfirmAddress, coinType)
 			if err != nil {
 				errCH <- 1
 				return

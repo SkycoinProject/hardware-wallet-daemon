@@ -298,7 +298,7 @@ paths:
 
   /transaction_sign:
     post:
-      description: Sign a transaction with the hardware wallet.
+      description: Sign a Skycoin transaction with the hardware wallet.
       consumes:
         - application/json
       produces:
@@ -309,6 +309,31 @@ paths:
           description: TransactionSignRequest is request data for /api/v1/transactionSign
           schema:
             $ref: '#/definitions/TransactionSignRequest'
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/HTTPSuccessResponse'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/HTTPErrorResponse'
+      security:
+        - csrfAuth: []
+
+  /bitcoin_transaction_sign:
+    post:
+      description: Sign a Bitcoin transaction with the hardware wallet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: BitcoinTransactionSignRequest
+          description: BitcoinTransactionSignRequest is request data for /api/v1/bitcoin_transaction_sign
+          schema:
+            $ref: '#/definitions/BitcoinTransactionSignRequest'
       responses:
         200:
           description: success
@@ -484,6 +509,9 @@ definitions:
       confirm_address:
         type: boolean
         example: false
+      coin_type:
+        type: string
+        example: "SKY"
 
   ApplySettingsRequest:
     type: object
@@ -617,6 +645,46 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/TransactionOutput'
+
+  BitcoinTransactionInput:
+    type: object
+    required:
+      - index
+      - prev_hash
+    properties:
+      index:
+        type: integer
+      prev_hash:
+        type: string
+
+  BitcoinTransactionOutput:
+    type: object
+    required:
+      - address_index
+      - address
+      - coins
+    properties:
+      address_index:
+        type: integer
+      address:
+        type: string
+      coins:
+        type: string
+
+  BitcoinTransactionSignRequest:
+    type: object
+    required:
+      - bitcoin_transaction_inputs
+      - bitcoin_transaction_outputs
+    properties:
+      bitcoin_transaction_inputs:
+        type: array
+        items:
+          $ref: '#/definitions/BitcoinTransactionInput'
+      bitcoin_transaction_outputs:
+        type: array
+        items:
+          $ref: '#/definitions/BitcoinTransactionOutput'
 
   PinMatrixRequest:
     type: object

@@ -71,7 +71,7 @@ func (suite *devicerSuit) TestAddressGen() {
 	}
 
 	for _, tc := range tt {
-		msg, err := device.AddressGen(tc.addressN, tc.startIndex, false)
+		msg, err := device.AddressGen(tc.addressN, tc.startIndex, false, SkycoinCoinType)
 		suite.Equal(err, tc.err)
 		suite.Equal(msg.Kind, tc.msgKind)
 	}
@@ -343,11 +343,12 @@ func (suite *devicerSuit) TestTransactionSign() {
 	msg, err := device.TransactionSign(nil, nil)
 
 	// NOTE(denisacostaq@gmail.com): Assert
-	suite.Nil(err)
+	suite.NotNil(err)
 	driverMock.AssertCalled(suite.T(), "GetDevice")
 	driverMock.AssertNumberOfCalls(suite.T(), "SendToDevice", 1)
 	mock.AssertExpectationsForObjects(suite.T(), driverMock)
-	require.Equal(suite.T(), msg.Kind, uint16(messages.MessageType_MessageType_Success))
+
+	require.Equal(suite.T(), msg, wire.Message{})
 }
 
 func (suite *devicerSuit) TestWipe() {

@@ -46,9 +46,13 @@
 
 [[constraint]]
   name = "github.com/SkycoinProject/hardware-wallet-go"
-  branch = "master"
+  branch = "develop"
 
 [[constraint]]
-  branch = "master"
+  name = "github.com/SkycoinProject/hardware-wallet-protob"
+  branch = "develop"
+
+[[constraint]]
   name = "github.com/andreyvit/diff"
+  branch = "master"
 

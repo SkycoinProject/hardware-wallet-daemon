@@ -14,14 +14,14 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/skycoin/hardware-wallet-daemon/src/api"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/api"
 
 	"github.com/andreyvit/diff"
 	"github.com/stretchr/testify/require"
 
-	"github.com/skycoin/hardware-wallet-daemon/src/client"
-	"github.com/skycoin/hardware-wallet-daemon/src/client/operations"
-	"github.com/skycoin/hardware-wallet-daemon/src/models"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/client"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/client/operations"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/models"
 )
 
 const (
@@ -238,7 +238,7 @@ func TestGenerateMnemonic(t *testing.T) {
 
 	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
+	require.Equal(t, "User data was wiped from the device", buttonResp.Payload.Data[0])
 
 	mnemonicParams := operations.NewPostGenerateMnemonicParams()
 	mnemonicParams.GenerateMnemonicRequest = &models.GenerateMnemonicRequest{
@@ -266,7 +266,7 @@ func TestRecovery(t *testing.T) {
 
 	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
+	require.Equal(t, "User data was wiped from the device", buttonResp.Payload.Data[0])
 
 	params := operations.NewPostRecoveryParams()
 	params.RecoveryRequest = &models.RecoveryRequest{
@@ -372,7 +372,7 @@ func TestWipe(t *testing.T) {
 
 	buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
+	require.Equal(t, "User data was wiped from the device", buttonResp.Payload.Data[0])
 }
 
 func TestGenerateAddresses(t *testing.T) {
@@ -384,9 +384,10 @@ func TestGenerateAddresses(t *testing.T) {
 
 	params := operations.NewPostGenerateAddressesParams()
 	params.GenerateAddressesRequest = &models.GenerateAddressesRequest{
-		AddressN:       newInt64Ptr(2),
+		Addressn:       newInt64Ptr(2),
 		ConfirmAddress: false,
 		StartIndex:     0,
+		CoinType:       "SKY",
 	}
 
 	resp, err := daemonClient.Operations.PostGenerateAddresses(params, addCSRFHeader(t, daemonClient))
@@ -447,18 +448,8 @@ func TestTransactionSign(t *testing.T) {
 
 	resp, err := daemonClient.Operations.PostTransactionSign(params, addCSRFHeader(t, daemonClient))
 	require.NoError(t, err)
-	require.Equal(t, resp.Payload.Data[0], "ButtonRequest")
 
-	var signature string
-	for {
-		buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
-		require.NoError(t, err)
-		if buttonResp.Payload.Data[0] != "ButtonRequest" {
-			require.Len(t, buttonResp.Payload.Data, 1)
-			signature = buttonResp.Payload.Data[0]
-			break
-		}
-	}
+	signature := resp.Payload.Data[0]
 
 	// verify the message signature
 	fmt.Println(signature)
@@ -497,7 +488,7 @@ func bootstrap(t *testing.T) {
 
 		buttonResp, err := daemonClient.Operations.PostIntermediateButton(nil, addCSRFHeader(t, daemonClient))
 		require.NoError(t, err)
-		require.Equal(t, "Device wiped", buttonResp.Payload.Data[0])
+		require.Equal(t, "User data was wiped from the device", buttonResp.Payload.Data[0])
 
 		// set mnemonic
 		mnemonic := "cloud flower upset remain green metal below cup stem infant art thank"

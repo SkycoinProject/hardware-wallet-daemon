@@ -831,7 +831,7 @@ func TestWipe(t *testing.T) {
 		require.Equal(t, err, "exit status 1")
 	}
 
-	require.Contains(t, string(output), "Device wiped")
+	require.Contains(t, string(output), "User data was wiped from the device")
 
 	output, err = execCommandCombinedOutput([]string{"features"}...)
 	if err != nil {

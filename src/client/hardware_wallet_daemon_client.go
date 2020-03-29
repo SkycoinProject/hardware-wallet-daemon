@@ -6,12 +6,10 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/client/operations"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
-
-	"github.com/skycoin/hardware-wallet-daemon/src/client/operations"
+	"github.com/go-openapi/strfmt"
 )
 
 // Default hardware wallet daemon HTTP client.
@@ -56,9 +54,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *HardwareWa
 
 	cli := new(HardwareWalletDaemon)
 	cli.Transport = transport
-
 	cli.Operations = operations.New(transport, formats)
-
 	return cli
 }
 
@@ -103,7 +99,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // HardwareWalletDaemon is a client for hardware wallet daemon
 type HardwareWalletDaemon struct {
-	Operations *operations.Client
+	Operations operations.ClientService
 
 	Transport runtime.ClientTransport
 }
@@ -111,7 +107,5 @@ type HardwareWalletDaemon struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *HardwareWalletDaemon) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-
 	c.Operations.SetTransport(transport)
-
 }

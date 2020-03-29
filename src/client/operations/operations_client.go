@@ -7,12 +7,11 @@ package operations
 
 import (
 	"github.com/go-openapi/runtime"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new operations API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -24,8 +23,57 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientService is the interface for Client methods
+type ClientService interface {
+	DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteWipeOK, error)
+
+	GetAvailable(params *GetAvailableParams, authInfo runtime.ClientAuthInfoWriter) (*GetAvailableOK, error)
+
+	GetCsrf(params *GetCsrfParams) (*GetCsrfOK, error)
+
+	GetFeatures(params *GetFeaturesParams, authInfo runtime.ClientAuthInfoWriter) (*GetFeaturesOK, error)
+
+	GetVersion(params *GetVersionParams, authInfo runtime.ClientAuthInfoWriter) (*GetVersionOK, error)
+
+	PostApplySettings(params *PostApplySettingsParams, authInfo runtime.ClientAuthInfoWriter) (*PostApplySettingsOK, error)
+
+	PostBackup(params *PostBackupParams, authInfo runtime.ClientAuthInfoWriter) (*PostBackupOK, error)
+
+	PostBitcoinTransactionSign(params *PostBitcoinTransactionSignParams, authInfo runtime.ClientAuthInfoWriter) (*PostBitcoinTransactionSignOK, error)
+
+	PostCheckMessageSignature(params *PostCheckMessageSignatureParams, authInfo runtime.ClientAuthInfoWriter) (*PostCheckMessageSignatureOK, error)
+
+	PostConfigurePinCode(params *PostConfigurePinCodeParams, authInfo runtime.ClientAuthInfoWriter) (*PostConfigurePinCodeOK, error)
+
+	PostGenerateAddresses(params *PostGenerateAddressesParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateAddressesOK, error)
+
+	PostGenerateMnemonic(params *PostGenerateMnemonicParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateMnemonicOK, error)
+
+	PostIntermediateButton(params *PostIntermediateButtonParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediateButtonOK, error)
+
+	PostIntermediatePassphrase(params *PostIntermediatePassphraseParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePassphraseOK, error)
+
+	PostIntermediatePinMatrix(params *PostIntermediatePinMatrixParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePinMatrixOK, error)
+
+	PostIntermediateWord(params *PostIntermediateWordParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediateWordOK, error)
+
+	PostRecovery(params *PostRecoveryParams, authInfo runtime.ClientAuthInfoWriter) (*PostRecoveryOK, error)
+
+	PostSetMnemonic(params *PostSetMnemonicParams, authInfo runtime.ClientAuthInfoWriter) (*PostSetMnemonicOK, error)
+
+	PostSignMessage(params *PostSignMessageParams, authInfo runtime.ClientAuthInfoWriter) (*PostSignMessageOK, error)
+
+	PostTransactionSign(params *PostTransactionSignParams, authInfo runtime.ClientAuthInfoWriter) (*PostTransactionSignOK, error)
+
+	PutCancel(params *PutCancelParams, authInfo runtime.ClientAuthInfoWriter) (*PutCancelOK, error)
+
+	PutFirmwareUpdate(params *PutFirmwareUpdateParams, authInfo runtime.ClientAuthInfoWriter) (*PutFirmwareUpdateOK, error)
+
+	SetTransport(transport runtime.ClientTransport)
+}
+
 /*
-DeleteWipe clean all the configurations.
+  DeleteWipe clean all the configurations.
 */
 func (a *Client) DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteWipeOK, error) {
 	// TODO: Validate the params before sending
@@ -38,7 +86,7 @@ func (a *Client) DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAut
 		Method:             "DELETE",
 		PathPattern:        "/wipe",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &DeleteWipeReader{formats: a.formats},
@@ -49,12 +97,17 @@ func (a *Client) DeleteWipe(params *DeleteWipeParams, authInfo runtime.ClientAut
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DeleteWipeOK), nil
-
+	success, ok := result.(*DeleteWipeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DeleteWipeDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-GetAvailable check whether a skywallet is connected to the machine.
+  GetAvailable check whether a skywallet is connected to the machine.
 */
 func (a *Client) GetAvailable(params *GetAvailableParams, authInfo runtime.ClientAuthInfoWriter) (*GetAvailableOK, error) {
 	// TODO: Validate the params before sending
@@ -67,7 +120,7 @@ func (a *Client) GetAvailable(params *GetAvailableParams, authInfo runtime.Clien
 		Method:             "GET",
 		PathPattern:        "/available",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetAvailableReader{formats: a.formats},
@@ -78,12 +131,17 @@ func (a *Client) GetAvailable(params *GetAvailableParams, authInfo runtime.Clien
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetAvailableOK), nil
-
+	success, ok := result.(*GetAvailableOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetAvailableDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-GetCsrf Returns csrf token
+  GetCsrf Returns csrf token
 */
 func (a *Client) GetCsrf(params *GetCsrfParams) (*GetCsrfOK, error) {
 	// TODO: Validate the params before sending
@@ -96,7 +154,7 @@ func (a *Client) GetCsrf(params *GetCsrfParams) (*GetCsrfOK, error) {
 		Method:             "GET",
 		PathPattern:        "/csrf",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetCsrfReader{formats: a.formats},
@@ -106,12 +164,17 @@ func (a *Client) GetCsrf(params *GetCsrfParams) (*GetCsrfOK, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetCsrfOK), nil
-
+	success, ok := result.(*GetCsrfOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetCsrfDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-GetFeatures Returns device information.
+  GetFeatures Returns device information.
 */
 func (a *Client) GetFeatures(params *GetFeaturesParams, authInfo runtime.ClientAuthInfoWriter) (*GetFeaturesOK, error) {
 	// TODO: Validate the params before sending
@@ -124,7 +187,7 @@ func (a *Client) GetFeatures(params *GetFeaturesParams, authInfo runtime.ClientA
 		Method:             "GET",
 		PathPattern:        "/features",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetFeaturesReader{formats: a.formats},
@@ -135,12 +198,17 @@ func (a *Client) GetFeatures(params *GetFeaturesParams, authInfo runtime.ClientA
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetFeaturesOK), nil
-
+	success, ok := result.(*GetFeaturesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetFeaturesDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-GetVersion Returns daemon version information.
+  GetVersion Returns daemon version information.
 */
 func (a *Client) GetVersion(params *GetVersionParams, authInfo runtime.ClientAuthInfoWriter) (*GetVersionOK, error) {
 	// TODO: Validate the params before sending
@@ -153,7 +221,7 @@ func (a *Client) GetVersion(params *GetVersionParams, authInfo runtime.ClientAut
 		Method:             "GET",
 		PathPattern:        "/version",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetVersionReader{formats: a.formats},
@@ -164,12 +232,17 @@ func (a *Client) GetVersion(params *GetVersionParams, authInfo runtime.ClientAut
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetVersionOK), nil
-
+	success, ok := result.(*GetVersionOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetVersionDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostApplySettings Apply hardware wallet settings.
+  PostApplySettings Apply hardware wallet settings.
 */
 func (a *Client) PostApplySettings(params *PostApplySettingsParams, authInfo runtime.ClientAuthInfoWriter) (*PostApplySettingsOK, error) {
 	// TODO: Validate the params before sending
@@ -193,12 +266,17 @@ func (a *Client) PostApplySettings(params *PostApplySettingsParams, authInfo run
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostApplySettingsOK), nil
-
+	success, ok := result.(*PostApplySettingsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostApplySettingsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostBackup Start seed backup procedure.
+  PostBackup Start seed backup procedure.
 */
 func (a *Client) PostBackup(params *PostBackupParams, authInfo runtime.ClientAuthInfoWriter) (*PostBackupOK, error) {
 	// TODO: Validate the params before sending
@@ -211,7 +289,7 @@ func (a *Client) PostBackup(params *PostBackupParams, authInfo runtime.ClientAut
 		Method:             "POST",
 		PathPattern:        "/backup",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostBackupReader{formats: a.formats},
@@ -222,12 +300,51 @@ func (a *Client) PostBackup(params *PostBackupParams, authInfo runtime.ClientAut
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostBackupOK), nil
-
+	success, ok := result.(*PostBackupOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostBackupDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostCheckMessageSignature Check a message signature matches the given address.
+  PostBitcoinTransactionSign Sign a Bitcoin transaction with the hardware wallet.
+*/
+func (a *Client) PostBitcoinTransactionSign(params *PostBitcoinTransactionSignParams, authInfo runtime.ClientAuthInfoWriter) (*PostBitcoinTransactionSignOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostBitcoinTransactionSignParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostBitcoinTransactionSign",
+		Method:             "POST",
+		PathPattern:        "/bitcoin_transaction_sign",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostBitcoinTransactionSignReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*PostBitcoinTransactionSignOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostBitcoinTransactionSignDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  PostCheckMessageSignature Check a message signature matches the given address.
 */
 func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignatureParams, authInfo runtime.ClientAuthInfoWriter) (*PostCheckMessageSignatureOK, error) {
 	// TODO: Validate the params before sending
@@ -251,12 +368,17 @@ func (a *Client) PostCheckMessageSignature(params *PostCheckMessageSignaturePara
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostCheckMessageSignatureOK), nil
-
+	success, ok := result.(*PostCheckMessageSignatureOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostCheckMessageSignatureDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostConfigurePinCode Configure a pin code on the device.
+  PostConfigurePinCode Configure a pin code on the device.
 */
 func (a *Client) PostConfigurePinCode(params *PostConfigurePinCodeParams, authInfo runtime.ClientAuthInfoWriter) (*PostConfigurePinCodeOK, error) {
 	// TODO: Validate the params before sending
@@ -280,12 +402,17 @@ func (a *Client) PostConfigurePinCode(params *PostConfigurePinCodeParams, authIn
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostConfigurePinCodeOK), nil
-
+	success, ok := result.(*PostConfigurePinCodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostConfigurePinCodeDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostGenerateAddresses Generate addresses for the hardware wallet seed.
+  PostGenerateAddresses Generate addresses for the hardware wallet seed.
 */
 func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateAddressesOK, error) {
 	// TODO: Validate the params before sending
@@ -309,12 +436,17 @@ func (a *Client) PostGenerateAddresses(params *PostGenerateAddressesParams, auth
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostGenerateAddressesOK), nil
-
+	success, ok := result.(*PostGenerateAddressesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostGenerateAddressesDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostGenerateMnemonic Generate mnemonic can be used to initialize the device with a random seed.
+  PostGenerateMnemonic Generate mnemonic can be used to initialize the device with a random seed.
 */
 func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams, authInfo runtime.ClientAuthInfoWriter) (*PostGenerateMnemonicOK, error) {
 	// TODO: Validate the params before sending
@@ -338,12 +470,17 @@ func (a *Client) PostGenerateMnemonic(params *PostGenerateMnemonicParams, authIn
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostGenerateMnemonicOK), nil
-
+	success, ok := result.(*PostGenerateMnemonicOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostGenerateMnemonicDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostIntermediateButton button ack request.
+  PostIntermediateButton button ack request.
 */
 func (a *Client) PostIntermediateButton(params *PostIntermediateButtonParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediateButtonOK, error) {
 	// TODO: Validate the params before sending
@@ -356,7 +493,7 @@ func (a *Client) PostIntermediateButton(params *PostIntermediateButtonParams, au
 		Method:             "POST",
 		PathPattern:        "/intermediate/button",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PostIntermediateButtonReader{formats: a.formats},
@@ -367,12 +504,17 @@ func (a *Client) PostIntermediateButton(params *PostIntermediateButtonParams, au
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostIntermediateButtonOK), nil
-
+	success, ok := result.(*PostIntermediateButtonOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostIntermediateButtonDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostIntermediatePassphrase passphrase ack request.
+  PostIntermediatePassphrase passphrase ack request.
 */
 func (a *Client) PostIntermediatePassphrase(params *PostIntermediatePassphraseParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePassphraseOK, error) {
 	// TODO: Validate the params before sending
@@ -396,12 +538,17 @@ func (a *Client) PostIntermediatePassphrase(params *PostIntermediatePassphrasePa
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostIntermediatePassphraseOK), nil
-
+	success, ok := result.(*PostIntermediatePassphraseOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostIntermediatePassphraseDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostIntermediatePinMatrix pin matrix ack request.
+  PostIntermediatePinMatrix pin matrix ack request.
 */
 func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediatePinMatrixOK, error) {
 	// TODO: Validate the params before sending
@@ -425,12 +572,17 @@ func (a *Client) PostIntermediatePinMatrix(params *PostIntermediatePinMatrixPara
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostIntermediatePinMatrixOK), nil
-
+	success, ok := result.(*PostIntermediatePinMatrixOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostIntermediatePinMatrixDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostIntermediateWord word ack request.
+  PostIntermediateWord word ack request.
 */
 func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams, authInfo runtime.ClientAuthInfoWriter) (*PostIntermediateWordOK, error) {
 	// TODO: Validate the params before sending
@@ -454,12 +606,17 @@ func (a *Client) PostIntermediateWord(params *PostIntermediateWordParams, authIn
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostIntermediateWordOK), nil
-
+	success, ok := result.(*PostIntermediateWordOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostIntermediateWordDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostRecovery Recover existing wallet using seed.
+  PostRecovery Recover existing wallet using seed.
 */
 func (a *Client) PostRecovery(params *PostRecoveryParams, authInfo runtime.ClientAuthInfoWriter) (*PostRecoveryOK, error) {
 	// TODO: Validate the params before sending
@@ -483,12 +640,17 @@ func (a *Client) PostRecovery(params *PostRecoveryParams, authInfo runtime.Clien
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostRecoveryOK), nil
-
+	success, ok := result.(*PostRecoveryOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostRecoveryDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostSetMnemonic Set mnemonic can be used to initialize the device with your own seed.
+  PostSetMnemonic Set mnemonic can be used to initialize the device with your own seed.
 */
 func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams, authInfo runtime.ClientAuthInfoWriter) (*PostSetMnemonicOK, error) {
 	// TODO: Validate the params before sending
@@ -512,12 +674,17 @@ func (a *Client) PostSetMnemonic(params *PostSetMnemonicParams, authInfo runtime
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostSetMnemonicOK), nil
-
+	success, ok := result.(*PostSetMnemonicOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostSetMnemonicDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostSignMessage Sign a message using the secret key at given index.
+  PostSignMessage Sign a message using the secret key at given index.
 */
 func (a *Client) PostSignMessage(params *PostSignMessageParams, authInfo runtime.ClientAuthInfoWriter) (*PostSignMessageOK, error) {
 	// TODO: Validate the params before sending
@@ -541,12 +708,17 @@ func (a *Client) PostSignMessage(params *PostSignMessageParams, authInfo runtime
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostSignMessageOK), nil
-
+	success, ok := result.(*PostSignMessageOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostSignMessageDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostTransactionSign Sign a transaction with the hardware wallet.
+  PostTransactionSign Sign a Skycoin transaction with the hardware wallet.
 */
 func (a *Client) PostTransactionSign(params *PostTransactionSignParams, authInfo runtime.ClientAuthInfoWriter) (*PostTransactionSignOK, error) {
 	// TODO: Validate the params before sending
@@ -570,12 +742,17 @@ func (a *Client) PostTransactionSign(params *PostTransactionSignParams, authInfo
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostTransactionSignOK), nil
-
+	success, ok := result.(*PostTransactionSignOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PostTransactionSignDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PutCancel Cancels the current operation.
+  PutCancel Cancels the current operation.
 */
 func (a *Client) PutCancel(params *PutCancelParams, authInfo runtime.ClientAuthInfoWriter) (*PutCancelOK, error) {
 	// TODO: Validate the params before sending
@@ -588,7 +765,7 @@ func (a *Client) PutCancel(params *PutCancelParams, authInfo runtime.ClientAuthI
 		Method:             "PUT",
 		PathPattern:        "/cancel",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PutCancelReader{formats: a.formats},
@@ -599,12 +776,17 @@ func (a *Client) PutCancel(params *PutCancelParams, authInfo runtime.ClientAuthI
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PutCancelOK), nil
-
+	success, ok := result.(*PutCancelOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PutCancelDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PutFirmwareUpdate Update firmware
+  PutFirmwareUpdate Update firmware
 */
 func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams, authInfo runtime.ClientAuthInfoWriter) (*PutFirmwareUpdateOK, error) {
 	// TODO: Validate the params before sending
@@ -617,7 +799,7 @@ func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams, authInfo run
 		Method:             "PUT",
 		PathPattern:        "/firmware_update",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &PutFirmwareUpdateReader{formats: a.formats},
@@ -628,8 +810,13 @@ func (a *Client) PutFirmwareUpdate(params *PutFirmwareUpdateParams, authInfo run
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PutFirmwareUpdateOK), nil
-
+	success, ok := result.(*PutFirmwareUpdateOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PutFirmwareUpdateDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 // SetTransport changes the transport on the client

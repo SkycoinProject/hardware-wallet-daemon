@@ -6,20 +6,20 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // SignMessageRequest sign message request
+//
 // swagger:model SignMessageRequest
 type SignMessageRequest struct {
 
 	// address n
 	// Required: true
-	AddressN *int64 `json:"address_n"`
+	Addressn *int64 `json:"address_n"`
 
 	// message
 	// Required: true
@@ -30,7 +30,7 @@ type SignMessageRequest struct {
 func (m *SignMessageRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAddressN(formats); err != nil {
+	if err := m.validateAddressn(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -44,9 +44,9 @@ func (m *SignMessageRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *SignMessageRequest) validateAddressN(formats strfmt.Registry) error {
+func (m *SignMessageRequest) validateAddressn(formats strfmt.Registry) error {
 
-	if err := validate.Required("address_n", "body", m.AddressN); err != nil {
+	if err := validate.Required("address_n", "body", m.Addressn); err != nil {
 		return err
 	}
 

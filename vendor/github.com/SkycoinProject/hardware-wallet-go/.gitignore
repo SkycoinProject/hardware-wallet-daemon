@@ -22,3 +22,5 @@ DS_Store
 .idea
 .vscode
 
+vendor/
+Gopkg.lock

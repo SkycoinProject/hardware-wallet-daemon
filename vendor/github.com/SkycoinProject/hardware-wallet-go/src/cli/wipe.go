@@ -61,7 +61,11 @@ func wipeCmd() gcli.Command {
 				return
 			}
 
-			fmt.Println(responseMsg)
+			if len(responseMsg) > 0 {
+				fmt.Println(responseMsg)
+			} else {
+				fmt.Println("Firmware was successfully wiped from the device")
+			}
 		},
 	}
 }

@@ -12,7 +12,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/skycoin/hardware-wallet-daemon/src/models"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/models"
 )
 
 // PostSetMnemonicReader is a Reader for the PostSetMnemonic structure.
@@ -53,12 +53,12 @@ func NewPostSetMnemonicOK() *PostSetMnemonicOK {
 success
 */
 type PostSetMnemonicOK struct {
-	Payload *models.HttpsuccessResponse
+	Payload *models.HTTPSuccessResponse
 }
 
 func (o *PostSetMnemonicOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.HttpsuccessResponse)
+	o.Payload = new(models.HTTPSuccessResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

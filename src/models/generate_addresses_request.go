@@ -6,20 +6,23 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GenerateAddressesRequest generate addresses request
+//
 // swagger:model GenerateAddressesRequest
 type GenerateAddressesRequest struct {
 
 	// address n
 	// Required: true
-	AddressN *int64 `json:"address_n"`
+	Addressn *int64 `json:"address_n"`
+
+	// coin type
+	CoinType string `json:"coin_type,omitempty"`
 
 	// confirm address
 	ConfirmAddress bool `json:"confirm_address,omitempty"`
@@ -32,7 +35,7 @@ type GenerateAddressesRequest struct {
 func (m *GenerateAddressesRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAddressN(formats); err != nil {
+	if err := m.validateAddressn(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -42,9 +45,9 @@ func (m *GenerateAddressesRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *GenerateAddressesRequest) validateAddressN(formats strfmt.Registry) error {
+func (m *GenerateAddressesRequest) validateAddressn(formats strfmt.Registry) error {
 
-	if err := validate.Required("address_n", "body", m.AddressN); err != nil {
+	if err := validate.Required("address_n", "body", m.Addressn); err != nil {
 		return err
 	}
 

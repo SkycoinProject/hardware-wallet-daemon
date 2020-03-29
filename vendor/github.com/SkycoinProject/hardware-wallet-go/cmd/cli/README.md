@@ -181,8 +181,9 @@ $ skycoin-hw-cli addressGen [number of addresses] [start index]
 ```
 OPTIONS:
         --addressN value            Number of addresses to generate (default: 1)
-        --startIndex value          Start to genereate deterministic addresses from startIndex (default: 0)
+        --startIndex value          Start to generate deterministic addresses from startIndex (default: 0)
         --confirmAddress            If requesting one address it will be sent only if user confirms operation by pressing device's button.
+        --coinType                  Coin Type, which will be used on hardware-wallet. Supported values: SKY, BTC (default: SKY)) 
 ```
 
 #### Examples
@@ -535,11 +536,13 @@ Ask the device to sign a message using the secret key at given index.
 ```
 OPTIONS:
         --inputHash value                   Hash of the Input of the transaction we expect the device to sign
+        --prevHash value                    Hash of the previous transaction we expect the device to sign (for BTC)
         --inputIndex value                  Index of the input in the wallet
         --outputAddress string              Addresses of the output for the transaction
         --coin value                        Amount of coins
         --hour value                        Number of hours
         --addressIndex value                If the address is a return address tell its index in the wallet
+        --coinType                          Coin Type, which will be used on hardware-wallet. Supported values: SKY, BTC (default: SKY)) 
 ```
 
 ```bash

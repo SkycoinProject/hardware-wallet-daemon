@@ -241,6 +241,7 @@ func newServerMux(c muxConfig, gateway Gatewayer) *http.ServeMux {
 	webHandlerV1("/configure_pin_code", configurePinCode(gateway))
 	webHandlerV1("/sign_message", signMessage(gateway))
 	webHandlerV1("/transaction_sign", transactionSign(gateway))
+	webHandlerV1("/bitcoin_transaction_sign", bitcoinTransactionSign(gateway))
 	webHandlerV1("/wipe", wipe(gateway))
 
 	webHandlerV1("/intermediate/pin_matrix", pinMatrixRequestHandler(gateway))

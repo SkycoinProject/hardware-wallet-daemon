@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
+
 	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/usb"
 
 	"github.com/SkycoinProject/skycoin/src/util/logging"
@@ -54,7 +56,7 @@ var (
 
 // Devicer provides api for the hw wallet functions
 type Devicer interface {
-	AddressGen(addressN, startIndex uint32, confirmAddress bool) (wire.Message, error)
+	AddressGen(addressN, startIndex uint32, confirmAddress bool, coinType CoinType) (wire.Message, error)
 	ApplySettings(usePassphrase *bool, label string, language string) (wire.Message, error)
 	Backup() (wire.Message, error)
 	Cancel() (wire.Message, error)
@@ -68,6 +70,7 @@ type Devicer interface {
 	Recovery(wordCount uint32, usePassphrase *bool, dryRun bool) (wire.Message, error)
 	SetMnemonic(mnemonic string) (wire.Message, error)
 	TransactionSign(inputs []*messages.SkycoinTransactionInput, outputs []*messages.SkycoinTransactionOutput) (wire.Message, error)
+	GeneralTransactionSign(signer TransactionSigner) ([]string, error)
 	SignMessage(addressIndex int, message string) (wire.Message, error)
 	Wipe() (wire.Message, error)
 	PinMatrixAck(p string) (wire.Message, error)
@@ -192,7 +195,7 @@ func (d *Device) GetUsbInfo() ([]usb.Info, error) {
 }
 
 // AddressGen Ask the device to generate an address
-func (d *Device) AddressGen(addressN, startIndex uint32, confirmAddress bool) (wire.Message, error) {
+func (d *Device) AddressGen(addressN, startIndex uint32, confirmAddress bool, coinType CoinType) (wire.Message, error) {
 	if err := d.Connect(); err != nil {
 		return wire.Message{}, err
 	}
@@ -202,7 +205,7 @@ func (d *Device) AddressGen(addressN, startIndex uint32, confirmAddress bool) (w
 		return wire.Message{}, ErrAddressNZero
 	}
 
-	addressGenChunks, err := MessageAddressGen(addressN, startIndex, confirmAddress)
+	addressGenChunks, err := MessageAddressGen(addressN, startIndex, confirmAddress, coinType)
 	if err != nil {
 		return wire.Message{}, err
 	}
@@ -755,12 +758,98 @@ func (d *Device) TransactionSign(inputs []*messages.SkycoinTransactionInput, out
 	}
 	defer d.Disconnect()
 
-	transactionSignChunks, err := MessageTransactionSign(inputs, outputs)
+	var transactionInputs []*messages.TxAck_TransactionType_TxInputType
+	var transactionOutputs []*messages.TxAck_TransactionType_TxOutputType
+
+	for _, input := range inputs {
+		transactionInputs = append(transactionInputs, &messages.TxAck_TransactionType_TxInputType{
+			AddressN: make([]uint32, *input.Index),
+			HashIn:   input.HashIn,
+		})
+	}
+	for _, output := range outputs {
+		transactionOutputs = append(transactionOutputs, &messages.TxAck_TransactionType_TxOutputType{
+			Address: output.Address,
+			Coins:   output.Coin,
+			Hours:   output.Hour,
+		})
+		if output.AddressIndex != nil {
+			transactionOutputs[len(transactionOutputs)-1].AddressN = make([]uint32, *output.AddressIndex)
+		}
+	}
+	signer := SkycoinTransactionSigner{
+		Device:   d,
+		Inputs:   transactionInputs,
+		Outputs:  transactionOutputs,
+		Version:  1,
+		LockTime: 0,
+	}
+	signatures, err := signer.Sign()
+	if err != nil {
+		return wire.Message{}, err
+	}
+	padding := false
+	data, err := proto.Marshal(&messages.ResponseTransactionSign{
+		Padding:    &padding,
+		Signatures: signatures,
+	})
+	if err != nil {
+		return wire.Message{}, err
+	}
+	return wire.Message{
+		Kind: uint16(messages.MessageType_MessageType_ResponseTransactionSign),
+		Data: data,
+	}, nil
+}
+
+// GeneralTransactionSign Ask the device to sign a transaction using the given TransactionSigner
+func (d *Device) GeneralTransactionSign(signer TransactionSigner) ([]string, error) {
+	signer.SetDevice(d)
+	return signer.Sign()
+}
+
+// SignTx Ask the device to sign a long transaction using the given information.
+func (d *Device) SignTx(outputsCount int, inputsCount int, coinName string, version int, lockTime int, txHash string) (wire.Message, error) {
+	if err := d.Connect(); err != nil {
+		return wire.Message{}, err
+	}
+	defer d.Disconnect()
+
+	signTxChunks, err := MessageSignTx(outputsCount, inputsCount, coinName, version, lockTime, txHash)
+
 	if err != nil {
 		return wire.Message{}, err
 	}
 
-	return d.Driver.SendToDevice(d.dev, transactionSignChunks)
+	return d.Driver.SendToDevice(d.dev, signTxChunks)
+}
+
+// TxAck Ask the device to continue a long transaction using the given information.
+func (d *Device) TxAck(inputs []*messages.TxAck_TransactionType_TxInputType, outputs []*messages.TxAck_TransactionType_TxOutputType, version int, lockTime int) (wire.Message, error) {
+	if err := d.Connect(); err != nil {
+		return wire.Message{}, err
+	}
+	defer d.Disconnect()
+	txAckChunks, err := MessageTxAck(inputs, outputs, version, lockTime)
+	if err != nil {
+		return wire.Message{}, err
+	}
+
+	return d.Driver.SendToDevice(d.dev, txAckChunks)
+}
+
+// BitcoinTxAck ask the device to continue a Bitcoin long transaction using the given information.
+func (d *Device) BitcoinTxAck(inputs []*messages.BitcoinTransactionInput, outputs []*messages.BitcoinTransactionOutput) (wire.Message, error) {
+	if err := d.Connect(); err != nil {
+		return wire.Message{}, err
+	}
+	defer d.Disconnect()
+	txAckChunks, err := BitcoinMessageTxAck(inputs, outputs)
+	if err != nil {
+		return wire.Message{}, err
+	}
+
+	return d.Driver.SendToDevice(d.dev, txAckChunks)
 }
 
 // Wipe wipes out device configuration

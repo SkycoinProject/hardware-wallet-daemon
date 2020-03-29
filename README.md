@@ -2,8 +2,8 @@
 
 # Hardware Wallet Daemon
 [![Build Status](https://travis-ci.com/skycoin/hardware-wallet-daemon.svg)](https://travis-ci.com/skycoin/hardware-wallet-daemon)
-[![GoDoc](https://godoc.org/github.com/skycoin/hardware-wallet-daemon?status.svg)](https://godoc.org/github.com/skycoin/hardware-walletd-daemon)
-[![Go Report Card](https://goreportcard.com/badge/github.com/skycoin/hardware-wallet-daemon)](https://goreportcard.com/report/github.com/skycoin/hardware-wallet-daemon)
+[![GoDoc](https://godoc.org/github.com/SkycoinProject/hardware-wallet-daemon?status.svg)](https://godoc.org/github.com/SkycoinProject/hardware-walletd-daemon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SkycoinProject/hardware-wallet-daemon)](https://goreportcard.com/report/github.com/SkycoinProject/hardware-wallet-daemon)
 
 The hardware walllet daemon provides an HTTP API to interface with the wallets supported by skycoin.
 It uses the go bindings provided by the hardware wallet go [library](https://github.com/SkycoinProject/hardware-wallet-go).
@@ -56,20 +56,20 @@ You can use the `-daemon-mode` flag to enable the required mode or use the `make
 
 Example(USB Mode):
 ```sh
-$ cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
+$ cd $GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon
 $ make run-usb
 ```
 
 Example(Emulator Mode):
 ```sh
-$ cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
+$ cd $GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon
 $ make run-emulator
 ```
 
 ### Show Daemon options
 
 ```sh
-$ cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
+$ cd $GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon
 $ make run-help
 ```
 
@@ -94,7 +94,7 @@ The project has two branches: `master` and `develop`.
 Hardware wallet daemon uses swagger for the API specification. It follows OpenAPI 2.0.
 
 The go client has been automatically generated using [go-swagger](https://github.com/go-swagger/go-swagger) and the swagger specification.
->Note: The go client uses a slightly modified response [template](https://github.com/skycoin/hardware-wallet-daemon/blog/master/templates/client).
+>Note: The go client uses a slightly modified response [template](https://github.com/SkycoinProject/hardware-wallet-daemon/blog/master/templates/client).
 
 The swagger specification can be used to generate more libraries in the required language.
 
@@ -303,7 +303,7 @@ dep ensure github.com/foo/bar@tag
 
 #### Pre-release testing
 
-Pre-release testing procedure requires [skycoin-cli](https://github.com/SkycoinProject/skycoin/tree/develop/cmd/cli) of version strictly greater than `0.26.0`. Please [install it](https://github.com/SkycoinProject/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/SkycoinProject/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/skycoin/hardware-wallet/) in advance.
+Pre-release testing procedure requires [skycoin-cli](https://github.com/SkycoinProject/skycoin/tree/develop/cmd/cli) of version strictly greater than `0.26.0`. Please [install it](https://github.com/SkycoinProject/skycoin/blob/develop/cmd/cli/README.md#install) if not available in your system. Some operations in the process require [running a Skycoin node](https://github.com/SkycoinProject/skycoin/tree/master/INTEGRATION.md#running-the-skycoin-node). Also clone [Skywallet firmware repository](https://github.com/SkycoinProject/hardware-wallet/) in advance.
 
 The instructions that follow are meant to be followed for Skywallet devices flashed without memory protection. If your device memory is protected then some values might be different e.g. `firmware_features`.
 
@@ -340,7 +340,7 @@ make check
 
 - Run daemon service in background or a separate terminal window
 ```sh
-cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon/
+cd $GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon/
 make run-usb
 ```
 - Create new wallet e.g. with `skycoin-cli` (or reuse existing wallet for testing purposes)

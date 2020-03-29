@@ -2,13 +2,16 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
+	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
 	messages "github.com/SkycoinProject/hardware-wallet-protob/go"
+
+	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
 	"github.com/stretchr/testify/require"
 )
 
@@ -84,6 +87,7 @@ func TestGenerateAddresses(t *testing.T) {
 			status:      http.StatusUnprocessableEntity,
 			httpBody: toJSON(t, &GenerateAddressesRequest{
 				AddressN: -2,
+				CoinType: "SKY",
 			}),
 			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "address_n cannot be negative"),
 		},
@@ -96,8 +100,22 @@ func TestGenerateAddresses(t *testing.T) {
 			httpBody: toJSON(t, &GenerateAddressesRequest{
 				AddressN:   2,
 				StartIndex: -2,
+				CoinType:   "SKY",
 			}),
 			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "start_index cannot be negative"),
+		},
+
+		{
+			name:        "422 - Non existing coin type",
+			method:      http.MethodPost,
+			contentType: ContentTypeJSON,
+			status:      http.StatusUnprocessableEntity,
+			httpBody: toJSON(t, &GenerateAddressesRequest{
+				AddressN:   2,
+				StartIndex: 0,
+				CoinType:   "AAA",
+			}),
+			httpResponse: NewHTTPErrorResponse(http.StatusUnprocessableEntity, "currently unsupported coin"),
 		},
 
 		{
@@ -108,6 +126,7 @@ func TestGenerateAddresses(t *testing.T) {
 			httpBody: toJSON(t, &GenerateAddressesRequest{
 				AddressN:   2,
 				StartIndex: 0,
+				CoinType:   "SKY",
 			}),
 			gatewayAddressGenResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_Failure),
@@ -124,6 +143,7 @@ func TestGenerateAddresses(t *testing.T) {
 			httpBody: toJSON(t, &GenerateAddressesRequest{
 				AddressN:   2,
 				StartIndex: 0,
+				CoinType:   "SKY",
 			}),
 			gatewayAddressGenResult: wire.Message{
 				Kind: uint16(messages.MessageType_MessageType_ResponseSkycoinAddress),
@@ -143,7 +163,11 @@ func TestGenerateAddresses(t *testing.T) {
 			var body GenerateAddressesRequest
 			err := json.Unmarshal([]byte(tc.httpBody), &body)
 			if err == nil {
-				gateway.On("AddressGen", uint32(body.AddressN), uint32(body.StartIndex), body.ConfirmAddress).Return(tc.gatewayAddressGenResult, nil)
+				coinType, err := skyWallet.CoinTypeFromString(body.CoinType)
+				log.Printf("%s", err)
+				if err == nil {
+					gateway.On("AddressGen", uint32(body.AddressN), uint32(body.StartIndex), body.ConfirmAddress, coinType).Return(tc.gatewayAddressGenResult, nil)
+				}
 			}
 
 			req, err := http.NewRequest(tc.method, "/api/v1"+endpoint, strings.NewReader(tc.httpBody))

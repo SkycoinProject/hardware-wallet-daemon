@@ -6,13 +6,13 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // VersionResponse version response
+//
 // swagger:model VersionResponse
 type VersionResponse struct {
 
@@ -71,6 +71,7 @@ func (m *VersionResponse) UnmarshalBinary(b []byte) error {
 }
 
 // VersionResponseData version response data
+//
 // swagger:model VersionResponseData
 type VersionResponseData struct {
 

@@ -6,7 +6,7 @@ matrix:
   include:
     - os: linux
       env:
-        - PIP='sudo pip'
+        - PIP='sudo pip3'
 env:
   global:
     - XARGS="-screen 0 1024x768x24"

@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
-	"github.com/skycoin/hardware-wallet-daemon/src/api"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/api"
 
 	"github.com/SkycoinProject/skycoin/src/util/logging"
 
-	"github.com/skycoin/hardware-wallet-daemon/src/daemon"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/daemon"
 )
 
 var (

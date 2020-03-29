@@ -20,11 +20,11 @@ run-help: ## Show daemon help
 
 test: ## Run tests for hardware wallet daemon
 	@mkdir -p coverage/
-	go test -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
+	go test -coverpkg="github.com/SkycoinProject/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
 test-race: ## Run tests for hardware wallet daemon with race flag
 	@mkdir -p coverage/
-	go test -race -coverpkg="github.com/skycoin/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
+	go test -race -coverpkg="github.com/SkycoinProject/hardware-wallet-daemon/..." -coverprofile=coverage/go-test-cmd.coverage.out -timeout=5m ./src/...
 
 test-integration-emulator: ## Run emulator integration tests
 	./ci-scripts/integration-test.sh -a -m EMULATOR -n emulator-integration
@@ -71,8 +71,8 @@ install-linters: ## Install linters
 	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(shell go env GOPATH)/bin v1.16.0
 
 format: ## Formats the code. Must have goimports installed (use make install-linters).
-	goimports -w -local github.com/skycoin/hardware-wallet-daemon ./cmd
-	goimports -w -local github.com/skycoin/hardware-wallet-daemon ./src
+	goimports -w -local github.com/SkycoinProject/hardware-wallet-daemon ./cmd
+	goimports -w -local github.com/SkycoinProject/hardware-wallet-daemon ./src
 
 generate-client: ## Generate go client using swagger
 	swagger generate client swagger.yml --template-dir templates -t ./src

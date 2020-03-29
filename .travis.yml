@@ -11,7 +11,7 @@ matrix:
   include:
     - os: linux
       env:
-        - PIP='sudo pip'
+        - PIP='sudo pip3'
       dist: xenial
     - os: osx
       if: type != pull_request
@@ -23,11 +23,11 @@ env:
     - XARGS="-screen 0 1024x768x24"
 
 install:
-  - if [[ ! -d "$GOPATH/src/github.com/skycoin/hardware-wallet-daemon" ]]; then
-    mkdir -p "$GOPATH/src/github.com/skycoin";
-    cp -rf $TRAVIS_BUILD_DIR $GOPATH/src/github.com/skycoin/;
+  - if [[ ! -d "$GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon" ]]; then
+    mkdir -p "$GOPATH/src/github.com/SkycoinProject";
+    cp -rf $TRAVIS_BUILD_DIR $GOPATH/src/github.com/SkycoinProject/;
     fi
-  - cd $GOPATH/src/github.com/skycoin/hardware-wallet-daemon
+  - cd $GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon
   - if [[ $TRAVIS_OS_NAME == 'linux' && "$TRAVIS_PULL_REQUEST" == false ]]; then
     docker pull karalabe/xgo-latest ;
     go get github.com/karalabe/xgo;

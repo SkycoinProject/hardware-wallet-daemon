@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/SkycoinProject/hardware-wallet-go/src/skywallet/wire"
-
 	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
 	messages "github.com/SkycoinProject/hardware-wallet-protob/go"
 	"github.com/SkycoinProject/skycoin/src/cipher"
@@ -89,13 +87,19 @@ func transactionSign(gateway Gatewayer) http.HandlerFunc {
 			}
 		}
 
-		var msg wire.Message
+		var signatures []string
 		retCH := make(chan int)
 		errCH := make(chan int)
 		ctx := r.Context()
 
 		go func() {
-			msg, err = gateway.TransactionSign(txnInputs, txnOutputs)
+			signer := skyWallet.SkycoinTransactionSigner{
+				Inputs:   txnInputs,
+				Outputs:  txnOutputs,
+				Version:  1,
+				LockTime: 0,
+			}
+			signatures, err = gateway.GeneralTransactionSign(&signer)
 			if err != nil {
 				errCH <- 1
 				return
@@ -105,7 +109,9 @@ func transactionSign(gateway Gatewayer) http.HandlerFunc {
 
 		select {
 		case <-retCH:
-			HandleFirmwareResponseMessages(w, msg)
+			writeHTTPResponse(w, HTTPResponse{
+				Data: &signatures,
+			})
 		case <-errCH:
 			logger.Errorf("transactionSign failed: %s", err.Error())
 			resp := NewHTTPErrorResponse(http.StatusInternalServerError, err.Error())
@@ -152,25 +158,25 @@ func (r *TransactionSignRequest) validate() error {
 }
 
 // TransactionParams returns params for a transaction from the request data
-func (r *TransactionSignRequest) TransactionParams() ([]*messages.SkycoinTransactionInput, []*messages.SkycoinTransactionOutput, error) {
-	var transactionInputs []*messages.SkycoinTransactionInput
-	var transactionOutputs []*messages.SkycoinTransactionOutput
+func (r *TransactionSignRequest) TransactionParams() ([]*messages.TxAck_TransactionType_TxInputType, []*messages.TxAck_TransactionType_TxOutputType, error) {
+	var transactionInputs []*messages.TxAck_TransactionType_TxInputType
+	var transactionOutputs []*messages.TxAck_TransactionType_TxOutputType
 
 	for _, input := range r.TransactionInputs {
-		var transactionInput messages.SkycoinTransactionInput
+		var transactionInput messages.TxAck_TransactionType_TxInputType
 
 		transactionInput.HashIn = proto.String(input.Hash)
 
 		if input.Index != nil {
-			transactionInput.Index = proto.Uint32(*input.Index)
+			transactionInput.AddressN = []uint32{*proto.Uint32(*input.Index)}
 		} else {
-			transactionInput.Index = nil
+			transactionInput.AddressN = nil
 		}
 		transactionInputs = append(transactionInputs, &transactionInput)
 	}
 
 	for _, output := range r.TransactionOutputs {
-		var transactionOutput messages.SkycoinTransactionOutput
+		var transactionOutput messages.TxAck_TransactionType_TxOutputType
 
 		_, err := cipher.DecodeBase58Address(output.Address)
 		if err != nil {
@@ -188,11 +194,11 @@ func (r *TransactionSignRequest) TransactionParams() ([]*messages.SkycoinTransac
 		}
 
 		transactionOutput.Address = proto.String(output.Address)
-		transactionOutput.Coin = proto.Uint64(coins)
-		transactionOutput.Hour = proto.Uint64(hours)
+		transactionOutput.Coins = proto.Uint64(coins)
+		transactionOutput.Hours = proto.Uint64(hours)
 
 		if output.AddressIndex != nil {
-			transactionOutput.AddressIndex = proto.Uint32(*output.AddressIndex)
+			transactionOutput.AddressN = []uint32{*proto.Uint32(*output.AddressIndex)}
 		}
 
 		transactionOutputs = append(transactionOutputs, &transactionOutput)

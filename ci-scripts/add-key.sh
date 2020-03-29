@@ -19,7 +19,7 @@ security set-keychain-settings -t 3600 -u $KEY_CHAIN
 
 # Add certificates to keychain and allow codesign to access them
 echo "import distp12"
-security import $GOPATH/src/github.com/skycoin/hardware-wallet-daemon/ci-scripts/certs/pkg-dist.p12 -k $KEY_CHAIN -P $CERT_PWD  -A /usr/bin/productsign
+security import $GOPATH/src/github.com/SkycoinProject/hardware-wallet-daemon/ci-scripts/certs/pkg-dist.p12 -k $KEY_CHAIN -P $CERT_PWD  -A /usr/bin/productsign
 
 echo "list keychains: "
 security list-keychains

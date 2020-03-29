@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/skycoin/hardware-wallet-daemon/src/api"
+	"github.com/SkycoinProject/hardware-wallet-daemon/src/api"
 
 	skyWallet "github.com/SkycoinProject/hardware-wallet-go/src/skywallet"
 

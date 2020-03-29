@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+### Security
+
+## v1.0.0
+
+### Added
+
 - Add travis CD instructions for github releases.
 - Add BitEncodedFlags to encode/decode flags from/to a string.
 - Add remove PIN code.
@@ -28,6 +40,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Only connect to `USB` devices announcing Skycoin vendor and product through HID.
 - Add `Available` function to check if a skycoin wallet is connected to the system.
 - Added cli integration tests.
+- Added BTC Adresses support
 
 ### Fixed
 
@@ -45,6 +58,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Remove `protobuf` files from the project.
 - Installation instructions for `protobuf` related tools, use this from `hardware-wallet-protob` submodule.
-
-### Security
-
